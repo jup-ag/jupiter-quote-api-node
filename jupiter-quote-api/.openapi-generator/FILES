@@ -1,0 +1,13 @@
+.openapi-generator-ignore
+apis/DefaultApi.ts
+apis/index.ts
+index.ts
+models/InlineObject.ts
+models/InlineResponseDefault.ts
+models/InlineResponseDefault1.ts
+models/InlineResponseDefaultData.ts
+models/InlineResponseDefaultLpFee.ts
+models/InlineResponseDefaultMarketInfos.ts
+models/V1SwapRoute.ts
+models/index.ts
+runtime.ts

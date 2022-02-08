@@ -1,0 +1,231 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Jupiter API",
+    "description": "Jupiter quote and swap API",
+    "version": "0.0.0"
+  },
+  "definitions": { "def-0": { "title": "defs" } },
+  "paths": {
+    "/ping": {
+      "get": { "responses": { "200": { "description": "Default Response" } } }
+    },
+    "/v1/quote": {
+      "get": {
+        "summary": "Return route",
+        "description": "Get quote for a given input mint, output mint and amount",
+        "tags": [],
+        "parameters": [
+          {
+            "type": "string",
+            "description": "inputMint",
+            "required": true,
+            "in": "path",
+            "name": "inputMint"
+          },
+          {
+            "type": "string",
+            "description": "outputMint",
+            "required": true,
+            "in": "path",
+            "name": "outputMint"
+          },
+          {
+            "type": "number",
+            "description": "amount",
+            "required": true,
+            "in": "path",
+            "name": "amount"
+          },
+          {
+            "type": "number",
+            "description": "slippage",
+            "required": true,
+            "in": "path",
+            "name": "slippage"
+          },
+          {
+            "type": "number",
+            "description": "fee bps",
+            "optional": true,
+            "required": true,
+            "in": "path",
+            "name": "feeBps"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Default response",
+            "schema": {
+              "description": "Default response",
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [],
+                    "properties": {
+                      "inAmount": { "type": "number" },
+                      "outAmount": { "type": "number" },
+                      "outAmountWithSlippage": { "type": "number" },
+                      "priceImpactPct": { "type": "number" },
+                      "marketInfos": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": [],
+                          "properties": {
+                            "id": { "type": "string" },
+                            "label": { "type": "string" },
+                            "inputMint": { "type": "string" },
+                            "outputMint": { "type": "string" },
+                            "notEnoughLiquidity": { "type": "boolean" },
+                            "inAmount": { "type": "number" },
+                            "outAmount": { "type": "number" },
+                            "priceImpactPct": { "type": "number" },
+                            "lpFee": {
+                              "type": "object",
+                              "properties": {
+                                "amount": { "type": "number" },
+                                "mint": { "type": "string" },
+                                "pct": { "type": "number" }
+                              }
+                            },
+                            "platformFee": {
+                              "type": "object",
+                              "properties": {
+                                "amount": { "type": "number" },
+                                "mint": { "type": "string" },
+                                "pct": { "type": "number" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "timeTaken": { "type": "number" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/swap": {
+      "post": {
+        "summary": "Return setup, swap and cleanup transactions",
+        "description": "Get swap serialized transactions for a route",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "route": {
+                  "type": "object",
+                  "description": "Data from /v1/quote",
+                  "required": [],
+                  "properties": {
+                    "inAmount": { "type": "number" },
+                    "outAmount": { "type": "number" },
+                    "outAmountWithSlippage": { "type": "number" },
+                    "priceImpactPct": { "type": "number" },
+                    "marketInfos": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [],
+                        "properties": {
+                          "id": { "type": "string" },
+                          "label": { "type": "string" },
+                          "inputMint": { "type": "string" },
+                          "outputMint": { "type": "string" },
+                          "notEnoughLiquidity": { "type": "boolean" },
+                          "inAmount": { "type": "number" },
+                          "outAmount": { "type": "number" },
+                          "priceImpactPct": { "type": "number" },
+                          "lpFee": {
+                            "type": "object",
+                            "properties": {
+                              "amount": { "type": "number" },
+                              "mint": { "type": "string" },
+                              "pct": { "type": "number" }
+                            }
+                          },
+                          "platformFee": {
+                            "type": "object",
+                            "properties": {
+                              "amount": { "type": "number" },
+                              "mint": { "type": "string" },
+                              "pct": { "type": "number" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "wrapUnwrapSOL": {
+                  "type": "boolean",
+                  "description": "Wrap/unwrap SOL",
+                  "optional": true
+                },
+                "feeAccount": {
+                  "type": "string",
+                  "description": "fee account",
+                  "optional": true
+                },
+                "userPublicKey": {
+                  "type": "string",
+                  "description": "Public key of the user"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Default response",
+            "schema": {
+              "description": "Default response",
+              "type": "object",
+              "properties": {
+                "setupTransaction": {
+                  "type": "string",
+                  "description": "Base64 encoded transaction"
+                },
+                "swapTransaction": {
+                  "type": "string",
+                  "description": "Base64 encoded transaction"
+                },
+                "cleanupTransaction": {
+                  "type": "string",
+                  "description": "Base64 encoded transaction"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/route-map": {
+      "get": {
+        "description": "Returns a hash map, input mint as key and an array of valid output mint as values",
+        "responses": { "200": { "description": "Default Response" } }
+      }
+    },
+    "/v1/indexed-route-map": {
+      "get": {
+        "description": "Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size",
+        "responses": { "200": { "description": "Default Response" } }
+      }
+    }
+  },
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"]
+}
