@@ -20,36 +20,36 @@
             "type": "string",
             "description": "inputMint",
             "required": true,
-            "in": "path",
+            "in": "query",
             "name": "inputMint"
           },
           {
             "type": "string",
             "description": "outputMint",
             "required": true,
-            "in": "path",
+            "in": "query",
             "name": "outputMint"
           },
           {
             "type": "number",
             "description": "amount",
             "required": true,
-            "in": "path",
+            "in": "query",
             "name": "amount"
           },
           {
             "type": "number",
             "description": "slippage",
-            "required": true,
-            "in": "path",
+            "required": false,
+            "in": "query",
             "name": "slippage"
           },
           {
             "type": "number",
             "description": "fee bps",
             "optional": true,
-            "required": true,
-            "in": "path",
+            "required": false,
+            "in": "query",
             "name": "feeBps"
           }
         ],

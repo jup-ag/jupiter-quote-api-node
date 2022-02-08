@@ -42,8 +42,6 @@ export async function main() {
     inputMint: "So11111111111111111111111111111111111111112",
     outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     amount: 100000000,
-    slippage: 0.5,
-    feeBps: 0,
   });
   console.log(quote?.data ? quote.data[0] : "Nothing");
 

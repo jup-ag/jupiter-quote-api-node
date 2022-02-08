@@ -30,8 +30,8 @@ export interface V1QuoteGetRequest {
     inputMint: string;
     outputMint: string;
     amount: number;
-    slippage: number;
-    feeBps: number;
+    slippage?: number;
+    feeBps?: number;
 }
 
 export interface V1SwapPostRequest {
@@ -108,20 +108,32 @@ export class DefaultApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('amount','Required parameter requestParameters.amount was null or undefined when calling v1QuoteGet.');
         }
 
-        if (requestParameters.slippage === null || requestParameters.slippage === undefined) {
-            throw new runtime.RequiredError('slippage','Required parameter requestParameters.slippage was null or undefined when calling v1QuoteGet.');
-        }
-
-        if (requestParameters.feeBps === null || requestParameters.feeBps === undefined) {
-            throw new runtime.RequiredError('feeBps','Required parameter requestParameters.feeBps was null or undefined when calling v1QuoteGet.');
-        }
-
         const queryParameters: any = {};
+
+        if (requestParameters.inputMint !== undefined) {
+            queryParameters['inputMint'] = requestParameters.inputMint;
+        }
+
+        if (requestParameters.outputMint !== undefined) {
+            queryParameters['outputMint'] = requestParameters.outputMint;
+        }
+
+        if (requestParameters.amount !== undefined) {
+            queryParameters['amount'] = requestParameters.amount;
+        }
+
+        if (requestParameters.slippage !== undefined) {
+            queryParameters['slippage'] = requestParameters.slippage;
+        }
+
+        if (requestParameters.feeBps !== undefined) {
+            queryParameters['feeBps'] = requestParameters.feeBps;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v1/quote`.replace(`{${"inputMint"}}`, encodeURIComponent(String(requestParameters.inputMint))).replace(`{${"outputMint"}}`, encodeURIComponent(String(requestParameters.outputMint))).replace(`{${"amount"}}`, encodeURIComponent(String(requestParameters.amount))).replace(`{${"slippage"}}`, encodeURIComponent(String(requestParameters.slippage))).replace(`{${"feeBps"}}`, encodeURIComponent(String(requestParameters.feeBps))),
+            path: `/v1/quote`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
