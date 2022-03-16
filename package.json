@@ -8,7 +8,7 @@
   "scripts": {
     "start": "ts-node ./src/index.ts",
     "build": "tsup generated/index.ts --dts --format esm,cjs",
-    "openapi-gen": "openapi-generator-cli generate -i swagger.json -o jupiter-quote-api -g typescript-fetch --skip-validate-spec --additional-properties=typescriptThreePlus=true"
+    "openapi-gen": "openapi-generator-cli generate -i swagger.json -o generated -g typescript-fetch --skip-validate-spec --additional-properties=typescriptThreePlus=true"
   },
   "author": "",
   "license": "MIT",

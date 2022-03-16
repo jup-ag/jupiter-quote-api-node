@@ -24,6 +24,9 @@ import {
     InlineResponseDefault1,
     InlineResponseDefault1FromJSON,
     InlineResponseDefault1ToJSON,
+    InlineResponseDefault2,
+    InlineResponseDefault2FromJSON,
+    InlineResponseDefault2ToJSON,
 } from '../models';
 
 export interface V1QuoteGetRequest {
@@ -46,7 +49,7 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      */
-    async v1IndexedRouteMapGetRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
+    async v1IndexedRouteMapGetRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault2>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -58,14 +61,15 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponseDefault2FromJSON(jsonValue));
     }
 
     /**
      * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      */
-    async v1IndexedRouteMapGet(initOverrides?: RequestInit): Promise<void> {
-        await this.v1IndexedRouteMapGetRaw(initOverrides);
+    async v1IndexedRouteMapGet(initOverrides?: RequestInit): Promise<InlineResponseDefault2> {
+        const response = await this.v1IndexedRouteMapGetRaw(initOverrides);
+        return await response.value();
     }
 
     /**
