@@ -1,2 +1,1 @@
-# Example of the jupiter quote api in typescript
-
+# Jup-ag JavaScript API client

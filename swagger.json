@@ -7,9 +7,6 @@
   },
   "definitions": { "def-0": { "title": "defs" } },
   "paths": {
-    "/ping": {
-      "get": { "responses": { "200": { "description": "Default Response" } } }
-    },
     "/v1/quote": {
       "get": {
         "summary": "Return route",
@@ -214,7 +211,8 @@
     },
     "/v1/route-map": {
       "get": {
-        "description": "Returns a hash map, input mint as key and an array of valid output mint as values",
+        "description": "[DEPRECATED] use /indexed-route-map Returns a hash map, input mint as key and an array of valid output mint as values",
+        "deprecated": true,
         "responses": { "200": { "description": "Default Response" } }
       }
     },

@@ -44,29 +44,6 @@ export interface V1SwapPostRequest {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
-     */
-    async pingGetRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/ping`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     */
-    async pingGet(initOverrides?: RequestInit): Promise<void> {
-        await this.pingGetRaw(initOverrides);
-    }
-
-    /**
      * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      */
     async v1IndexedRouteMapGetRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
@@ -152,7 +129,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a hash map, input mint as key and an array of valid output mint as values
+     * [DEPRECATED] use /indexed-route-map Returns a hash map, input mint as key and an array of valid output mint as values
      */
     async v1RouteMapGetRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
         const queryParameters: any = {};
@@ -170,7 +147,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a hash map, input mint as key and an array of valid output mint as values
+     * [DEPRECATED] use /indexed-route-map Returns a hash map, input mint as key and an array of valid output mint as values
      */
     async v1RouteMapGet(initOverrides?: RequestInit): Promise<void> {
         await this.v1RouteMapGetRaw(initOverrides);

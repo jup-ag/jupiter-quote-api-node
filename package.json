@@ -1,21 +1,24 @@
 {
-  "name": "jupiter-quote-api-node",
-  "version": "1.0.0",
+  "name": "@jup-ag/api",
+  "version": "0.0.1",
   "description": "## Generate typescript types from swagger schema",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "start": "ts-node ./src/index.ts",
+    "build": "tsup generated/index.ts --dts --format esm,cjs",
     "openapi-gen": "openapi-generator-cli generate -i swagger.json -o jupiter-quote-api -g typescript-fetch --skip-validate-spec --additional-properties=typescriptThreePlus=true"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "@types/isomorphic-fetch": "^0.0.35",
-    "isomorphic-fetch": "^3.0.0",
-    "ts-node": "^10.5.0",
-    "typescript": "^4.5.5"
+    "cross-fetch": "^3.1.5"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.4.26"
+    "@openapitools/openapi-generator-cli": "^2.4.26",
+    "ts-node": "^10.5.0",
+    "tsup": "^5.12.1",
+    "typescript": "^4.5.5"
   }
 }

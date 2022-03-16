@@ -1,5 +1,5 @@
-import fetch from "isomorphic-fetch";
-import { Configuration, DefaultApi } from "../jupiter-quote-api";
+import fetch from "cross-fetch";
+import { Configuration, DefaultApi } from "../generated";
 
 interface IndexedRouteMapResult {
   mintKeys: string[];
