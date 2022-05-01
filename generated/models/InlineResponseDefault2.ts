@@ -20,17 +20,23 @@ import { exists, mapValues } from '../runtime';
  */
 export interface InlineResponseDefault2 {
     /**
-     * All the mints that are indexed to match in indexedRouteMap
-     * @type {Array<string>}
+     * Base64 encoded transaction
+     * @type {string}
      * @memberof InlineResponseDefault2
      */
-    mintKeys?: Array<string>;
+    setupTransaction?: string;
     /**
-     * All the possible route and their corresponding output mints
-     * @type {{ [key: string]: Array<number>; }}
+     * Base64 encoded transaction
+     * @type {string}
      * @memberof InlineResponseDefault2
      */
-    indexedRouteMap?: { [key: string]: Array<number>; };
+    swapTransaction?: string;
+    /**
+     * Base64 encoded transaction
+     * @type {string}
+     * @memberof InlineResponseDefault2
+     */
+    cleanupTransaction?: string;
 }
 
 export function InlineResponseDefault2FromJSON(json: any): InlineResponseDefault2 {
@@ -43,8 +49,9 @@ export function InlineResponseDefault2FromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
-        'mintKeys': !exists(json, 'mintKeys') ? undefined : json['mintKeys'],
-        'indexedRouteMap': !exists(json, 'indexedRouteMap') ? undefined : json['indexedRouteMap'],
+        'setupTransaction': !exists(json, 'setupTransaction') ? undefined : json['setupTransaction'],
+        'swapTransaction': !exists(json, 'swapTransaction') ? undefined : json['swapTransaction'],
+        'cleanupTransaction': !exists(json, 'cleanupTransaction') ? undefined : json['cleanupTransaction'],
     };
 }
 
@@ -57,8 +64,9 @@ export function InlineResponseDefault2ToJSON(value?: InlineResponseDefault2 | nu
     }
     return {
         
-        'mintKeys': value.mintKeys,
-        'indexedRouteMap': value.indexedRouteMap,
+        'setupTransaction': value.setupTransaction,
+        'swapTransaction': value.swapTransaction,
+        'cleanupTransaction': value.cleanupTransaction,
     };
 }
 

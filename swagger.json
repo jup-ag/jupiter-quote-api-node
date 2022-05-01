@@ -5,11 +5,7 @@
     "description": "Jupiter quote and swap API",
     "version": "0.0.0"
   },
-  "definitions": {
-    "def-0": {
-      "title": "defs"
-    }
-  },
+  "definitions": { "def-0": { "title": "defs" } },
   "paths": {
     "/v1/quote": {
       "get": {
@@ -52,6 +48,13 @@
             "required": false,
             "in": "query",
             "name": "feeBps"
+          },
+          {
+            "type": "boolean",
+            "description": "Only return direct routes (no hoppings and split trade)",
+            "required": false,
+            "in": "query",
+            "name": "onlyDirectRoutes"
           }
         ],
         "responses": {
@@ -67,74 +70,38 @@
                     "type": "object",
                     "required": [],
                     "properties": {
-                      "inAmount": {
-                        "type": "number"
-                      },
-                      "outAmount": {
-                        "type": "number"
-                      },
-                      "outAmountWithSlippage": {
-                        "type": "number"
-                      },
-                      "priceImpactPct": {
-                        "type": "number"
-                      },
+                      "inAmount": { "type": "number" },
+                      "outAmount": { "type": "number" },
+                      "outAmountWithSlippage": { "type": "number" },
+                      "priceImpactPct": { "type": "number" },
                       "marketInfos": {
                         "type": "array",
                         "items": {
                           "type": "object",
                           "required": [],
                           "properties": {
-                            "id": {
-                              "type": "string"
-                            },
-                            "label": {
-                              "type": "string"
-                            },
-                            "inputMint": {
-                              "type": "string"
-                            },
-                            "outputMint": {
-                              "type": "string"
-                            },
-                            "notEnoughLiquidity": {
-                              "type": "boolean"
-                            },
-                            "inAmount": {
-                              "type": "number"
-                            },
-                            "outAmount": {
-                              "type": "number"
-                            },
-                            "priceImpactPct": {
-                              "type": "number"
-                            },
+                            "id": { "type": "string" },
+                            "label": { "type": "string" },
+                            "inputMint": { "type": "string" },
+                            "outputMint": { "type": "string" },
+                            "notEnoughLiquidity": { "type": "boolean" },
+                            "inAmount": { "type": "number" },
+                            "outAmount": { "type": "number" },
+                            "priceImpactPct": { "type": "number" },
                             "lpFee": {
                               "type": "object",
                               "properties": {
-                                "amount": {
-                                  "type": "number"
-                                },
-                                "mint": {
-                                  "type": "string"
-                                },
-                                "pct": {
-                                  "type": "number"
-                                }
+                                "amount": { "type": "number" },
+                                "mint": { "type": "string" },
+                                "pct": { "type": "number" }
                               }
                             },
                             "platformFee": {
                               "type": "object",
                               "properties": {
-                                "amount": {
-                                  "type": "number"
-                                },
-                                "mint": {
-                                  "type": "string"
-                                },
-                                "pct": {
-                                  "type": "number"
-                                }
+                                "amount": { "type": "number" },
+                                "mint": { "type": "string" },
+                                "pct": { "type": "number" }
                               }
                             }
                           }
@@ -143,9 +110,57 @@
                     }
                   }
                 },
-                "timeTaken": {
-                  "type": "number"
-                }
+                "timeTaken": { "type": "number" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/price": {
+      "get": {
+        "summary": "Return simple price",
+        "description": "Get simple price for a given input mint, output mint and amount",
+        "tags": [],
+        "parameters": [
+          {
+            "type": "string",
+            "description": "inputMint",
+            "required": true,
+            "in": "query",
+            "name": "inputMint"
+          },
+          {
+            "type": "string",
+            "description": "outputMint",
+            "required": true,
+            "in": "query",
+            "name": "outputMint"
+          },
+          {
+            "type": "number",
+            "description": "amount",
+            "required": false,
+            "in": "query",
+            "name": "amount"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Default response",
+            "schema": {
+              "description": "Default response",
+              "type": "object",
+              "properties": {
+                "data": {
+                  "inputMint": "string",
+                  "inputSymbol": "string",
+                  "outputMint": "string",
+                  "outputSymbol": "string",
+                  "amount": "number",
+                  "price": "number"
+                },
+                "timeTaken": { "type": "number" }
               }
             }
           }
@@ -169,74 +184,38 @@
                   "description": "Data from /v1/quote",
                   "required": [],
                   "properties": {
-                    "inAmount": {
-                      "type": "number"
-                    },
-                    "outAmount": {
-                      "type": "number"
-                    },
-                    "outAmountWithSlippage": {
-                      "type": "number"
-                    },
-                    "priceImpactPct": {
-                      "type": "number"
-                    },
+                    "inAmount": { "type": "number" },
+                    "outAmount": { "type": "number" },
+                    "outAmountWithSlippage": { "type": "number" },
+                    "priceImpactPct": { "type": "number" },
                     "marketInfos": {
                       "type": "array",
                       "items": {
                         "type": "object",
                         "required": [],
                         "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "label": {
-                            "type": "string"
-                          },
-                          "inputMint": {
-                            "type": "string"
-                          },
-                          "outputMint": {
-                            "type": "string"
-                          },
-                          "notEnoughLiquidity": {
-                            "type": "boolean"
-                          },
-                          "inAmount": {
-                            "type": "number"
-                          },
-                          "outAmount": {
-                            "type": "number"
-                          },
-                          "priceImpactPct": {
-                            "type": "number"
-                          },
+                          "id": { "type": "string" },
+                          "label": { "type": "string" },
+                          "inputMint": { "type": "string" },
+                          "outputMint": { "type": "string" },
+                          "notEnoughLiquidity": { "type": "boolean" },
+                          "inAmount": { "type": "number" },
+                          "outAmount": { "type": "number" },
+                          "priceImpactPct": { "type": "number" },
                           "lpFee": {
                             "type": "object",
                             "properties": {
-                              "amount": {
-                                "type": "number"
-                              },
-                              "mint": {
-                                "type": "string"
-                              },
-                              "pct": {
-                                "type": "number"
-                              }
+                              "amount": { "type": "number" },
+                              "mint": { "type": "string" },
+                              "pct": { "type": "number" }
                             }
                           },
                           "platformFee": {
                             "type": "object",
                             "properties": {
-                              "amount": {
-                                "type": "number"
-                              },
-                              "mint": {
-                                "type": "string"
-                              },
-                              "pct": {
-                                "type": "number"
-                              }
+                              "amount": { "type": "number" },
+                              "mint": { "type": "string" },
+                              "pct": { "type": "number" }
                             }
                           }
                         }
@@ -252,6 +231,11 @@
                 "feeAccount": {
                   "type": "string",
                   "description": "fee account",
+                  "optional": true
+                },
+                "tokenLedger": {
+                  "type": "string",
+                  "description": "custom token ledger account",
                   "optional": true
                 },
                 "userPublicKey": {
@@ -291,16 +275,21 @@
       "get": {
         "description": "[DEPRECATED] use /indexed-route-map Returns a hash map, input mint as key and an array of valid output mint as values",
         "deprecated": true,
-        "responses": {
-          "200": {
-            "description": "Default Response"
-          }
-        }
+        "responses": { "200": { "description": "Default Response" } }
       }
     },
     "/v1/indexed-route-map": {
       "get": {
         "description": "Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size",
+        "parameters": [
+          {
+            "type": "boolean",
+            "description": "Only return direct routes (no hoppings and split trade)",
+            "required": false,
+            "in": "query",
+            "name": "onlyDirectRoutes"
+          }
+        ],
         "responses": {
           "default": {
             "description": "Default response",
@@ -310,9 +299,7 @@
               "properties": {
                 "mintKeys": {
                   "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
+                  "items": { "type": "string" },
                   "description": "All the mints that are indexed to match in indexedRouteMap"
                 },
                 "indexedRouteMap": {
@@ -320,14 +307,9 @@
                   "description": "All the possible route and their corresponding output mints",
                   "additionalProperties": {
                     "type": "array",
-                    "items": {
-                      "type": "number"
-                    }
+                    "items": { "type": "number" }
                   },
-                  "example": {
-                    "1": [2, 3, 4],
-                    "2": [1, 3, 4]
-                  }
+                  "example": { "1": [2, 3, 4], "2": [1, 3, 4] }
                 }
               }
             }

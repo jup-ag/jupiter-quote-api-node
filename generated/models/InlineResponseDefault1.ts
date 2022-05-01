@@ -20,23 +20,17 @@ import { exists, mapValues } from '../runtime';
  */
 export interface InlineResponseDefault1 {
     /**
-     * Base64 encoded transaction
-     * @type {string}
+     * 
+     * @type {object}
      * @memberof InlineResponseDefault1
      */
-    setupTransaction?: string;
+    data?: object;
     /**
-     * Base64 encoded transaction
-     * @type {string}
+     * 
+     * @type {number}
      * @memberof InlineResponseDefault1
      */
-    swapTransaction?: string;
-    /**
-     * Base64 encoded transaction
-     * @type {string}
-     * @memberof InlineResponseDefault1
-     */
-    cleanupTransaction?: string;
+    timeTaken?: number;
 }
 
 export function InlineResponseDefault1FromJSON(json: any): InlineResponseDefault1 {
@@ -49,9 +43,8 @@ export function InlineResponseDefault1FromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
-        'setupTransaction': !exists(json, 'setupTransaction') ? undefined : json['setupTransaction'],
-        'swapTransaction': !exists(json, 'swapTransaction') ? undefined : json['swapTransaction'],
-        'cleanupTransaction': !exists(json, 'cleanupTransaction') ? undefined : json['cleanupTransaction'],
+        'data': !exists(json, 'data') ? undefined : json['data'],
+        'timeTaken': !exists(json, 'timeTaken') ? undefined : json['timeTaken'],
     };
 }
 
@@ -64,9 +57,8 @@ export function InlineResponseDefault1ToJSON(value?: InlineResponseDefault1 | nu
     }
     return {
         
-        'setupTransaction': value.setupTransaction,
-        'swapTransaction': value.swapTransaction,
-        'cleanupTransaction': value.cleanupTransaction,
+        'data': value.data,
+        'timeTaken': value.timeTaken,
     };
 }
 

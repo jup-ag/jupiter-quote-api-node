@@ -45,6 +45,12 @@ export interface InlineObject {
      */
     feeAccount?: string;
     /**
+     * custom token ledger account
+     * @type {string}
+     * @memberof InlineObject
+     */
+    tokenLedger?: string;
+    /**
      * Public key of the user
      * @type {string}
      * @memberof InlineObject
@@ -65,6 +71,7 @@ export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'route': !exists(json, 'route') ? undefined : V1SwapRouteFromJSON(json['route']),
         'wrapUnwrapSOL': !exists(json, 'wrapUnwrapSOL') ? undefined : json['wrapUnwrapSOL'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
+        'tokenLedger': !exists(json, 'tokenLedger') ? undefined : json['tokenLedger'],
         'userPublicKey': !exists(json, 'userPublicKey') ? undefined : json['userPublicKey'],
     };
 }
@@ -81,6 +88,7 @@ export function InlineObjectToJSON(value?: InlineObject | null): any {
         'route': V1SwapRouteToJSON(value.route),
         'wrapUnwrapSOL': value.wrapUnwrapSOL,
         'feeAccount': value.feeAccount,
+        'tokenLedger': value.tokenLedger,
         'userPublicKey': value.userPublicKey,
     };
 }
