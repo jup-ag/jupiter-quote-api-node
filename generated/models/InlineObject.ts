@@ -14,11 +14,11 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    V1SwapRoute,
-    V1SwapRouteFromJSON,
-    V1SwapRouteFromJSONTyped,
-    V1SwapRouteToJSON,
-} from './V1SwapRoute';
+    Def1,
+    Def1FromJSON,
+    Def1FromJSONTyped,
+    Def1ToJSON,
+} from './Def1';
 
 /**
  * 
@@ -28,10 +28,10 @@ import {
 export interface InlineObject {
     /**
      * 
-     * @type {V1SwapRoute}
+     * @type {Def1}
      * @memberof InlineObject
      */
-    route?: V1SwapRoute;
+    route: Def1;
     /**
      * Wrap/unwrap SOL
      * @type {boolean}
@@ -55,7 +55,7 @@ export interface InlineObject {
      * @type {string}
      * @memberof InlineObject
      */
-    userPublicKey?: string;
+    userPublicKey: string;
 }
 
 export function InlineObjectFromJSON(json: any): InlineObject {
@@ -68,11 +68,11 @@ export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'route': !exists(json, 'route') ? undefined : V1SwapRouteFromJSON(json['route']),
+        'route': Def1FromJSON(json['route']),
         'wrapUnwrapSOL': !exists(json, 'wrapUnwrapSOL') ? undefined : json['wrapUnwrapSOL'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
         'tokenLedger': !exists(json, 'tokenLedger') ? undefined : json['tokenLedger'],
-        'userPublicKey': !exists(json, 'userPublicKey') ? undefined : json['userPublicKey'],
+        'userPublicKey': json['userPublicKey'],
     };
 }
 
@@ -85,7 +85,7 @@ export function InlineObjectToJSON(value?: InlineObject | null): any {
     }
     return {
         
-        'route': V1SwapRouteToJSON(value.route),
+        'route': Def1ToJSON(value.route),
         'wrapUnwrapSOL': value.wrapUnwrapSOL,
         'feeAccount': value.feeAccount,
         'tokenLedger': value.tokenLedger,

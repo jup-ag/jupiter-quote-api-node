@@ -35,7 +35,10 @@ function inflateIndexedRouteMap(
 }
 
 export async function main() {
-  const config = new Configuration({ basePath: "http://localhost:8080" });
+  const config = new Configuration({
+    basePath: "https://quote-api.jup.ag",
+    fetchApi: fetch,
+  });
   const jupiterQuoteApi = new DefaultApi(config);
 
   const quote = await jupiterQuoteApi.v1QuoteGet({
@@ -46,7 +49,7 @@ export async function main() {
   console.log(quote?.data ? quote.data[0] : "Nothing");
 
   const result = (await (
-    await fetch("http://localhost:8080/v1/indexed-route-map")
+    await fetch("https://quote-api.jup.ag/v1/indexed-route-map")
   ).json()) as IndexedRouteMapResult;
 
   const routeMap = inflateIndexedRouteMap(result);

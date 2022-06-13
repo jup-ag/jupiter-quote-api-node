@@ -5,7 +5,161 @@
     "description": "Jupiter quote and swap API",
     "version": "0.0.0"
   },
-  "definitions": { "def-0": { "title": "defs" } },
+  "definitions": {
+    "def-0": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "inputMint": {
+          "type": "string"
+        },
+        "outputMint": {
+          "type": "string"
+        },
+        "notEnoughLiquidity": {
+          "type": "boolean"
+        },
+        "inAmount": {
+          "type": "integer"
+        },
+        "outAmount": {
+          "type": "integer"
+        },
+        "priceImpactPct": {
+          "type": "number"
+        },
+        "lpFee": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "mint": {
+              "type": "string"
+            },
+            "pct": {
+              "type": "number"
+            }
+          }
+        },
+        "platformFee": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "mint": {
+              "type": "string"
+            },
+            "pct": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "title": "MarketInfo"
+    },
+    "def-1": {
+      "type": "object",
+      "required": ["inAmount", "outAmount", "priceImpactPct", "marketInfos"],
+      "properties": {
+        "inAmount": {
+          "type": "integer"
+        },
+        "outAmount": {
+          "type": "integer"
+        },
+        "amount": {
+          "type": "integer"
+        },
+        "outAmountWithSlippage": {
+          "type": "integer",
+          "nullable": true,
+          "deprecated": true,
+          "description": "The minimum out amount, populated when swapMode is ExactIn, deprecated please use otherAmountThreshold instead"
+        },
+        "otherAmountThreshold": {
+          "type": "integer",
+          "description": "The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount"
+        },
+        "swapMode": {
+          "type": "string",
+          "enum": ["ExactIn", "ExactOut"]
+        },
+        "priceImpactPct": {
+          "type": "number"
+        },
+        "marketInfos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "inputMint": {
+                "type": "string"
+              },
+              "outputMint": {
+                "type": "string"
+              },
+              "notEnoughLiquidity": {
+                "type": "boolean"
+              },
+              "inAmount": {
+                "type": "integer"
+              },
+              "outAmount": {
+                "type": "integer"
+              },
+              "priceImpactPct": {
+                "type": "number"
+              },
+              "lpFee": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "mint": {
+                    "type": "string"
+                  },
+                  "pct": {
+                    "type": "number"
+                  }
+                }
+              },
+              "platformFee": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number"
+                  },
+                  "mint": {
+                    "type": "string"
+                  },
+                  "pct": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "title": "Route"
+    }
+  },
   "paths": {
     "/v1/quote": {
       "get": {
@@ -28,11 +182,19 @@
             "name": "outputMint"
           },
           {
-            "type": "number",
+            "type": "integer",
             "description": "amount",
             "required": true,
             "in": "query",
             "name": "amount"
+          },
+          {
+            "type": "string",
+            "enum": ["ExactIn", "ExactOut"],
+            "description": "swapMode",
+            "required": false,
+            "in": "query",
+            "name": "swapMode"
           },
           {
             "type": "number",
@@ -42,9 +204,8 @@
             "name": "slippage"
           },
           {
-            "type": "number",
+            "type": "integer",
             "description": "fee bps",
-            "optional": true,
             "required": false,
             "in": "query",
             "name": "feeBps"
@@ -68,40 +229,95 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": [],
+                    "required": [
+                      "inAmount",
+                      "outAmount",
+                      "priceImpactPct",
+                      "marketInfos"
+                    ],
                     "properties": {
-                      "inAmount": { "type": "number" },
-                      "outAmount": { "type": "number" },
-                      "outAmountWithSlippage": { "type": "number" },
-                      "priceImpactPct": { "type": "number" },
+                      "inAmount": {
+                        "type": "integer"
+                      },
+                      "outAmount": {
+                        "type": "integer"
+                      },
+                      "amount": {
+                        "type": "integer"
+                      },
+                      "outAmountWithSlippage": {
+                        "type": "integer",
+                        "nullable": true,
+                        "deprecated": true,
+                        "description": "The minimum out amount, populated when swapMode is ExactIn, deprecated please use otherAmountThreshold instead"
+                      },
+                      "otherAmountThreshold": {
+                        "type": "integer",
+                        "description": "The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount"
+                      },
+                      "swapMode": {
+                        "type": "string",
+                        "enum": ["ExactIn", "ExactOut"]
+                      },
+                      "priceImpactPct": {
+                        "type": "number"
+                      },
                       "marketInfos": {
                         "type": "array",
                         "items": {
                           "type": "object",
                           "required": [],
                           "properties": {
-                            "id": { "type": "string" },
-                            "label": { "type": "string" },
-                            "inputMint": { "type": "string" },
-                            "outputMint": { "type": "string" },
-                            "notEnoughLiquidity": { "type": "boolean" },
-                            "inAmount": { "type": "number" },
-                            "outAmount": { "type": "number" },
-                            "priceImpactPct": { "type": "number" },
+                            "id": {
+                              "type": "string"
+                            },
+                            "label": {
+                              "type": "string"
+                            },
+                            "inputMint": {
+                              "type": "string"
+                            },
+                            "outputMint": {
+                              "type": "string"
+                            },
+                            "notEnoughLiquidity": {
+                              "type": "boolean"
+                            },
+                            "inAmount": {
+                              "type": "integer"
+                            },
+                            "outAmount": {
+                              "type": "integer"
+                            },
+                            "priceImpactPct": {
+                              "type": "number"
+                            },
                             "lpFee": {
                               "type": "object",
                               "properties": {
-                                "amount": { "type": "number" },
-                                "mint": { "type": "string" },
-                                "pct": { "type": "number" }
+                                "amount": {
+                                  "type": "number"
+                                },
+                                "mint": {
+                                  "type": "string"
+                                },
+                                "pct": {
+                                  "type": "number"
+                                }
                               }
                             },
                             "platformFee": {
                               "type": "object",
                               "properties": {
-                                "amount": { "type": "number" },
-                                "mint": { "type": "string" },
-                                "pct": { "type": "number" }
+                                "amount": {
+                                  "type": "number"
+                                },
+                                "mint": {
+                                  "type": "string"
+                                },
+                                "pct": {
+                                  "type": "number"
+                                }
                               }
                             }
                           }
@@ -110,7 +326,9 @@
                     }
                   }
                 },
-                "timeTaken": { "type": "number" }
+                "timeTaken": {
+                  "type": "number"
+                }
               }
             }
           }
@@ -125,42 +343,98 @@
         "parameters": [
           {
             "type": "string",
-            "description": "inputMint",
+            "description": "Symbol or address of a token, (e.g. SOL or EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v).",
             "required": true,
             "in": "query",
-            "name": "inputMint"
+            "name": "id"
           },
           {
             "type": "string",
-            "description": "outputMint",
-            "required": true,
+            "description": "Default to USDC. Symbol or address of a token, (e.g. SOL or EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v).",
+            "required": false,
             "in": "query",
-            "name": "outputMint"
+            "name": "vsToken"
           },
           {
             "type": "number",
-            "description": "amount",
+            "description": "Unit amount of specified input token. Default to 1.",
             "required": false,
             "in": "query",
             "name": "amount"
           }
         ],
         "responses": {
-          "default": {
-            "description": "Default response",
+          "200": {
+            "description": "Default response with id",
             "schema": {
-              "description": "Default response",
+              "description": "Default response with id",
               "type": "object",
               "properties": {
                 "data": {
-                  "inputMint": "string",
-                  "inputSymbol": "string",
-                  "outputMint": "string",
-                  "outputSymbol": "string",
-                  "amount": "number",
-                  "price": "number"
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "description": "Address of the token"
+                    },
+                    "mintSymbol": {
+                      "type": "string",
+                      "description": "Symbol of the token"
+                    },
+                    "vsToken": {
+                      "type": "string",
+                      "description": "Address of the vs token"
+                    },
+                    "vsTokenSymbol": {
+                      "type": "string",
+                      "description": "Symbol of the vs token"
+                    },
+                    "price": {
+                      "type": "number",
+                      "description": "Default to 1 unit of the token worth in USDC if vsToken is not specified."
+                    }
+                  }
                 },
-                "timeTaken": { "type": "number" }
+                "timeTaken": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Amount lesser or equals to 0. No routes found for trading pairs",
+            "schema": {
+              "description": "Amount lesser or equals to 0. No routes found for trading pairs",
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "Symbol or address not found for either input or vsToken",
+            "schema": {
+              "description": "Symbol or address not found for either input or vsToken",
+              "type": "object"
+            }
+          },
+          "409": {
+            "description": "Duplicate symbol found for input or vsToken. The server will respond an error structure which contains the conflict addresses. User will have to use address mode instead.",
+            "schema": {
+              "description": "Duplicate symbol found for input or vsToken. The server will respond an error structure which contains the conflict addresses. User will have to use address mode instead.",
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Duplicated symbol found for [symbol], use one of the address instead"
+                    },
+                    "addresses": {
+                      "type": "array",
+                      "description": "List of addresses for the symbol",
+                      "items": {}
+                    }
+                  }
+                }
               }
             }
           }
@@ -178,65 +452,22 @@
             "in": "body",
             "schema": {
               "type": "object",
+              "required": ["route", "userPublicKey"],
               "properties": {
                 "route": {
-                  "type": "object",
-                  "description": "Data from /v1/quote",
-                  "required": [],
-                  "properties": {
-                    "inAmount": { "type": "number" },
-                    "outAmount": { "type": "number" },
-                    "outAmountWithSlippage": { "type": "number" },
-                    "priceImpactPct": { "type": "number" },
-                    "marketInfos": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "required": [],
-                        "properties": {
-                          "id": { "type": "string" },
-                          "label": { "type": "string" },
-                          "inputMint": { "type": "string" },
-                          "outputMint": { "type": "string" },
-                          "notEnoughLiquidity": { "type": "boolean" },
-                          "inAmount": { "type": "number" },
-                          "outAmount": { "type": "number" },
-                          "priceImpactPct": { "type": "number" },
-                          "lpFee": {
-                            "type": "object",
-                            "properties": {
-                              "amount": { "type": "number" },
-                              "mint": { "type": "string" },
-                              "pct": { "type": "number" }
-                            }
-                          },
-                          "platformFee": {
-                            "type": "object",
-                            "properties": {
-                              "amount": { "type": "number" },
-                              "mint": { "type": "string" },
-                              "pct": { "type": "number" }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
+                  "$ref": "#/definitions/def-1"
                 },
                 "wrapUnwrapSOL": {
                   "type": "boolean",
-                  "description": "Wrap/unwrap SOL",
-                  "optional": true
+                  "description": "Wrap/unwrap SOL"
                 },
                 "feeAccount": {
                   "type": "string",
-                  "description": "fee account",
-                  "optional": true
+                  "description": "fee account"
                 },
                 "tokenLedger": {
                   "type": "string",
-                  "description": "custom token ledger account",
-                  "optional": true
+                  "description": "custom token ledger account"
                 },
                 "userPublicKey": {
                   "type": "string",
@@ -275,7 +506,11 @@
       "get": {
         "description": "[DEPRECATED] use /indexed-route-map Returns a hash map, input mint as key and an array of valid output mint as values",
         "deprecated": true,
-        "responses": { "200": { "description": "Default Response" } }
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
       }
     },
     "/v1/indexed-route-map": {
@@ -299,7 +534,9 @@
               "properties": {
                 "mintKeys": {
                   "type": "array",
-                  "items": { "type": "string" },
+                  "items": {
+                    "type": "string"
+                  },
                   "description": "All the mints that are indexed to match in indexedRouteMap"
                 },
                 "indexedRouteMap": {
@@ -307,9 +544,14 @@
                   "description": "All the possible route and their corresponding output mints",
                   "additionalProperties": {
                     "type": "array",
-                    "items": { "type": "number" }
+                    "items": {
+                      "type": "number"
+                    }
                   },
-                  "example": { "1": [2, 3, 4], "2": [1, 3, 4] }
+                  "example": {
+                    "1": [2, 3, 4],
+                    "2": [1, 3, 4]
+                  }
                 }
               }
             }

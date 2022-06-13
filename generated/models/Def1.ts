@@ -23,55 +23,55 @@ import {
 /**
  * 
  * @export
- * @interface InlineResponseDefaultData
+ * @interface Def1
  */
-export interface InlineResponseDefaultData {
+export interface Def1 {
     /**
      * 
      * @type {number}
-     * @memberof InlineResponseDefaultData
+     * @memberof Def1
      */
     inAmount: number;
     /**
      * 
      * @type {number}
-     * @memberof InlineResponseDefaultData
+     * @memberof Def1
      */
     outAmount: number;
     /**
      * 
      * @type {number}
-     * @memberof InlineResponseDefaultData
+     * @memberof Def1
      */
     amount?: number;
     /**
      * The minimum out amount, populated when swapMode is ExactIn, deprecated please use otherAmountThreshold instead
      * @type {number}
-     * @memberof InlineResponseDefaultData
+     * @memberof Def1
      */
     outAmountWithSlippage?: number;
     /**
      * The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount
      * @type {number}
-     * @memberof InlineResponseDefaultData
+     * @memberof Def1
      */
     otherAmountThreshold?: number;
     /**
      * 
      * @type {string}
-     * @memberof InlineResponseDefaultData
+     * @memberof Def1
      */
-    swapMode?: InlineResponseDefaultDataSwapModeEnum;
+    swapMode?: Def1SwapModeEnum;
     /**
      * 
      * @type {number}
-     * @memberof InlineResponseDefaultData
+     * @memberof Def1
      */
     priceImpactPct: number;
     /**
      * 
      * @type {Array<InlineResponseDefaultMarketInfos>}
-     * @memberof InlineResponseDefaultData
+     * @memberof Def1
      */
     marketInfos: Array<InlineResponseDefaultMarketInfos>;
 }
@@ -80,16 +80,16 @@ export interface InlineResponseDefaultData {
 * @export
 * @enum {string}
 */
-export enum InlineResponseDefaultDataSwapModeEnum {
+export enum Def1SwapModeEnum {
     ExactIn = 'ExactIn',
     ExactOut = 'ExactOut'
 }
 
-export function InlineResponseDefaultDataFromJSON(json: any): InlineResponseDefaultData {
-    return InlineResponseDefaultDataFromJSONTyped(json, false);
+export function Def1FromJSON(json: any): Def1 {
+    return Def1FromJSONTyped(json, false);
 }
 
-export function InlineResponseDefaultDataFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponseDefaultData {
+export function Def1FromJSONTyped(json: any, ignoreDiscriminator: boolean): Def1 {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -106,7 +106,7 @@ export function InlineResponseDefaultDataFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function InlineResponseDefaultDataToJSON(value?: InlineResponseDefaultData | null): any {
+export function Def1ToJSON(value?: Def1 | null): any {
     if (value === undefined) {
         return undefined;
     }
