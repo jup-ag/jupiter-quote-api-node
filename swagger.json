@@ -155,6 +155,39 @@
               }
             }
           }
+        },
+        "fees": {
+          "description": "Only returned when userPublicKey is given to /quote",
+          "nullable": true,
+          "type": "object",
+          "properties": {
+            "signatureFee": {
+              "type": "number",
+              "description": "This inidicate the total amount needed for signing transaction(s). Value in lamports."
+            },
+            "openOrdersDeposits": {
+              "description": "This inidicate the total amount needed for deposit of serum order account(s). Value in lamports.",
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "ataDeposits": {
+              "description": "This inidicate the total amount needed for deposit of associative token account(s). Value in lamports.",
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "totalFeeAndDeposits": {
+              "type": "number",
+              "description": "This inidicate the total lamports needed for fees and deposits above."
+            },
+            "minimumSOLForTransaction": {
+              "type": "number",
+              "description": "This inidicate the minimum lamports needed for transaction(s). Might be used to create wrapped SOL and will be returned when the wrapped SOL is closed."
+            }
+          }
         }
       },
       "title": "Route"
@@ -216,6 +249,13 @@
             "required": false,
             "in": "query",
             "name": "onlyDirectRoutes"
+          },
+          {
+            "type": "string",
+            "description": "Public key of the user (only pass in if you want deposit and fee being returned, might slow down query)",
+            "required": false,
+            "in": "query",
+            "name": "userPublicKey"
           }
         ],
         "responses": {
@@ -320,6 +360,39 @@
                                 }
                               }
                             }
+                          }
+                        }
+                      },
+                      "fees": {
+                        "description": "Only returned when userPublicKey is given to /quote",
+                        "nullable": true,
+                        "type": "object",
+                        "properties": {
+                          "signatureFee": {
+                            "type": "number",
+                            "description": "This inidicate the total amount needed for signing transaction(s). Value in lamports."
+                          },
+                          "openOrdersDeposits": {
+                            "description": "This inidicate the total amount needed for deposit of serum order account(s). Value in lamports.",
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            }
+                          },
+                          "ataDeposits": {
+                            "description": "This inidicate the total amount needed for deposit of associative token account(s). Value in lamports.",
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            }
+                          },
+                          "totalFeeAndDeposits": {
+                            "type": "number",
+                            "description": "This inidicate the total lamports needed for fees and deposits above."
+                          },
+                          "minimumSOLForTransaction": {
+                            "type": "number",
+                            "description": "This inidicate the minimum lamports needed for transaction(s). Might be used to create wrapped SOL and will be returned when the wrapped SOL is closed."
                           }
                         }
                       }

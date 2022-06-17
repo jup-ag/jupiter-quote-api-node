@@ -11,5 +11,6 @@ export * from './InlineResponseDefault';
 export * from './InlineResponseDefault1';
 export * from './InlineResponseDefault2';
 export * from './InlineResponseDefaultData';
+export * from './InlineResponseDefaultFees';
 export * from './InlineResponseDefaultLpFee';
 export * from './InlineResponseDefaultMarketInfos';

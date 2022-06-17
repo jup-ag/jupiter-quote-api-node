@@ -53,6 +53,7 @@ export interface V1QuoteGetRequest {
     slippage?: number;
     feeBps?: number;
     onlyDirectRoutes?: boolean;
+    userPublicKey?: string;
 }
 
 export interface V1SwapPostRequest {
@@ -183,6 +184,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.onlyDirectRoutes !== undefined) {
             queryParameters['onlyDirectRoutes'] = requestParameters.onlyDirectRoutes;
+        }
+
+        if (requestParameters.userPublicKey !== undefined) {
+            queryParameters['userPublicKey'] = requestParameters.userPublicKey;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

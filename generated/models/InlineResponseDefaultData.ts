@@ -14,6 +14,12 @@
 
 import { exists, mapValues } from '../runtime';
 import {
+    InlineResponseDefaultFees,
+    InlineResponseDefaultFeesFromJSON,
+    InlineResponseDefaultFeesFromJSONTyped,
+    InlineResponseDefaultFeesToJSON,
+} from './InlineResponseDefaultFees';
+import {
     InlineResponseDefaultMarketInfos,
     InlineResponseDefaultMarketInfosFromJSON,
     InlineResponseDefaultMarketInfosFromJSONTyped,
@@ -74,6 +80,12 @@ export interface InlineResponseDefaultData {
      * @memberof InlineResponseDefaultData
      */
     marketInfos: Array<InlineResponseDefaultMarketInfos>;
+    /**
+     * 
+     * @type {InlineResponseDefaultFees}
+     * @memberof InlineResponseDefaultData
+     */
+    fees?: InlineResponseDefaultFees;
 }
 
 /**
@@ -103,6 +115,7 @@ export function InlineResponseDefaultDataFromJSONTyped(json: any, ignoreDiscrimi
         'swapMode': !exists(json, 'swapMode') ? undefined : json['swapMode'],
         'priceImpactPct': json['priceImpactPct'],
         'marketInfos': ((json['marketInfos'] as Array<any>).map(InlineResponseDefaultMarketInfosFromJSON)),
+        'fees': !exists(json, 'fees') ? undefined : InlineResponseDefaultFeesFromJSON(json['fees']),
     };
 }
 
@@ -123,6 +136,7 @@ export function InlineResponseDefaultDataToJSON(value?: InlineResponseDefaultDat
         'swapMode': value.swapMode,
         'priceImpactPct': value.priceImpactPct,
         'marketInfos': ((value.marketInfos as Array<any>).map(InlineResponseDefaultMarketInfosToJSON)),
+        'fees': InlineResponseDefaultFeesToJSON(value.fees),
     };
 }
 
