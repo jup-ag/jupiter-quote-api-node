@@ -38,6 +38,12 @@ export interface InlineResponseDefault {
      * @memberof InlineResponseDefault
      */
     timeTaken?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InlineResponseDefault
+     */
+    contextSlot?: number;
 }
 
 export function InlineResponseDefaultFromJSON(json: any): InlineResponseDefault {
@@ -52,6 +58,7 @@ export function InlineResponseDefaultFromJSONTyped(json: any, ignoreDiscriminato
         
         'data': !exists(json, 'data') ? undefined : ((json['data'] as Array<any>).map(InlineResponseDefaultDataFromJSON)),
         'timeTaken': !exists(json, 'timeTaken') ? undefined : json['timeTaken'],
+        'contextSlot': !exists(json, 'contextSlot') ? undefined : json['contextSlot'],
     };
 }
 
@@ -66,6 +73,7 @@ export function InlineResponseDefaultToJSON(value?: InlineResponseDefault | null
         
         'data': value.data === undefined ? undefined : ((value.data as Array<any>).map(InlineResponseDefaultDataToJSON)),
         'timeTaken': value.timeTaken,
+        'contextSlot': value.contextSlot,
     };
 }
 

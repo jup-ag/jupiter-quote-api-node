@@ -67,30 +67,22 @@
     },
     "def-1": {
       "type": "object",
-      "required": ["inAmount", "outAmount", "priceImpactPct", "marketInfos"],
+      "required": [
+        "inAmount",
+        "outAmount",
+        "amount",
+        "slippageBps",
+        "priceImpactPct",
+        "marketInfos",
+        "otherAmountThreshold",
+        "swapMode"
+      ],
       "properties": {
         "inAmount": {
           "type": "integer"
         },
         "outAmount": {
           "type": "integer"
-        },
-        "amount": {
-          "type": "integer"
-        },
-        "outAmountWithSlippage": {
-          "type": "integer",
-          "nullable": true,
-          "deprecated": true,
-          "description": "The minimum out amount, populated when swapMode is ExactIn, deprecated please use otherAmountThreshold instead"
-        },
-        "otherAmountThreshold": {
-          "type": "integer",
-          "description": "The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount"
-        },
-        "swapMode": {
-          "type": "string",
-          "enum": ["ExactIn", "ExactOut"]
         },
         "priceImpactPct": {
           "type": "number"
@@ -156,6 +148,22 @@
             }
           }
         },
+        "amount": {
+          "type": "integer"
+        },
+        "slippageBps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "otherAmountThreshold": {
+          "type": "integer",
+          "description": "The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount"
+        },
+        "swapMode": {
+          "type": "string",
+          "enum": ["ExactIn", "ExactOut"]
+        },
         "fees": {
           "description": "Only returned when userPublicKey is given to /quote",
           "nullable": true,
@@ -191,10 +199,66 @@
         }
       },
       "title": "Route"
+    },
+    "def-2": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Address of the token"
+        },
+        "mintSymbol": {
+          "type": "string",
+          "description": "Symbol of the token"
+        },
+        "vsToken": {
+          "type": "string",
+          "description": "Address of the vs token"
+        },
+        "vsTokenSymbol": {
+          "type": "string",
+          "description": "Symbol of the vs token"
+        },
+        "price": {
+          "type": "number",
+          "description": "Default to 1 unit of the token worth in USDC if vsToken is not specified."
+        }
+      },
+      "example": {
+        "id": "So11111111111111111111111111111111111111112",
+        "mintSymbol": "SOL",
+        "vsToken": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+        "vsTokenSymbol": "USDC",
+        "price": 36.094229038
+      },
+      "title": "Price"
+    },
+    "def-3": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/def-2"
+      },
+      "example": {
+        "SOL": {
+          "id": "So11111111111111111111111111111111111111112",
+          "mintSymbol": "SOL",
+          "vsToken": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "vsTokenSymbol": "USDC",
+          "price": 36.094229038
+        },
+        "USDT": {
+          "id": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+          "mintSymbol": "USDT",
+          "vsToken": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "vsTokenSymbol": "USDC",
+          "price": 1.000052
+        }
+      },
+      "title": "PriceHash"
     }
   },
   "paths": {
-    "/v1/quote": {
+    "/v3/quote": {
       "get": {
         "summary": "Return route",
         "description": "Get quote for a given input mint, output mint and amount",
@@ -224,21 +288,23 @@
           {
             "type": "string",
             "enum": ["ExactIn", "ExactOut"],
-            "description": "swapMode",
+            "description": "Swap mode, default is ExactIn",
             "required": false,
             "in": "query",
             "name": "swapMode"
           },
           {
-            "type": "number",
-            "description": "slippage",
+            "type": "integer",
+            "description": "Slippage bps",
+            "minimum": 0,
+            "maximum": 10000,
             "required": false,
             "in": "query",
-            "name": "slippage"
+            "name": "slippageBps"
           },
           {
             "type": "integer",
-            "description": "fee bps",
+            "description": "Fee BPS (only pass in if you want to charge a fee on this swap)",
             "required": false,
             "in": "query",
             "name": "feeBps"
@@ -272,8 +338,12 @@
                     "required": [
                       "inAmount",
                       "outAmount",
+                      "amount",
+                      "slippageBps",
                       "priceImpactPct",
-                      "marketInfos"
+                      "marketInfos",
+                      "otherAmountThreshold",
+                      "swapMode"
                     ],
                     "properties": {
                       "inAmount": {
@@ -281,23 +351,6 @@
                       },
                       "outAmount": {
                         "type": "integer"
-                      },
-                      "amount": {
-                        "type": "integer"
-                      },
-                      "outAmountWithSlippage": {
-                        "type": "integer",
-                        "nullable": true,
-                        "deprecated": true,
-                        "description": "The minimum out amount, populated when swapMode is ExactIn, deprecated please use otherAmountThreshold instead"
-                      },
-                      "otherAmountThreshold": {
-                        "type": "integer",
-                        "description": "The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount"
-                      },
-                      "swapMode": {
-                        "type": "string",
-                        "enum": ["ExactIn", "ExactOut"]
                       },
                       "priceImpactPct": {
                         "type": "number"
@@ -363,6 +416,22 @@
                           }
                         }
                       },
+                      "amount": {
+                        "type": "integer"
+                      },
+                      "slippageBps": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 10000
+                      },
+                      "otherAmountThreshold": {
+                        "type": "integer",
+                        "description": "The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount"
+                      },
+                      "swapMode": {
+                        "type": "string",
+                        "enum": ["ExactIn", "ExactOut"]
+                      },
                       "fees": {
                         "description": "Only returned when userPublicKey is given to /quote",
                         "nullable": true,
@@ -401,6 +470,9 @@
                 },
                 "timeTaken": {
                   "type": "number"
+                },
+                "contextSlot": {
+                  "type": "integer"
                 }
               }
             }
@@ -408,7 +480,69 @@
         }
       }
     },
-    "/v1/price": {
+    "/v3/swap": {
+      "post": {
+        "summary": "Return setup, swap and cleanup transactions",
+        "description": "Get swap serialized transactions for a route",
+        "tags": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": ["route", "userPublicKey"],
+              "properties": {
+                "route": {
+                  "$ref": "#/definitions/def-1"
+                },
+                "userPublicKey": {
+                  "type": "string",
+                  "description": "Public key of the user"
+                },
+                "wrapUnwrapSOL": {
+                  "type": "boolean",
+                  "nullable": true,
+                  "description": "Wrap/unwrap SOL"
+                },
+                "feeAccount": {
+                  "type": "string",
+                  "description": "Fee token account for the output token (only pass in if you set a feeBps)"
+                },
+                "destinationWallet": {
+                  "type": "string",
+                  "description": "Public key of the wallet that will receive the output of the swap, this assumes the associated token account exists, currently adds a token transfer"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Default response",
+            "schema": {
+              "description": "Default response",
+              "type": "object",
+              "properties": {
+                "setupTransaction": {
+                  "type": "string",
+                  "description": "Base64 encoded transaction"
+                },
+                "swapTransaction": {
+                  "type": "string",
+                  "description": "Base64 encoded transaction"
+                },
+                "cleanupTransaction": {
+                  "type": "string",
+                  "description": "Base64 encoded transaction"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v3/price": {
       "get": {
         "summary": "Return simple price",
         "description": "Get simple price for a given input mint, output mint and amount",
@@ -416,10 +550,10 @@
         "parameters": [
           {
             "type": "string",
-            "description": "Symbol or address of a token, (e.g. SOL or EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v).",
+            "description": "Symbol or address of a token, (e.g. SOL or EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v). Use `,` to query multiple tokens, e.g. (sol,btc,mer,<address>)",
             "required": true,
             "in": "query",
-            "name": "id"
+            "name": "ids"
           },
           {
             "type": "string",
@@ -433,42 +567,23 @@
             "description": "Unit amount of specified input token. Default to 1.",
             "required": false,
             "in": "query",
-            "name": "amount"
+            "name": "vsAmount"
           }
         ],
         "responses": {
           "200": {
-            "description": "Default response with id",
+            "description": "Default response with ids which return an object. Refer to Price hash model below. If the id is invalid, it will not return in the hash.",
             "schema": {
-              "description": "Default response with id",
+              "description": "Default response with ids which return an object. Refer to Price hash model below. If the id is invalid, it will not return in the hash.",
               "type": "object",
               "properties": {
                 "data": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "string",
-                      "description": "Address of the token"
-                    },
-                    "mintSymbol": {
-                      "type": "string",
-                      "description": "Symbol of the token"
-                    },
-                    "vsToken": {
-                      "type": "string",
-                      "description": "Address of the vs token"
-                    },
-                    "vsTokenSymbol": {
-                      "type": "string",
-                      "description": "Symbol of the vs token"
-                    },
-                    "price": {
-                      "type": "number",
-                      "description": "Default to 1 unit of the token worth in USDC if vsToken is not specified."
-                    }
-                  }
+                  "$ref": "#/definitions/def-3"
                 },
                 "timeTaken": {
+                  "type": "number"
+                },
+                "contextSlot": {
                   "type": "number"
                 }
               }
@@ -503,8 +618,7 @@
                     },
                     "addresses": {
                       "type": "array",
-                      "description": "List of addresses for the symbol",
-                      "items": {}
+                      "description": "List of addresses for the symbol"
                     }
                   }
                 }
@@ -514,79 +628,7 @@
         }
       }
     },
-    "/v1/swap": {
-      "post": {
-        "summary": "Return setup, swap and cleanup transactions",
-        "description": "Get swap serialized transactions for a route",
-        "tags": [],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "required": ["route", "userPublicKey"],
-              "properties": {
-                "route": {
-                  "$ref": "#/definitions/def-1"
-                },
-                "wrapUnwrapSOL": {
-                  "type": "boolean",
-                  "description": "Wrap/unwrap SOL"
-                },
-                "feeAccount": {
-                  "type": "string",
-                  "description": "fee account"
-                },
-                "tokenLedger": {
-                  "type": "string",
-                  "description": "custom token ledger account"
-                },
-                "userPublicKey": {
-                  "type": "string",
-                  "description": "Public key of the user"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "Default response",
-            "schema": {
-              "description": "Default response",
-              "type": "object",
-              "properties": {
-                "setupTransaction": {
-                  "type": "string",
-                  "description": "Base64 encoded transaction"
-                },
-                "swapTransaction": {
-                  "type": "string",
-                  "description": "Base64 encoded transaction"
-                },
-                "cleanupTransaction": {
-                  "type": "string",
-                  "description": "Base64 encoded transaction"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/route-map": {
-      "get": {
-        "description": "[DEPRECATED] use /indexed-route-map Returns a hash map, input mint as key and an array of valid output mint as values",
-        "deprecated": true,
-        "responses": {
-          "200": {
-            "description": "Default Response"
-          }
-        }
-      }
-    },
-    "/v1/indexed-route-map": {
+    "/v3/indexed-route-map": {
       "get": {
         "description": "Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size",
         "parameters": [

@@ -33,29 +33,29 @@ export interface InlineObject {
      */
     route: Def1;
     /**
+     * Public key of the user
+     * @type {string}
+     * @memberof InlineObject
+     */
+    userPublicKey: string;
+    /**
      * Wrap/unwrap SOL
      * @type {boolean}
      * @memberof InlineObject
      */
     wrapUnwrapSOL?: boolean;
     /**
-     * fee account
+     * Fee token account for the output token (only pass in if you set a feeBps)
      * @type {string}
      * @memberof InlineObject
      */
     feeAccount?: string;
     /**
-     * custom token ledger account
+     * Public key of the wallet that will receive the output of the swap, this assumes the associated token account exists, currently adds a token transfer
      * @type {string}
      * @memberof InlineObject
      */
-    tokenLedger?: string;
-    /**
-     * Public key of the user
-     * @type {string}
-     * @memberof InlineObject
-     */
-    userPublicKey: string;
+    destinationWallet?: string;
 }
 
 export function InlineObjectFromJSON(json: any): InlineObject {
@@ -69,10 +69,10 @@ export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolea
     return {
         
         'route': Def1FromJSON(json['route']),
+        'userPublicKey': json['userPublicKey'],
         'wrapUnwrapSOL': !exists(json, 'wrapUnwrapSOL') ? undefined : json['wrapUnwrapSOL'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
-        'tokenLedger': !exists(json, 'tokenLedger') ? undefined : json['tokenLedger'],
-        'userPublicKey': json['userPublicKey'],
+        'destinationWallet': !exists(json, 'destinationWallet') ? undefined : json['destinationWallet'],
     };
 }
 
@@ -86,10 +86,10 @@ export function InlineObjectToJSON(value?: InlineObject | null): any {
     return {
         
         'route': Def1ToJSON(value.route),
+        'userPublicKey': value.userPublicKey,
         'wrapUnwrapSOL': value.wrapUnwrapSOL,
         'feeAccount': value.feeAccount,
-        'tokenLedger': value.tokenLedger,
-        'userPublicKey': value.userPublicKey,
+        'destinationWallet': value.destinationWallet,
     };
 }
 

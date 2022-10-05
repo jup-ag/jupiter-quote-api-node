@@ -49,30 +49,6 @@ export interface InlineResponseDefaultData {
      * @type {number}
      * @memberof InlineResponseDefaultData
      */
-    amount?: number;
-    /**
-     * The minimum out amount, populated when swapMode is ExactIn, deprecated please use otherAmountThreshold instead
-     * @type {number}
-     * @memberof InlineResponseDefaultData
-     */
-    outAmountWithSlippage?: number;
-    /**
-     * The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount
-     * @type {number}
-     * @memberof InlineResponseDefaultData
-     */
-    otherAmountThreshold?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof InlineResponseDefaultData
-     */
-    swapMode?: InlineResponseDefaultDataSwapModeEnum;
-    /**
-     * 
-     * @type {number}
-     * @memberof InlineResponseDefaultData
-     */
     priceImpactPct: number;
     /**
      * 
@@ -80,6 +56,30 @@ export interface InlineResponseDefaultData {
      * @memberof InlineResponseDefaultData
      */
     marketInfos: Array<InlineResponseDefaultMarketInfos>;
+    /**
+     * 
+     * @type {number}
+     * @memberof InlineResponseDefaultData
+     */
+    amount: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InlineResponseDefaultData
+     */
+    slippageBps: number;
+    /**
+     * The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount
+     * @type {number}
+     * @memberof InlineResponseDefaultData
+     */
+    otherAmountThreshold: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponseDefaultData
+     */
+    swapMode: InlineResponseDefaultDataSwapModeEnum;
     /**
      * 
      * @type {InlineResponseDefaultFees}
@@ -109,12 +109,12 @@ export function InlineResponseDefaultDataFromJSONTyped(json: any, ignoreDiscrimi
         
         'inAmount': json['inAmount'],
         'outAmount': json['outAmount'],
-        'amount': !exists(json, 'amount') ? undefined : json['amount'],
-        'outAmountWithSlippage': !exists(json, 'outAmountWithSlippage') ? undefined : json['outAmountWithSlippage'],
-        'otherAmountThreshold': !exists(json, 'otherAmountThreshold') ? undefined : json['otherAmountThreshold'],
-        'swapMode': !exists(json, 'swapMode') ? undefined : json['swapMode'],
         'priceImpactPct': json['priceImpactPct'],
         'marketInfos': ((json['marketInfos'] as Array<any>).map(InlineResponseDefaultMarketInfosFromJSON)),
+        'amount': json['amount'],
+        'slippageBps': json['slippageBps'],
+        'otherAmountThreshold': json['otherAmountThreshold'],
+        'swapMode': json['swapMode'],
         'fees': !exists(json, 'fees') ? undefined : InlineResponseDefaultFeesFromJSON(json['fees']),
     };
 }
@@ -130,12 +130,12 @@ export function InlineResponseDefaultDataToJSON(value?: InlineResponseDefaultDat
         
         'inAmount': value.inAmount,
         'outAmount': value.outAmount,
-        'amount': value.amount,
-        'outAmountWithSlippage': value.outAmountWithSlippage,
-        'otherAmountThreshold': value.otherAmountThreshold,
-        'swapMode': value.swapMode,
         'priceImpactPct': value.priceImpactPct,
         'marketInfos': ((value.marketInfos as Array<any>).map(InlineResponseDefaultMarketInfosToJSON)),
+        'amount': value.amount,
+        'slippageBps': value.slippageBps,
+        'otherAmountThreshold': value.otherAmountThreshold,
+        'swapMode': value.swapMode,
         'fees': InlineResponseDefaultFeesToJSON(value.fees),
     };
 }

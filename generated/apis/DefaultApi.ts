@@ -35,28 +35,28 @@ import {
     InlineResponseDefault2ToJSON,
 } from '../models';
 
-export interface V1IndexedRouteMapGetRequest {
+export interface V3IndexedRouteMapGetRequest {
     onlyDirectRoutes?: boolean;
 }
 
-export interface V1PriceGetRequest {
-    id: string;
+export interface V3PriceGetRequest {
+    ids: string;
     vsToken?: string;
-    amount?: number;
+    vsAmount?: number;
 }
 
-export interface V1QuoteGetRequest {
+export interface V3QuoteGetRequest {
     inputMint: string;
     outputMint: string;
     amount: number;
-    swapMode?: V1QuoteGetSwapModeEnum;
-    slippage?: number;
+    swapMode?: V3QuoteGetSwapModeEnum;
+    slippageBps?: number;
     feeBps?: number;
     onlyDirectRoutes?: boolean;
     userPublicKey?: string;
 }
 
-export interface V1SwapPostRequest {
+export interface V3SwapPostRequest {
     body?: InlineObject;
 }
 
@@ -68,7 +68,7 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      */
-    async v1IndexedRouteMapGetRaw(requestParameters: V1IndexedRouteMapGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault2>> {
+    async v3IndexedRouteMapGetRaw(requestParameters: V3IndexedRouteMapGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault2>> {
         const queryParameters: any = {};
 
         if (requestParameters.onlyDirectRoutes !== undefined) {
@@ -78,7 +78,7 @@ export class DefaultApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v1/indexed-route-map`,
+            path: `/v3/indexed-route-map`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -90,8 +90,8 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      */
-    async v1IndexedRouteMapGet(requestParameters: V1IndexedRouteMapGetRequest = {}, initOverrides?: RequestInit): Promise<InlineResponseDefault2> {
-        const response = await this.v1IndexedRouteMapGetRaw(requestParameters, initOverrides);
+    async v3IndexedRouteMapGet(requestParameters: V3IndexedRouteMapGetRequest = {}, initOverrides?: RequestInit): Promise<InlineResponseDefault2> {
+        const response = await this.v3IndexedRouteMapGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -99,29 +99,29 @@ export class DefaultApi extends runtime.BaseAPI {
      * Get simple price for a given input mint, output mint and amount
      * Return simple price
      */
-    async v1PriceGetRaw(requestParameters: V1PriceGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponse200>> {
-        if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling v1PriceGet.');
+    async v3PriceGetRaw(requestParameters: V3PriceGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponse200>> {
+        if (requestParameters.ids === null || requestParameters.ids === undefined) {
+            throw new runtime.RequiredError('ids','Required parameter requestParameters.ids was null or undefined when calling v3PriceGet.');
         }
 
         const queryParameters: any = {};
 
-        if (requestParameters.id !== undefined) {
-            queryParameters['id'] = requestParameters.id;
+        if (requestParameters.ids !== undefined) {
+            queryParameters['ids'] = requestParameters.ids;
         }
 
         if (requestParameters.vsToken !== undefined) {
             queryParameters['vsToken'] = requestParameters.vsToken;
         }
 
-        if (requestParameters.amount !== undefined) {
-            queryParameters['amount'] = requestParameters.amount;
+        if (requestParameters.vsAmount !== undefined) {
+            queryParameters['vsAmount'] = requestParameters.vsAmount;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v1/price`,
+            path: `/v3/price`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -134,8 +134,8 @@ export class DefaultApi extends runtime.BaseAPI {
      * Get simple price for a given input mint, output mint and amount
      * Return simple price
      */
-    async v1PriceGet(requestParameters: V1PriceGetRequest, initOverrides?: RequestInit): Promise<InlineResponse200> {
-        const response = await this.v1PriceGetRaw(requestParameters, initOverrides);
+    async v3PriceGet(requestParameters: V3PriceGetRequest, initOverrides?: RequestInit): Promise<InlineResponse200> {
+        const response = await this.v3PriceGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -143,17 +143,17 @@ export class DefaultApi extends runtime.BaseAPI {
      * Get quote for a given input mint, output mint and amount
      * Return route
      */
-    async v1QuoteGetRaw(requestParameters: V1QuoteGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault>> {
+    async v3QuoteGetRaw(requestParameters: V3QuoteGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault>> {
         if (requestParameters.inputMint === null || requestParameters.inputMint === undefined) {
-            throw new runtime.RequiredError('inputMint','Required parameter requestParameters.inputMint was null or undefined when calling v1QuoteGet.');
+            throw new runtime.RequiredError('inputMint','Required parameter requestParameters.inputMint was null or undefined when calling v3QuoteGet.');
         }
 
         if (requestParameters.outputMint === null || requestParameters.outputMint === undefined) {
-            throw new runtime.RequiredError('outputMint','Required parameter requestParameters.outputMint was null or undefined when calling v1QuoteGet.');
+            throw new runtime.RequiredError('outputMint','Required parameter requestParameters.outputMint was null or undefined when calling v3QuoteGet.');
         }
 
         if (requestParameters.amount === null || requestParameters.amount === undefined) {
-            throw new runtime.RequiredError('amount','Required parameter requestParameters.amount was null or undefined when calling v1QuoteGet.');
+            throw new runtime.RequiredError('amount','Required parameter requestParameters.amount was null or undefined when calling v3QuoteGet.');
         }
 
         const queryParameters: any = {};
@@ -174,8 +174,8 @@ export class DefaultApi extends runtime.BaseAPI {
             queryParameters['swapMode'] = requestParameters.swapMode;
         }
 
-        if (requestParameters.slippage !== undefined) {
-            queryParameters['slippage'] = requestParameters.slippage;
+        if (requestParameters.slippageBps !== undefined) {
+            queryParameters['slippageBps'] = requestParameters.slippageBps;
         }
 
         if (requestParameters.feeBps !== undefined) {
@@ -193,7 +193,7 @@ export class DefaultApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/v1/quote`,
+            path: `/v3/quote`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -206,41 +206,16 @@ export class DefaultApi extends runtime.BaseAPI {
      * Get quote for a given input mint, output mint and amount
      * Return route
      */
-    async v1QuoteGet(requestParameters: V1QuoteGetRequest, initOverrides?: RequestInit): Promise<InlineResponseDefault> {
-        const response = await this.v1QuoteGetRaw(requestParameters, initOverrides);
+    async v3QuoteGet(requestParameters: V3QuoteGetRequest, initOverrides?: RequestInit): Promise<InlineResponseDefault> {
+        const response = await this.v3QuoteGetRaw(requestParameters, initOverrides);
         return await response.value();
-    }
-
-    /**
-     * [DEPRECATED] use /indexed-route-map Returns a hash map, input mint as key and an array of valid output mint as values
-     */
-    async v1RouteMapGetRaw(initOverrides?: RequestInit): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/v1/route-map`,
-            method: 'GET',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * [DEPRECATED] use /indexed-route-map Returns a hash map, input mint as key and an array of valid output mint as values
-     */
-    async v1RouteMapGet(initOverrides?: RequestInit): Promise<void> {
-        await this.v1RouteMapGetRaw(initOverrides);
     }
 
     /**
      * Get swap serialized transactions for a route
      * Return setup, swap and cleanup transactions
      */
-    async v1SwapPostRaw(requestParameters: V1SwapPostRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault1>> {
+    async v3SwapPostRaw(requestParameters: V3SwapPostRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault1>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -248,7 +223,7 @@ export class DefaultApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/v1/swap`,
+            path: `/v3/swap`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -262,8 +237,8 @@ export class DefaultApi extends runtime.BaseAPI {
      * Get swap serialized transactions for a route
      * Return setup, swap and cleanup transactions
      */
-    async v1SwapPost(requestParameters: V1SwapPostRequest = {}, initOverrides?: RequestInit): Promise<InlineResponseDefault1> {
-        const response = await this.v1SwapPostRaw(requestParameters, initOverrides);
+    async v3SwapPost(requestParameters: V3SwapPostRequest = {}, initOverrides?: RequestInit): Promise<InlineResponseDefault1> {
+        const response = await this.v3SwapPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -273,7 +248,7 @@ export class DefaultApi extends runtime.BaseAPI {
     * @export
     * @enum {string}
     */
-export enum V1QuoteGetSwapModeEnum {
+export enum V3QuoteGetSwapModeEnum {
     ExactIn = 'ExactIn',
     ExactOut = 'ExactOut'
 }

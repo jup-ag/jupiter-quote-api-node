@@ -14,30 +14,36 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    InlineResponse200Data,
-    InlineResponse200DataFromJSON,
-    InlineResponse200DataFromJSONTyped,
-    InlineResponse200DataToJSON,
-} from './InlineResponse200Data';
+    Def2,
+    Def2FromJSON,
+    Def2FromJSONTyped,
+    Def2ToJSON,
+} from './Def2';
 
 /**
- * Default response with id
+ * Default response with ids which return an object. Refer to Price hash model below. If the id is invalid, it will not return in the hash.
  * @export
  * @interface InlineResponse200
  */
 export interface InlineResponse200 {
     /**
      * 
-     * @type {InlineResponse200Data}
+     * @type {{ [key: string]: Def2; }}
      * @memberof InlineResponse200
      */
-    data?: InlineResponse200Data;
+    data?: { [key: string]: Def2; };
     /**
      * 
      * @type {number}
      * @memberof InlineResponse200
      */
     timeTaken?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InlineResponse200
+     */
+    contextSlot?: number;
 }
 
 export function InlineResponse200FromJSON(json: any): InlineResponse200 {
@@ -50,8 +56,9 @@ export function InlineResponse200FromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'data': !exists(json, 'data') ? undefined : InlineResponse200DataFromJSON(json['data']),
+        'data': !exists(json, 'data') ? undefined : (mapValues(json['data'], Def2FromJSON)),
         'timeTaken': !exists(json, 'timeTaken') ? undefined : json['timeTaken'],
+        'contextSlot': !exists(json, 'contextSlot') ? undefined : json['contextSlot'],
     };
 }
 
@@ -64,8 +71,9 @@ export function InlineResponse200ToJSON(value?: InlineResponse200 | null): any {
     }
     return {
         
-        'data': InlineResponse200DataToJSON(value.data),
+        'data': value.data === undefined ? undefined : (mapValues(value.data, Def2ToJSON)),
         'timeTaken': value.timeTaken,
+        'contextSlot': value.contextSlot,
     };
 }
 

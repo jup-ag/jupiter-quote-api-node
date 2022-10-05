@@ -49,30 +49,6 @@ export interface Def1 {
      * @type {number}
      * @memberof Def1
      */
-    amount?: number;
-    /**
-     * The minimum out amount, populated when swapMode is ExactIn, deprecated please use otherAmountThreshold instead
-     * @type {number}
-     * @memberof Def1
-     */
-    outAmountWithSlippage?: number;
-    /**
-     * The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount
-     * @type {number}
-     * @memberof Def1
-     */
-    otherAmountThreshold?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof Def1
-     */
-    swapMode?: Def1SwapModeEnum;
-    /**
-     * 
-     * @type {number}
-     * @memberof Def1
-     */
     priceImpactPct: number;
     /**
      * 
@@ -80,6 +56,30 @@ export interface Def1 {
      * @memberof Def1
      */
     marketInfos: Array<InlineResponseDefaultMarketInfos>;
+    /**
+     * 
+     * @type {number}
+     * @memberof Def1
+     */
+    amount: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Def1
+     */
+    slippageBps: number;
+    /**
+     * The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount
+     * @type {number}
+     * @memberof Def1
+     */
+    otherAmountThreshold: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Def1
+     */
+    swapMode: Def1SwapModeEnum;
     /**
      * 
      * @type {InlineResponseDefaultFees}
@@ -109,12 +109,12 @@ export function Def1FromJSONTyped(json: any, ignoreDiscriminator: boolean): Def1
         
         'inAmount': json['inAmount'],
         'outAmount': json['outAmount'],
-        'amount': !exists(json, 'amount') ? undefined : json['amount'],
-        'outAmountWithSlippage': !exists(json, 'outAmountWithSlippage') ? undefined : json['outAmountWithSlippage'],
-        'otherAmountThreshold': !exists(json, 'otherAmountThreshold') ? undefined : json['otherAmountThreshold'],
-        'swapMode': !exists(json, 'swapMode') ? undefined : json['swapMode'],
         'priceImpactPct': json['priceImpactPct'],
         'marketInfos': ((json['marketInfos'] as Array<any>).map(InlineResponseDefaultMarketInfosFromJSON)),
+        'amount': json['amount'],
+        'slippageBps': json['slippageBps'],
+        'otherAmountThreshold': json['otherAmountThreshold'],
+        'swapMode': json['swapMode'],
         'fees': !exists(json, 'fees') ? undefined : InlineResponseDefaultFeesFromJSON(json['fees']),
     };
 }
@@ -130,12 +130,12 @@ export function Def1ToJSON(value?: Def1 | null): any {
         
         'inAmount': value.inAmount,
         'outAmount': value.outAmount,
-        'amount': value.amount,
-        'outAmountWithSlippage': value.outAmountWithSlippage,
-        'otherAmountThreshold': value.otherAmountThreshold,
-        'swapMode': value.swapMode,
         'priceImpactPct': value.priceImpactPct,
         'marketInfos': ((value.marketInfos as Array<any>).map(InlineResponseDefaultMarketInfosToJSON)),
+        'amount': value.amount,
+        'slippageBps': value.slippageBps,
+        'otherAmountThreshold': value.otherAmountThreshold,
+        'swapMode': value.swapMode,
         'fees': InlineResponseDefaultFeesToJSON(value.fees),
     };
 }

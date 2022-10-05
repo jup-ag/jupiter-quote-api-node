@@ -27,10 +27,10 @@ export interface InlineResponse409Data {
     error?: string;
     /**
      * List of addresses for the symbol
-     * @type {Array<object>}
+     * @type {Array<string>}
      * @memberof InlineResponse409Data
      */
-    addresses?: Array<object>;
+    addresses?: Array<string>;
 }
 
 export function InlineResponse409DataFromJSON(json: any): InlineResponse409Data {

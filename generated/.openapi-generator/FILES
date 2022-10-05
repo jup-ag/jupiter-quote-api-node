@@ -3,9 +3,9 @@ apis/index.ts
 index.ts
 models/Def0.ts
 models/Def1.ts
+models/Def2.ts
 models/InlineObject.ts
 models/InlineResponse200.ts
-models/InlineResponse200Data.ts
 models/InlineResponse409.ts
 models/InlineResponse409Data.ts
 models/InlineResponseDefault.ts
