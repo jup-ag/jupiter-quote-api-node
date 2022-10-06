@@ -13,6 +13,19 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    InlineResponse200Fees,
+    InlineResponse200FeesFromJSON,
+    InlineResponse200FeesFromJSONTyped,
+    InlineResponse200FeesToJSON,
+} from './InlineResponse200Fees';
+import {
+    InlineResponse200MarketInfos,
+    InlineResponse200MarketInfosFromJSON,
+    InlineResponse200MarketInfosFromJSONTyped,
+    InlineResponse200MarketInfosToJSON,
+} from './InlineResponse200MarketInfos';
+
 /**
  * 
  * @export
@@ -20,35 +33,68 @@ import { exists, mapValues } from '../runtime';
  */
 export interface InlineResponse200Data {
     /**
-     * Address of the token
+     * 
      * @type {string}
      * @memberof InlineResponse200Data
      */
-    id?: string;
+    inAmount: string;
     /**
-     * Symbol of the token
+     * 
      * @type {string}
      * @memberof InlineResponse200Data
      */
-    mintSymbol?: string;
+    outAmount: string;
     /**
-     * Address of the vs token
-     * @type {string}
-     * @memberof InlineResponse200Data
-     */
-    vsToken?: string;
-    /**
-     * Symbol of the vs token
-     * @type {string}
-     * @memberof InlineResponse200Data
-     */
-    vsTokenSymbol?: string;
-    /**
-     * Default to 1 unit of the token worth in USDC if vsToken is not specified.
+     * 
      * @type {number}
      * @memberof InlineResponse200Data
      */
-    price?: number;
+    priceImpactPct: number;
+    /**
+     * 
+     * @type {Array<InlineResponse200MarketInfos>}
+     * @memberof InlineResponse200Data
+     */
+    marketInfos: Array<InlineResponse200MarketInfos>;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponse200Data
+     */
+    amount: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof InlineResponse200Data
+     */
+    slippageBps: number;
+    /**
+     * The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount
+     * @type {string}
+     * @memberof InlineResponse200Data
+     */
+    otherAmountThreshold: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponse200Data
+     */
+    swapMode: InlineResponse200DataSwapModeEnum;
+    /**
+     * 
+     * @type {InlineResponse200Fees}
+     * @memberof InlineResponse200Data
+     */
+    fees?: InlineResponse200Fees;
+}
+
+/**
+* @export
+* @enum {string}
+*/
+export enum InlineResponse200DataSwapModeEnum {
+    ExactIn = 'ExactIn',
+    ExactOut = 'ExactOut'
 }
 
 export function InlineResponse200DataFromJSON(json: any): InlineResponse200Data {
@@ -61,11 +107,15 @@ export function InlineResponse200DataFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'id': !exists(json, 'id') ? undefined : json['id'],
-        'mintSymbol': !exists(json, 'mintSymbol') ? undefined : json['mintSymbol'],
-        'vsToken': !exists(json, 'vsToken') ? undefined : json['vsToken'],
-        'vsTokenSymbol': !exists(json, 'vsTokenSymbol') ? undefined : json['vsTokenSymbol'],
-        'price': !exists(json, 'price') ? undefined : json['price'],
+        'inAmount': json['inAmount'],
+        'outAmount': json['outAmount'],
+        'priceImpactPct': json['priceImpactPct'],
+        'marketInfos': ((json['marketInfos'] as Array<any>).map(InlineResponse200MarketInfosFromJSON)),
+        'amount': json['amount'],
+        'slippageBps': json['slippageBps'],
+        'otherAmountThreshold': json['otherAmountThreshold'],
+        'swapMode': json['swapMode'],
+        'fees': !exists(json, 'fees') ? undefined : InlineResponse200FeesFromJSON(json['fees']),
     };
 }
 
@@ -78,11 +128,15 @@ export function InlineResponse200DataToJSON(value?: InlineResponse200Data | null
     }
     return {
         
-        'id': value.id,
-        'mintSymbol': value.mintSymbol,
-        'vsToken': value.vsToken,
-        'vsTokenSymbol': value.vsTokenSymbol,
-        'price': value.price,
+        'inAmount': value.inAmount,
+        'outAmount': value.outAmount,
+        'priceImpactPct': value.priceImpactPct,
+        'marketInfos': ((value.marketInfos as Array<any>).map(InlineResponse200MarketInfosToJSON)),
+        'amount': value.amount,
+        'slippageBps': value.slippageBps,
+        'otherAmountThreshold': value.otherAmountThreshold,
+        'swapMode': value.swapMode,
+        'fees': InlineResponse200FeesToJSON(value.fees),
     };
 }
 

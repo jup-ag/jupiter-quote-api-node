@@ -16,34 +16,34 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface InlineResponseDefaultLpFee
+ * @interface InlineResponse200LpFee
  */
-export interface InlineResponseDefaultLpFee {
-    /**
-     * 
-     * @type {number}
-     * @memberof InlineResponseDefaultLpFee
-     */
-    amount?: number;
+export interface InlineResponse200LpFee {
     /**
      * 
      * @type {string}
-     * @memberof InlineResponseDefaultLpFee
+     * @memberof InlineResponse200LpFee
+     */
+    amount?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponse200LpFee
      */
     mint?: string;
     /**
      * 
      * @type {number}
-     * @memberof InlineResponseDefaultLpFee
+     * @memberof InlineResponse200LpFee
      */
     pct?: number;
 }
 
-export function InlineResponseDefaultLpFeeFromJSON(json: any): InlineResponseDefaultLpFee {
-    return InlineResponseDefaultLpFeeFromJSONTyped(json, false);
+export function InlineResponse200LpFeeFromJSON(json: any): InlineResponse200LpFee {
+    return InlineResponse200LpFeeFromJSONTyped(json, false);
 }
 
-export function InlineResponseDefaultLpFeeFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponseDefaultLpFee {
+export function InlineResponse200LpFeeFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponse200LpFee {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -55,7 +55,7 @@ export function InlineResponseDefaultLpFeeFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-export function InlineResponseDefaultLpFeeToJSON(value?: InlineResponseDefaultLpFee | null): any {
+export function InlineResponse200LpFeeToJSON(value?: InlineResponse200LpFee | null): any {
     if (value === undefined) {
         return undefined;
     }

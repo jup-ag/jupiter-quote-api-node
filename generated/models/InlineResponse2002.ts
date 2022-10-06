@@ -14,55 +14,55 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    InlineResponse200Data,
-    InlineResponse200DataFromJSON,
-    InlineResponse200DataFromJSONTyped,
-    InlineResponse200DataToJSON,
-} from './InlineResponse200Data';
+    Def2,
+    Def2FromJSON,
+    Def2FromJSONTyped,
+    Def2ToJSON,
+} from './Def2';
 
 /**
- * Default response
+ * Default response with ids which return an object. Refer to Price hash model below. If the id is invalid, it will not return in the hash.
  * @export
- * @interface InlineResponse200
+ * @interface InlineResponse2002
  */
-export interface InlineResponse200 {
+export interface InlineResponse2002 {
     /**
      * 
-     * @type {Array<InlineResponse200Data>}
-     * @memberof InlineResponse200
+     * @type {{ [key: string]: Def2; }}
+     * @memberof InlineResponse2002
      */
-    data?: Array<InlineResponse200Data>;
+    data?: { [key: string]: Def2; };
     /**
      * 
      * @type {number}
-     * @memberof InlineResponse200
+     * @memberof InlineResponse2002
      */
     timeTaken?: number;
     /**
      * 
      * @type {number}
-     * @memberof InlineResponse200
+     * @memberof InlineResponse2002
      */
     contextSlot?: number;
 }
 
-export function InlineResponse200FromJSON(json: any): InlineResponse200 {
-    return InlineResponse200FromJSONTyped(json, false);
+export function InlineResponse2002FromJSON(json: any): InlineResponse2002 {
+    return InlineResponse2002FromJSONTyped(json, false);
 }
 
-export function InlineResponse200FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponse200 {
+export function InlineResponse2002FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponse2002 {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'data': !exists(json, 'data') ? undefined : ((json['data'] as Array<any>).map(InlineResponse200DataFromJSON)),
+        'data': !exists(json, 'data') ? undefined : (mapValues(json['data'], Def2FromJSON)),
         'timeTaken': !exists(json, 'timeTaken') ? undefined : json['timeTaken'],
         'contextSlot': !exists(json, 'contextSlot') ? undefined : json['contextSlot'],
     };
 }
 
-export function InlineResponse200ToJSON(value?: InlineResponse200 | null): any {
+export function InlineResponse2002ToJSON(value?: InlineResponse2002 | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -71,7 +71,7 @@ export function InlineResponse200ToJSON(value?: InlineResponse200 | null): any {
     }
     return {
         
-        'data': value.data === undefined ? undefined : ((value.data as Array<any>).map(InlineResponse200DataToJSON)),
+        'data': value.data === undefined ? undefined : (mapValues(value.data, Def2ToJSON)),
         'timeTaken': value.timeTaken,
         'contextSlot': value.contextSlot,
     };

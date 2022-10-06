@@ -14,11 +14,11 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    InlineResponseDefaultLpFee,
-    InlineResponseDefaultLpFeeFromJSON,
-    InlineResponseDefaultLpFeeFromJSONTyped,
-    InlineResponseDefaultLpFeeToJSON,
-} from './InlineResponseDefaultLpFee';
+    InlineResponse200LpFee,
+    InlineResponse200LpFeeFromJSON,
+    InlineResponse200LpFeeFromJSONTyped,
+    InlineResponse200LpFeeToJSON,
+} from './InlineResponse200LpFee';
 
 /**
  * 
@@ -58,16 +58,16 @@ export interface Def0 {
     notEnoughLiquidity?: boolean;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof Def0
      */
-    inAmount?: number;
+    inAmount?: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof Def0
      */
-    outAmount?: number;
+    outAmount?: string;
     /**
      * 
      * @type {number}
@@ -76,16 +76,16 @@ export interface Def0 {
     priceImpactPct?: number;
     /**
      * 
-     * @type {InlineResponseDefaultLpFee}
+     * @type {InlineResponse200LpFee}
      * @memberof Def0
      */
-    lpFee?: InlineResponseDefaultLpFee;
+    lpFee?: InlineResponse200LpFee;
     /**
      * 
-     * @type {InlineResponseDefaultLpFee}
+     * @type {InlineResponse200LpFee}
      * @memberof Def0
      */
-    platformFee?: InlineResponseDefaultLpFee;
+    platformFee?: InlineResponse200LpFee;
 }
 
 export function Def0FromJSON(json: any): Def0 {
@@ -106,8 +106,8 @@ export function Def0FromJSONTyped(json: any, ignoreDiscriminator: boolean): Def0
         'inAmount': !exists(json, 'inAmount') ? undefined : json['inAmount'],
         'outAmount': !exists(json, 'outAmount') ? undefined : json['outAmount'],
         'priceImpactPct': !exists(json, 'priceImpactPct') ? undefined : json['priceImpactPct'],
-        'lpFee': !exists(json, 'lpFee') ? undefined : InlineResponseDefaultLpFeeFromJSON(json['lpFee']),
-        'platformFee': !exists(json, 'platformFee') ? undefined : InlineResponseDefaultLpFeeFromJSON(json['platformFee']),
+        'lpFee': !exists(json, 'lpFee') ? undefined : InlineResponse200LpFeeFromJSON(json['lpFee']),
+        'platformFee': !exists(json, 'platformFee') ? undefined : InlineResponse200LpFeeFromJSON(json['platformFee']),
     };
 }
 
@@ -128,8 +128,8 @@ export function Def0ToJSON(value?: Def0 | null): any {
         'inAmount': value.inAmount,
         'outAmount': value.outAmount,
         'priceImpactPct': value.priceImpactPct,
-        'lpFee': InlineResponseDefaultLpFeeToJSON(value.lpFee),
-        'platformFee': InlineResponseDefaultLpFeeToJSON(value.platformFee),
+        'lpFee': InlineResponse200LpFeeToJSON(value.lpFee),
+        'platformFee': InlineResponse200LpFeeToJSON(value.platformFee),
     };
 }
 

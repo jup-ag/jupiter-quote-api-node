@@ -14,85 +14,85 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    InlineResponseDefaultLpFee,
-    InlineResponseDefaultLpFeeFromJSON,
-    InlineResponseDefaultLpFeeFromJSONTyped,
-    InlineResponseDefaultLpFeeToJSON,
-} from './InlineResponseDefaultLpFee';
+    InlineResponse200LpFee,
+    InlineResponse200LpFeeFromJSON,
+    InlineResponse200LpFeeFromJSONTyped,
+    InlineResponse200LpFeeToJSON,
+} from './InlineResponse200LpFee';
 
 /**
  * 
  * @export
- * @interface InlineResponseDefaultMarketInfos
+ * @interface InlineResponse200MarketInfos
  */
-export interface InlineResponseDefaultMarketInfos {
+export interface InlineResponse200MarketInfos {
     /**
      * 
      * @type {string}
-     * @memberof InlineResponseDefaultMarketInfos
+     * @memberof InlineResponse200MarketInfos
      */
     id?: string;
     /**
      * 
      * @type {string}
-     * @memberof InlineResponseDefaultMarketInfos
+     * @memberof InlineResponse200MarketInfos
      */
     label?: string;
     /**
      * 
      * @type {string}
-     * @memberof InlineResponseDefaultMarketInfos
+     * @memberof InlineResponse200MarketInfos
      */
     inputMint?: string;
     /**
      * 
      * @type {string}
-     * @memberof InlineResponseDefaultMarketInfos
+     * @memberof InlineResponse200MarketInfos
      */
     outputMint?: string;
     /**
      * 
      * @type {boolean}
-     * @memberof InlineResponseDefaultMarketInfos
+     * @memberof InlineResponse200MarketInfos
      */
     notEnoughLiquidity?: boolean;
     /**
      * 
-     * @type {number}
-     * @memberof InlineResponseDefaultMarketInfos
+     * @type {string}
+     * @memberof InlineResponse200MarketInfos
      */
-    inAmount?: number;
+    inAmount?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponse200MarketInfos
+     */
+    outAmount?: string;
     /**
      * 
      * @type {number}
-     * @memberof InlineResponseDefaultMarketInfos
-     */
-    outAmount?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof InlineResponseDefaultMarketInfos
+     * @memberof InlineResponse200MarketInfos
      */
     priceImpactPct?: number;
     /**
      * 
-     * @type {InlineResponseDefaultLpFee}
-     * @memberof InlineResponseDefaultMarketInfos
+     * @type {InlineResponse200LpFee}
+     * @memberof InlineResponse200MarketInfos
      */
-    lpFee?: InlineResponseDefaultLpFee;
+    lpFee?: InlineResponse200LpFee;
     /**
      * 
-     * @type {InlineResponseDefaultLpFee}
-     * @memberof InlineResponseDefaultMarketInfos
+     * @type {InlineResponse200LpFee}
+     * @memberof InlineResponse200MarketInfos
      */
-    platformFee?: InlineResponseDefaultLpFee;
+    platformFee?: InlineResponse200LpFee;
 }
 
-export function InlineResponseDefaultMarketInfosFromJSON(json: any): InlineResponseDefaultMarketInfos {
-    return InlineResponseDefaultMarketInfosFromJSONTyped(json, false);
+export function InlineResponse200MarketInfosFromJSON(json: any): InlineResponse200MarketInfos {
+    return InlineResponse200MarketInfosFromJSONTyped(json, false);
 }
 
-export function InlineResponseDefaultMarketInfosFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponseDefaultMarketInfos {
+export function InlineResponse200MarketInfosFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponse200MarketInfos {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -106,12 +106,12 @@ export function InlineResponseDefaultMarketInfosFromJSONTyped(json: any, ignoreD
         'inAmount': !exists(json, 'inAmount') ? undefined : json['inAmount'],
         'outAmount': !exists(json, 'outAmount') ? undefined : json['outAmount'],
         'priceImpactPct': !exists(json, 'priceImpactPct') ? undefined : json['priceImpactPct'],
-        'lpFee': !exists(json, 'lpFee') ? undefined : InlineResponseDefaultLpFeeFromJSON(json['lpFee']),
-        'platformFee': !exists(json, 'platformFee') ? undefined : InlineResponseDefaultLpFeeFromJSON(json['platformFee']),
+        'lpFee': !exists(json, 'lpFee') ? undefined : InlineResponse200LpFeeFromJSON(json['lpFee']),
+        'platformFee': !exists(json, 'platformFee') ? undefined : InlineResponse200LpFeeFromJSON(json['platformFee']),
     };
 }
 
-export function InlineResponseDefaultMarketInfosToJSON(value?: InlineResponseDefaultMarketInfos | null): any {
+export function InlineResponse200MarketInfosToJSON(value?: InlineResponse200MarketInfos | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -128,8 +128,8 @@ export function InlineResponseDefaultMarketInfosToJSON(value?: InlineResponseDef
         'inAmount': value.inAmount,
         'outAmount': value.outAmount,
         'priceImpactPct': value.priceImpactPct,
-        'lpFee': InlineResponseDefaultLpFeeToJSON(value.lpFee),
-        'platformFee': InlineResponseDefaultLpFeeToJSON(value.platformFee),
+        'lpFee': InlineResponse200LpFeeToJSON(value.lpFee),
+        'platformFee': InlineResponse200LpFeeToJSON(value.platformFee),
     };
 }
 

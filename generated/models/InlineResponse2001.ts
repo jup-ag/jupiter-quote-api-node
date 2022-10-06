@@ -16,34 +16,34 @@ import { exists, mapValues } from '../runtime';
 /**
  * Default response
  * @export
- * @interface InlineResponseDefault1
+ * @interface InlineResponse2001
  */
-export interface InlineResponseDefault1 {
+export interface InlineResponse2001 {
     /**
      * Base64 encoded transaction
      * @type {string}
-     * @memberof InlineResponseDefault1
+     * @memberof InlineResponse2001
      */
     setupTransaction?: string;
     /**
      * Base64 encoded transaction
      * @type {string}
-     * @memberof InlineResponseDefault1
+     * @memberof InlineResponse2001
      */
     swapTransaction?: string;
     /**
      * Base64 encoded transaction
      * @type {string}
-     * @memberof InlineResponseDefault1
+     * @memberof InlineResponse2001
      */
     cleanupTransaction?: string;
 }
 
-export function InlineResponseDefault1FromJSON(json: any): InlineResponseDefault1 {
-    return InlineResponseDefault1FromJSONTyped(json, false);
+export function InlineResponse2001FromJSON(json: any): InlineResponse2001 {
+    return InlineResponse2001FromJSONTyped(json, false);
 }
 
-export function InlineResponseDefault1FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponseDefault1 {
+export function InlineResponse2001FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponse2001 {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -55,7 +55,7 @@ export function InlineResponseDefault1FromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function InlineResponseDefault1ToJSON(value?: InlineResponseDefault1 | null): any {
+export function InlineResponse2001ToJSON(value?: InlineResponse2001 | null): any {
     if (value === undefined) {
         return undefined;
     }

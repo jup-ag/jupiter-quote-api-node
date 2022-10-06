@@ -26,10 +26,10 @@
           "type": "boolean"
         },
         "inAmount": {
-          "type": "integer"
+          "type": "string"
         },
         "outAmount": {
-          "type": "integer"
+          "type": "string"
         },
         "priceImpactPct": {
           "type": "number"
@@ -38,7 +38,7 @@
           "type": "object",
           "properties": {
             "amount": {
-              "type": "number"
+              "type": "string"
             },
             "mint": {
               "type": "string"
@@ -52,7 +52,7 @@
           "type": "object",
           "properties": {
             "amount": {
-              "type": "number"
+              "type": "string"
             },
             "mint": {
               "type": "string"
@@ -79,10 +79,10 @@
       ],
       "properties": {
         "inAmount": {
-          "type": "integer"
+          "type": "string"
         },
         "outAmount": {
-          "type": "integer"
+          "type": "string"
         },
         "priceImpactPct": {
           "type": "number"
@@ -109,10 +109,10 @@
                 "type": "boolean"
               },
               "inAmount": {
-                "type": "integer"
+                "type": "string"
               },
               "outAmount": {
-                "type": "integer"
+                "type": "string"
               },
               "priceImpactPct": {
                 "type": "number"
@@ -121,7 +121,7 @@
                 "type": "object",
                 "properties": {
                   "amount": {
-                    "type": "number"
+                    "type": "string"
                   },
                   "mint": {
                     "type": "string"
@@ -135,7 +135,7 @@
                 "type": "object",
                 "properties": {
                   "amount": {
-                    "type": "number"
+                    "type": "string"
                   },
                   "mint": {
                     "type": "string"
@@ -149,7 +149,7 @@
           }
         },
         "amount": {
-          "type": "integer"
+          "type": "string"
         },
         "slippageBps": {
           "type": "integer",
@@ -157,7 +157,7 @@
           "maximum": 10000
         },
         "otherAmountThreshold": {
-          "type": "integer",
+          "type": "string",
           "description": "The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount"
         },
         "swapMode": {
@@ -279,7 +279,7 @@
             "name": "outputMint"
           },
           {
-            "type": "integer",
+            "type": "string",
             "description": "amount",
             "required": true,
             "in": "query",
@@ -325,7 +325,7 @@
           }
         ],
         "responses": {
-          "default": {
+          "200": {
             "description": "Default response",
             "schema": {
               "description": "Default response",
@@ -347,10 +347,10 @@
                     ],
                     "properties": {
                       "inAmount": {
-                        "type": "integer"
+                        "type": "string"
                       },
                       "outAmount": {
-                        "type": "integer"
+                        "type": "string"
                       },
                       "priceImpactPct": {
                         "type": "number"
@@ -377,10 +377,10 @@
                               "type": "boolean"
                             },
                             "inAmount": {
-                              "type": "integer"
+                              "type": "string"
                             },
                             "outAmount": {
-                              "type": "integer"
+                              "type": "string"
                             },
                             "priceImpactPct": {
                               "type": "number"
@@ -389,7 +389,7 @@
                               "type": "object",
                               "properties": {
                                 "amount": {
-                                  "type": "number"
+                                  "type": "string"
                                 },
                                 "mint": {
                                   "type": "string"
@@ -403,7 +403,7 @@
                               "type": "object",
                               "properties": {
                                 "amount": {
-                                  "type": "number"
+                                  "type": "string"
                                 },
                                 "mint": {
                                   "type": "string"
@@ -417,7 +417,7 @@
                         }
                       },
                       "amount": {
-                        "type": "integer"
+                        "type": "string"
                       },
                       "slippageBps": {
                         "type": "integer",
@@ -425,7 +425,7 @@
                         "maximum": 10000
                       },
                       "otherAmountThreshold": {
-                        "type": "integer",
+                        "type": "string",
                         "description": "The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount"
                       },
                       "swapMode": {
@@ -518,7 +518,7 @@
           }
         ],
         "responses": {
-          "default": {
+          "200": {
             "description": "Default response",
             "schema": {
               "description": "Default response",
@@ -641,7 +641,7 @@
           }
         ],
         "responses": {
-          "default": {
+          "200": {
             "description": "Default response",
             "schema": {
               "description": "Default response",

@@ -21,18 +21,18 @@ import {
     InlineResponse200,
     InlineResponse200FromJSON,
     InlineResponse200ToJSON,
+    InlineResponse2001,
+    InlineResponse2001FromJSON,
+    InlineResponse2001ToJSON,
+    InlineResponse2002,
+    InlineResponse2002FromJSON,
+    InlineResponse2002ToJSON,
+    InlineResponse2003,
+    InlineResponse2003FromJSON,
+    InlineResponse2003ToJSON,
     InlineResponse409,
     InlineResponse409FromJSON,
     InlineResponse409ToJSON,
-    InlineResponseDefault,
-    InlineResponseDefaultFromJSON,
-    InlineResponseDefaultToJSON,
-    InlineResponseDefault1,
-    InlineResponseDefault1FromJSON,
-    InlineResponseDefault1ToJSON,
-    InlineResponseDefault2,
-    InlineResponseDefault2FromJSON,
-    InlineResponseDefault2ToJSON,
 } from '../models';
 
 export interface V3IndexedRouteMapGetRequest {
@@ -48,7 +48,7 @@ export interface V3PriceGetRequest {
 export interface V3QuoteGetRequest {
     inputMint: string;
     outputMint: string;
-    amount: number;
+    amount: string;
     swapMode?: V3QuoteGetSwapModeEnum;
     slippageBps?: number;
     feeBps?: number;
@@ -68,7 +68,7 @@ export class DefaultApi extends runtime.BaseAPI {
     /**
      * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      */
-    async v3IndexedRouteMapGetRaw(requestParameters: V3IndexedRouteMapGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault2>> {
+    async v3IndexedRouteMapGetRaw(requestParameters: V3IndexedRouteMapGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponse2003>> {
         const queryParameters: any = {};
 
         if (requestParameters.onlyDirectRoutes !== undefined) {
@@ -84,13 +84,13 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponseDefault2FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2003FromJSON(jsonValue));
     }
 
     /**
      * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      */
-    async v3IndexedRouteMapGet(requestParameters: V3IndexedRouteMapGetRequest = {}, initOverrides?: RequestInit): Promise<InlineResponseDefault2> {
+    async v3IndexedRouteMapGet(requestParameters: V3IndexedRouteMapGetRequest = {}, initOverrides?: RequestInit): Promise<InlineResponse2003> {
         const response = await this.v3IndexedRouteMapGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -99,7 +99,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Get simple price for a given input mint, output mint and amount
      * Return simple price
      */
-    async v3PriceGetRaw(requestParameters: V3PriceGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponse200>> {
+    async v3PriceGetRaw(requestParameters: V3PriceGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponse2002>> {
         if (requestParameters.ids === null || requestParameters.ids === undefined) {
             throw new runtime.RequiredError('ids','Required parameter requestParameters.ids was null or undefined when calling v3PriceGet.');
         }
@@ -127,14 +127,14 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse200FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2002FromJSON(jsonValue));
     }
 
     /**
      * Get simple price for a given input mint, output mint and amount
      * Return simple price
      */
-    async v3PriceGet(requestParameters: V3PriceGetRequest, initOverrides?: RequestInit): Promise<InlineResponse200> {
+    async v3PriceGet(requestParameters: V3PriceGetRequest, initOverrides?: RequestInit): Promise<InlineResponse2002> {
         const response = await this.v3PriceGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -143,7 +143,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Get quote for a given input mint, output mint and amount
      * Return route
      */
-    async v3QuoteGetRaw(requestParameters: V3QuoteGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault>> {
+    async v3QuoteGetRaw(requestParameters: V3QuoteGetRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponse200>> {
         if (requestParameters.inputMint === null || requestParameters.inputMint === undefined) {
             throw new runtime.RequiredError('inputMint','Required parameter requestParameters.inputMint was null or undefined when calling v3QuoteGet.');
         }
@@ -199,14 +199,14 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponseDefaultFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse200FromJSON(jsonValue));
     }
 
     /**
      * Get quote for a given input mint, output mint and amount
      * Return route
      */
-    async v3QuoteGet(requestParameters: V3QuoteGetRequest, initOverrides?: RequestInit): Promise<InlineResponseDefault> {
+    async v3QuoteGet(requestParameters: V3QuoteGetRequest, initOverrides?: RequestInit): Promise<InlineResponse200> {
         const response = await this.v3QuoteGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -215,7 +215,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Get swap serialized transactions for a route
      * Return setup, swap and cleanup transactions
      */
-    async v3SwapPostRaw(requestParameters: V3SwapPostRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponseDefault1>> {
+    async v3SwapPostRaw(requestParameters: V3SwapPostRequest, initOverrides?: RequestInit): Promise<runtime.ApiResponse<InlineResponse2001>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -230,14 +230,14 @@ export class DefaultApi extends runtime.BaseAPI {
             body: InlineObjectToJSON(requestParameters.body),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponseDefault1FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => InlineResponse2001FromJSON(jsonValue));
     }
 
     /**
      * Get swap serialized transactions for a route
      * Return setup, swap and cleanup transactions
      */
-    async v3SwapPost(requestParameters: V3SwapPostRequest = {}, initOverrides?: RequestInit): Promise<InlineResponseDefault1> {
+    async v3SwapPost(requestParameters: V3SwapPostRequest = {}, initOverrides?: RequestInit): Promise<InlineResponse2001> {
         const response = await this.v3SwapPostRaw(requestParameters, initOverrides);
         return await response.value();
     }

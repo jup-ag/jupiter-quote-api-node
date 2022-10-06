@@ -16,28 +16,28 @@ import { exists, mapValues } from '../runtime';
 /**
  * Default response
  * @export
- * @interface InlineResponseDefault2
+ * @interface InlineResponse2003
  */
-export interface InlineResponseDefault2 {
+export interface InlineResponse2003 {
     /**
      * All the mints that are indexed to match in indexedRouteMap
      * @type {Array<string>}
-     * @memberof InlineResponseDefault2
+     * @memberof InlineResponse2003
      */
     mintKeys?: Array<string>;
     /**
      * All the possible route and their corresponding output mints
      * @type {{ [key: string]: Array<number>; }}
-     * @memberof InlineResponseDefault2
+     * @memberof InlineResponse2003
      */
     indexedRouteMap?: { [key: string]: Array<number>; };
 }
 
-export function InlineResponseDefault2FromJSON(json: any): InlineResponseDefault2 {
-    return InlineResponseDefault2FromJSONTyped(json, false);
+export function InlineResponse2003FromJSON(json: any): InlineResponse2003 {
+    return InlineResponse2003FromJSONTyped(json, false);
 }
 
-export function InlineResponseDefault2FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponseDefault2 {
+export function InlineResponse2003FromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponse2003 {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -48,7 +48,7 @@ export function InlineResponseDefault2FromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-export function InlineResponseDefault2ToJSON(value?: InlineResponseDefault2 | null): any {
+export function InlineResponse2003ToJSON(value?: InlineResponse2003 | null): any {
     if (value === undefined) {
         return undefined;
     }

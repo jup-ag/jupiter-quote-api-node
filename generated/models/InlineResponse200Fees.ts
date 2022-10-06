@@ -16,46 +16,46 @@ import { exists, mapValues } from '../runtime';
 /**
  * Only returned when userPublicKey is given to /quote
  * @export
- * @interface InlineResponseDefaultFees
+ * @interface InlineResponse200Fees
  */
-export interface InlineResponseDefaultFees {
+export interface InlineResponse200Fees {
     /**
      * This inidicate the total amount needed for signing transaction(s). Value in lamports.
      * @type {number}
-     * @memberof InlineResponseDefaultFees
+     * @memberof InlineResponse200Fees
      */
     signatureFee?: number;
     /**
      * This inidicate the total amount needed for deposit of serum order account(s). Value in lamports.
      * @type {Array<number>}
-     * @memberof InlineResponseDefaultFees
+     * @memberof InlineResponse200Fees
      */
     openOrdersDeposits?: Array<number>;
     /**
      * This inidicate the total amount needed for deposit of associative token account(s). Value in lamports.
      * @type {Array<number>}
-     * @memberof InlineResponseDefaultFees
+     * @memberof InlineResponse200Fees
      */
     ataDeposits?: Array<number>;
     /**
      * This inidicate the total lamports needed for fees and deposits above.
      * @type {number}
-     * @memberof InlineResponseDefaultFees
+     * @memberof InlineResponse200Fees
      */
     totalFeeAndDeposits?: number;
     /**
      * This inidicate the minimum lamports needed for transaction(s). Might be used to create wrapped SOL and will be returned when the wrapped SOL is closed.
      * @type {number}
-     * @memberof InlineResponseDefaultFees
+     * @memberof InlineResponse200Fees
      */
     minimumSOLForTransaction?: number;
 }
 
-export function InlineResponseDefaultFeesFromJSON(json: any): InlineResponseDefaultFees {
-    return InlineResponseDefaultFeesFromJSONTyped(json, false);
+export function InlineResponse200FeesFromJSON(json: any): InlineResponse200Fees {
+    return InlineResponse200FeesFromJSONTyped(json, false);
 }
 
-export function InlineResponseDefaultFeesFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponseDefaultFees {
+export function InlineResponse200FeesFromJSONTyped(json: any, ignoreDiscriminator: boolean): InlineResponse200Fees {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -69,7 +69,7 @@ export function InlineResponseDefaultFeesFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-export function InlineResponseDefaultFeesToJSON(value?: InlineResponseDefaultFees | null): any {
+export function InlineResponse200FeesToJSON(value?: InlineResponse200Fees | null): any {
     if (value === undefined) {
         return undefined;
     }

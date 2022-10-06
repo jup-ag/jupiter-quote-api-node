@@ -14,17 +14,17 @@
 
 import { exists, mapValues } from '../runtime';
 import {
-    InlineResponseDefaultFees,
-    InlineResponseDefaultFeesFromJSON,
-    InlineResponseDefaultFeesFromJSONTyped,
-    InlineResponseDefaultFeesToJSON,
-} from './InlineResponseDefaultFees';
+    InlineResponse200Fees,
+    InlineResponse200FeesFromJSON,
+    InlineResponse200FeesFromJSONTyped,
+    InlineResponse200FeesToJSON,
+} from './InlineResponse200Fees';
 import {
-    InlineResponseDefaultMarketInfos,
-    InlineResponseDefaultMarketInfosFromJSON,
-    InlineResponseDefaultMarketInfosFromJSONTyped,
-    InlineResponseDefaultMarketInfosToJSON,
-} from './InlineResponseDefaultMarketInfos';
+    InlineResponse200MarketInfos,
+    InlineResponse200MarketInfosFromJSON,
+    InlineResponse200MarketInfosFromJSONTyped,
+    InlineResponse200MarketInfosToJSON,
+} from './InlineResponse200MarketInfos';
 
 /**
  * 
@@ -34,16 +34,16 @@ import {
 export interface Def1 {
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof Def1
      */
-    inAmount: number;
+    inAmount: string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof Def1
      */
-    outAmount: number;
+    outAmount: string;
     /**
      * 
      * @type {number}
@@ -52,16 +52,16 @@ export interface Def1 {
     priceImpactPct: number;
     /**
      * 
-     * @type {Array<InlineResponseDefaultMarketInfos>}
+     * @type {Array<InlineResponse200MarketInfos>}
      * @memberof Def1
      */
-    marketInfos: Array<InlineResponseDefaultMarketInfos>;
+    marketInfos: Array<InlineResponse200MarketInfos>;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof Def1
      */
-    amount: number;
+    amount: string;
     /**
      * 
      * @type {number}
@@ -70,10 +70,10 @@ export interface Def1 {
     slippageBps: number;
     /**
      * The threshold for the swap based on the provided slippage: when swapMode is ExactIn the minimum out amount, when swapMode is ExactOut the maximum in amount
-     * @type {number}
+     * @type {string}
      * @memberof Def1
      */
-    otherAmountThreshold: number;
+    otherAmountThreshold: string;
     /**
      * 
      * @type {string}
@@ -82,10 +82,10 @@ export interface Def1 {
     swapMode: Def1SwapModeEnum;
     /**
      * 
-     * @type {InlineResponseDefaultFees}
+     * @type {InlineResponse200Fees}
      * @memberof Def1
      */
-    fees?: InlineResponseDefaultFees;
+    fees?: InlineResponse200Fees;
 }
 
 /**
@@ -110,12 +110,12 @@ export function Def1FromJSONTyped(json: any, ignoreDiscriminator: boolean): Def1
         'inAmount': json['inAmount'],
         'outAmount': json['outAmount'],
         'priceImpactPct': json['priceImpactPct'],
-        'marketInfos': ((json['marketInfos'] as Array<any>).map(InlineResponseDefaultMarketInfosFromJSON)),
+        'marketInfos': ((json['marketInfos'] as Array<any>).map(InlineResponse200MarketInfosFromJSON)),
         'amount': json['amount'],
         'slippageBps': json['slippageBps'],
         'otherAmountThreshold': json['otherAmountThreshold'],
         'swapMode': json['swapMode'],
-        'fees': !exists(json, 'fees') ? undefined : InlineResponseDefaultFeesFromJSON(json['fees']),
+        'fees': !exists(json, 'fees') ? undefined : InlineResponse200FeesFromJSON(json['fees']),
     };
 }
 
@@ -131,12 +131,12 @@ export function Def1ToJSON(value?: Def1 | null): any {
         'inAmount': value.inAmount,
         'outAmount': value.outAmount,
         'priceImpactPct': value.priceImpactPct,
-        'marketInfos': ((value.marketInfos as Array<any>).map(InlineResponseDefaultMarketInfosToJSON)),
+        'marketInfos': ((value.marketInfos as Array<any>).map(InlineResponse200MarketInfosToJSON)),
         'amount': value.amount,
         'slippageBps': value.slippageBps,
         'otherAmountThreshold': value.otherAmountThreshold,
         'swapMode': value.swapMode,
-        'fees': InlineResponseDefaultFeesToJSON(value.fees),
+        'fees': InlineResponse200FeesToJSON(value.fees),
     };
 }
 
