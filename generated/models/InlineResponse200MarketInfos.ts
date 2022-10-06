@@ -70,6 +70,18 @@ export interface InlineResponse200MarketInfos {
     outAmount?: string;
     /**
      * 
+     * @type {string}
+     * @memberof InlineResponse200MarketInfos
+     */
+    minInAmount?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InlineResponse200MarketInfos
+     */
+    minOutAmount?: string;
+    /**
+     * 
      * @type {number}
      * @memberof InlineResponse200MarketInfos
      */
@@ -105,6 +117,8 @@ export function InlineResponse200MarketInfosFromJSONTyped(json: any, ignoreDiscr
         'notEnoughLiquidity': !exists(json, 'notEnoughLiquidity') ? undefined : json['notEnoughLiquidity'],
         'inAmount': !exists(json, 'inAmount') ? undefined : json['inAmount'],
         'outAmount': !exists(json, 'outAmount') ? undefined : json['outAmount'],
+        'minInAmount': !exists(json, 'minInAmount') ? undefined : json['minInAmount'],
+        'minOutAmount': !exists(json, 'minOutAmount') ? undefined : json['minOutAmount'],
         'priceImpactPct': !exists(json, 'priceImpactPct') ? undefined : json['priceImpactPct'],
         'lpFee': !exists(json, 'lpFee') ? undefined : InlineResponse200LpFeeFromJSON(json['lpFee']),
         'platformFee': !exists(json, 'platformFee') ? undefined : InlineResponse200LpFeeFromJSON(json['platformFee']),
@@ -127,6 +141,8 @@ export function InlineResponse200MarketInfosToJSON(value?: InlineResponse200Mark
         'notEnoughLiquidity': value.notEnoughLiquidity,
         'inAmount': value.inAmount,
         'outAmount': value.outAmount,
+        'minInAmount': value.minInAmount,
+        'minOutAmount': value.minOutAmount,
         'priceImpactPct': value.priceImpactPct,
         'lpFee': InlineResponse200LpFeeToJSON(value.lpFee),
         'platformFee': InlineResponse200LpFeeToJSON(value.platformFee),

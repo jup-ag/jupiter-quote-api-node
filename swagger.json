@@ -31,6 +31,14 @@
         "outAmount": {
           "type": "string"
         },
+        "minInAmount": {
+          "type": "string",
+          "nullable": true
+        },
+        "minOutAmount": {
+          "type": "string",
+          "nullable": true
+        },
         "priceImpactPct": {
           "type": "number"
         },
@@ -113,6 +121,14 @@
               },
               "outAmount": {
                 "type": "string"
+              },
+              "minInAmount": {
+                "type": "string",
+                "nullable": true
+              },
+              "minOutAmount": {
+                "type": "string",
+                "nullable": true
               },
               "priceImpactPct": {
                 "type": "number"
@@ -381,6 +397,14 @@
                             },
                             "outAmount": {
                               "type": "string"
+                            },
+                            "minInAmount": {
+                              "type": "string",
+                              "nullable": true
+                            },
+                            "minOutAmount": {
+                              "type": "string",
+                              "nullable": true
                             },
                             "priceImpactPct": {
                               "type": "number"

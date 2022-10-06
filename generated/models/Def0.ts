@@ -70,6 +70,18 @@ export interface Def0 {
     outAmount?: string;
     /**
      * 
+     * @type {string}
+     * @memberof Def0
+     */
+    minInAmount?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Def0
+     */
+    minOutAmount?: string;
+    /**
+     * 
      * @type {number}
      * @memberof Def0
      */
@@ -105,6 +117,8 @@ export function Def0FromJSONTyped(json: any, ignoreDiscriminator: boolean): Def0
         'notEnoughLiquidity': !exists(json, 'notEnoughLiquidity') ? undefined : json['notEnoughLiquidity'],
         'inAmount': !exists(json, 'inAmount') ? undefined : json['inAmount'],
         'outAmount': !exists(json, 'outAmount') ? undefined : json['outAmount'],
+        'minInAmount': !exists(json, 'minInAmount') ? undefined : json['minInAmount'],
+        'minOutAmount': !exists(json, 'minOutAmount') ? undefined : json['minOutAmount'],
         'priceImpactPct': !exists(json, 'priceImpactPct') ? undefined : json['priceImpactPct'],
         'lpFee': !exists(json, 'lpFee') ? undefined : InlineResponse200LpFeeFromJSON(json['lpFee']),
         'platformFee': !exists(json, 'platformFee') ? undefined : InlineResponse200LpFeeFromJSON(json['platformFee']),
@@ -127,6 +141,8 @@ export function Def0ToJSON(value?: Def0 | null): any {
         'notEnoughLiquidity': value.notEnoughLiquidity,
         'inAmount': value.inAmount,
         'outAmount': value.outAmount,
+        'minInAmount': value.minInAmount,
+        'minOutAmount': value.minOutAmount,
         'priceImpactPct': value.priceImpactPct,
         'lpFee': InlineResponse200LpFeeToJSON(value.lpFee),
         'platformFee': InlineResponse200LpFeeToJSON(value.platformFee),
