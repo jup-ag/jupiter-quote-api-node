@@ -54,6 +54,7 @@ export interface V3QuoteGetRequest {
     feeBps?: number;
     onlyDirectRoutes?: boolean;
     userPublicKey?: string;
+    enforceSingleTx?: boolean;
 }
 
 export interface V3SwapPostRequest {
@@ -188,6 +189,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.userPublicKey !== undefined) {
             queryParameters['userPublicKey'] = requestParameters.userPublicKey;
+        }
+
+        if (requestParameters.enforceSingleTx !== undefined) {
+            queryParameters['enforceSingleTx'] = requestParameters.enforceSingleTx;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

@@ -338,6 +338,13 @@
             "required": false,
             "in": "query",
             "name": "userPublicKey"
+          },
+          {
+            "type": "boolean",
+            "description": "Only return routes that can be done in a single transaction. (Routes might be limited)",
+            "required": false,
+            "in": "query",
+            "name": "enforceSingleTx"
           }
         ],
         "responses": {
