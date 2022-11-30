@@ -51,6 +51,12 @@ export interface InlineObject {
      */
     feeAccount?: string;
     /**
+     * Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large
+     * @type {boolean}
+     * @memberof InlineObject
+     */
+    asLegacyTransaction?: boolean;
+    /**
      * Public key of the wallet that will receive the output of the swap, this assumes the associated token account exists, currently adds a token transfer
      * @type {string}
      * @memberof InlineObject
@@ -72,6 +78,7 @@ export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'userPublicKey': json['userPublicKey'],
         'wrapUnwrapSOL': !exists(json, 'wrapUnwrapSOL') ? undefined : json['wrapUnwrapSOL'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
+        'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
         'destinationWallet': !exists(json, 'destinationWallet') ? undefined : json['destinationWallet'],
     };
 }
@@ -89,6 +96,7 @@ export function InlineObjectToJSON(value?: InlineObject | null): any {
         'userPublicKey': value.userPublicKey,
         'wrapUnwrapSOL': value.wrapUnwrapSOL,
         'feeAccount': value.feeAccount,
+        'asLegacyTransaction': value.asLegacyTransaction,
         'destinationWallet': value.destinationWallet,
     };
 }

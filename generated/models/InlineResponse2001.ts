@@ -24,19 +24,7 @@ export interface InlineResponse2001 {
      * @type {string}
      * @memberof InlineResponse2001
      */
-    setupTransaction?: string;
-    /**
-     * Base64 encoded transaction
-     * @type {string}
-     * @memberof InlineResponse2001
-     */
     swapTransaction?: string;
-    /**
-     * Base64 encoded transaction
-     * @type {string}
-     * @memberof InlineResponse2001
-     */
-    cleanupTransaction?: string;
 }
 
 export function InlineResponse2001FromJSON(json: any): InlineResponse2001 {
@@ -49,9 +37,7 @@ export function InlineResponse2001FromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'setupTransaction': !exists(json, 'setupTransaction') ? undefined : json['setupTransaction'],
         'swapTransaction': !exists(json, 'swapTransaction') ? undefined : json['swapTransaction'],
-        'cleanupTransaction': !exists(json, 'cleanupTransaction') ? undefined : json['cleanupTransaction'],
     };
 }
 
@@ -64,9 +50,7 @@ export function InlineResponse2001ToJSON(value?: InlineResponse2001 | null): any
     }
     return {
         
-        'setupTransaction': value.setupTransaction,
         'swapTransaction': value.swapTransaction,
-        'cleanupTransaction': value.cleanupTransaction,
     };
 }
 

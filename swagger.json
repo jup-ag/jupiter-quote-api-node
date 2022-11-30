@@ -274,7 +274,7 @@
     }
   },
   "paths": {
-    "/v3/quote": {
+    "/v4/quote": {
       "get": {
         "summary": "Return route",
         "description": "Get quote for a given input mint, output mint and amount",
@@ -341,10 +341,10 @@
           },
           {
             "type": "boolean",
-            "description": "Only return routes that can be done in a single transaction. (Routes might be limited)",
+            "description": "Only return routes that can be done in a single legacy transaction. (Routes might be limited)",
             "required": false,
             "in": "query",
-            "name": "enforceSingleTx"
+            "name": "asLegacyTransaction"
           }
         ],
         "responses": {
@@ -511,7 +511,7 @@
         }
       }
     },
-    "/v3/swap": {
+    "/v4/swap": {
       "post": {
         "summary": "Return setup, swap and cleanup transactions",
         "description": "Get swap serialized transactions for a route",
@@ -540,6 +540,11 @@
                   "type": "string",
                   "description": "Fee token account for the output token (only pass in if you set a feeBps)"
                 },
+                "asLegacyTransaction": {
+                  "type": "boolean",
+                  "nullable": true,
+                  "description": "Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large"
+                },
                 "destinationWallet": {
                   "type": "string",
                   "description": "Public key of the wallet that will receive the output of the swap, this assumes the associated token account exists, currently adds a token transfer"
@@ -555,15 +560,7 @@
               "description": "Default response",
               "type": "object",
               "properties": {
-                "setupTransaction": {
-                  "type": "string",
-                  "description": "Base64 encoded transaction"
-                },
                 "swapTransaction": {
-                  "type": "string",
-                  "description": "Base64 encoded transaction"
-                },
-                "cleanupTransaction": {
                   "type": "string",
                   "description": "Base64 encoded transaction"
                 }
@@ -573,7 +570,7 @@
         }
       }
     },
-    "/v3/price": {
+    "/v4/price": {
       "get": {
         "summary": "Return simple price",
         "description": "Get simple price for a given input mint, output mint and amount",
@@ -659,7 +656,7 @@
         }
       }
     },
-    "/v3/indexed-route-map": {
+    "/v4/indexed-route-map": {
       "get": {
         "description": "Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size",
         "parameters": [
