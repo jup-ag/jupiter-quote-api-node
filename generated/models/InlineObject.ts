@@ -57,6 +57,12 @@ export interface InlineObject {
      */
     asLegacyTransaction?: boolean;
     /**
+     * compute unit price to prioritize the transaction, the additional fee will be compute unit consumed * computeUnitPriceMicroLamports
+     * @type {number}
+     * @memberof InlineObject
+     */
+    computeUnitPriceMicroLamports?: number;
+    /**
      * Public key of the wallet that will receive the output of the swap, this assumes the associated token account exists, currently adds a token transfer
      * @type {string}
      * @memberof InlineObject
@@ -79,6 +85,7 @@ export function InlineObjectFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'wrapUnwrapSOL': !exists(json, 'wrapUnwrapSOL') ? undefined : json['wrapUnwrapSOL'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
         'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
+        'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : json['computeUnitPriceMicroLamports'],
         'destinationWallet': !exists(json, 'destinationWallet') ? undefined : json['destinationWallet'],
     };
 }
@@ -97,6 +104,7 @@ export function InlineObjectToJSON(value?: InlineObject | null): any {
         'wrapUnwrapSOL': value.wrapUnwrapSOL,
         'feeAccount': value.feeAccount,
         'asLegacyTransaction': value.asLegacyTransaction,
+        'computeUnitPriceMicroLamports': value.computeUnitPriceMicroLamports,
         'destinationWallet': value.destinationWallet,
     };
 }
