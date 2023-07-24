@@ -34,13 +34,18 @@ function inflateIndexedRouteMap(
 }
 
 export async function main() {
-  const jupiterQuoteApi = new DefaultApi();
+  const config = new Configuration({
+    fetchApi: fetch,
+  });
+
+  const jupiterQuoteApi = new DefaultApi(config);
 
   // get quote
   const quote = await jupiterQuoteApi.quoteGet({
     inputMint: "So11111111111111111111111111111111111111112",
     outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     amount: "100000000",
+    // platformFeeBps: 10,
     // asLegacyTransaction: true, // legacy transaction, default is versoined transaction
   });
 

@@ -43,7 +43,7 @@ export interface QuoteResponseV2 {
      * @type {string}
      * @memberof QuoteResponseV2
      */
-    inputMint?: string;
+    inputMint: string;
     /**
      * 
      * @type {string}
@@ -55,31 +55,31 @@ export interface QuoteResponseV2 {
      * @type {string}
      * @memberof QuoteResponseV2
      */
-    outputMint?: string;
+    outputMint: string;
     /**
      * 
      * @type {string}
      * @memberof QuoteResponseV2
      */
-    outAmount?: string;
+    outAmount: string;
     /**
      * 
      * @type {string}
      * @memberof QuoteResponseV2
      */
-    otherAmountThreshold?: string;
+    otherAmountThreshold: string;
     /**
      * 
      * @type {SwapMode}
      * @memberof QuoteResponseV2
      */
-    swapMode?: SwapMode;
+    swapMode: SwapMode;
     /**
      * 
      * @type {number}
      * @memberof QuoteResponseV2
      */
-    slippageBps?: number;
+    slippageBps: number;
     /**
      * 
      * @type {PlatformFee}
@@ -91,13 +91,13 @@ export interface QuoteResponseV2 {
      * @type {number}
      * @memberof QuoteResponseV2
      */
-    priceImpactPct?: number;
+    priceImpactPct: number;
     /**
      * 
      * @type {Array<RoutePlanStep>}
      * @memberof QuoteResponseV2
      */
-    routePlan?: Array<RoutePlanStep>;
+    routePlan: Array<RoutePlanStep>;
     /**
      * 
      * @type {number}
@@ -117,6 +117,14 @@ export interface QuoteResponseV2 {
  */
 export function instanceOfQuoteResponseV2(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "inputMint" in value;
+    isInstance = isInstance && "outputMint" in value;
+    isInstance = isInstance && "outAmount" in value;
+    isInstance = isInstance && "otherAmountThreshold" in value;
+    isInstance = isInstance && "swapMode" in value;
+    isInstance = isInstance && "slippageBps" in value;
+    isInstance = isInstance && "priceImpactPct" in value;
+    isInstance = isInstance && "routePlan" in value;
 
     return isInstance;
 }
@@ -131,16 +139,16 @@ export function QuoteResponseV2FromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
-        'inputMint': !exists(json, 'inputMint') ? undefined : json['inputMint'],
+        'inputMint': json['inputMint'],
         'inAmount': !exists(json, 'inAmount') ? undefined : json['inAmount'],
-        'outputMint': !exists(json, 'outputMint') ? undefined : json['outputMint'],
-        'outAmount': !exists(json, 'outAmount') ? undefined : json['outAmount'],
-        'otherAmountThreshold': !exists(json, 'otherAmountThreshold') ? undefined : json['otherAmountThreshold'],
-        'swapMode': !exists(json, 'swapMode') ? undefined : SwapModeFromJSON(json['swapMode']),
-        'slippageBps': !exists(json, 'slippageBps') ? undefined : json['slippageBps'],
+        'outputMint': json['outputMint'],
+        'outAmount': json['outAmount'],
+        'otherAmountThreshold': json['otherAmountThreshold'],
+        'swapMode': SwapModeFromJSON(json['swapMode']),
+        'slippageBps': json['slippageBps'],
         'platformFee': !exists(json, 'platformFee') ? undefined : PlatformFeeFromJSON(json['platformFee']),
-        'priceImpactPct': !exists(json, 'priceImpactPct') ? undefined : json['priceImpactPct'],
-        'routePlan': !exists(json, 'routePlan') ? undefined : ((json['routePlan'] as Array<any>).map(RoutePlanStepFromJSON)),
+        'priceImpactPct': json['priceImpactPct'],
+        'routePlan': ((json['routePlan'] as Array<any>).map(RoutePlanStepFromJSON)),
         'contextSlot': !exists(json, 'contextSlot') ? undefined : json['contextSlot'],
         'timeTaken': !exists(json, 'timeTaken') ? undefined : json['timeTaken'],
     };
@@ -164,7 +172,7 @@ export function QuoteResponseV2ToJSON(value?: QuoteResponseV2 | null): any {
         'slippageBps': value.slippageBps,
         'platformFee': PlatformFeeToJSON(value.platformFee),
         'priceImpactPct': value.priceImpactPct,
-        'routePlan': value.routePlan === undefined ? undefined : ((value.routePlan as Array<any>).map(RoutePlanStepToJSON)),
+        'routePlan': ((value.routePlan as Array<any>).map(RoutePlanStepToJSON)),
         'contextSlot': value.contextSlot,
         'timeTaken': value.timeTaken,
     };

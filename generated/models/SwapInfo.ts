@@ -24,7 +24,7 @@ export interface SwapInfo {
      * @type {string}
      * @memberof SwapInfo
      */
-    ammKey?: string;
+    ammKey: string;
     /**
      * 
      * @type {string}
@@ -36,37 +36,37 @@ export interface SwapInfo {
      * @type {string}
      * @memberof SwapInfo
      */
-    inputMint?: string;
+    inputMint: string;
     /**
      * 
      * @type {string}
      * @memberof SwapInfo
      */
-    outputMint?: string;
+    outputMint: string;
     /**
      * 
      * @type {string}
      * @memberof SwapInfo
      */
-    inAmount?: string;
+    inAmount: string;
     /**
      * 
      * @type {string}
      * @memberof SwapInfo
      */
-    outAmount?: string;
+    outAmount: string;
     /**
      * 
      * @type {string}
      * @memberof SwapInfo
      */
-    feeAmount?: string;
+    feeAmount: string;
     /**
      * 
      * @type {string}
      * @memberof SwapInfo
      */
-    feeMint?: string;
+    feeMint: string;
 }
 
 /**
@@ -74,6 +74,13 @@ export interface SwapInfo {
  */
 export function instanceOfSwapInfo(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "ammKey" in value;
+    isInstance = isInstance && "inputMint" in value;
+    isInstance = isInstance && "outputMint" in value;
+    isInstance = isInstance && "inAmount" in value;
+    isInstance = isInstance && "outAmount" in value;
+    isInstance = isInstance && "feeAmount" in value;
+    isInstance = isInstance && "feeMint" in value;
 
     return isInstance;
 }
@@ -88,14 +95,14 @@ export function SwapInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     }
     return {
         
-        'ammKey': !exists(json, 'ammKey') ? undefined : json['ammKey'],
+        'ammKey': json['ammKey'],
         'label': !exists(json, 'label') ? undefined : json['label'],
-        'inputMint': !exists(json, 'inputMint') ? undefined : json['inputMint'],
-        'outputMint': !exists(json, 'outputMint') ? undefined : json['outputMint'],
-        'inAmount': !exists(json, 'inAmount') ? undefined : json['inAmount'],
-        'outAmount': !exists(json, 'outAmount') ? undefined : json['outAmount'],
-        'feeAmount': !exists(json, 'feeAmount') ? undefined : json['feeAmount'],
-        'feeMint': !exists(json, 'feeMint') ? undefined : json['feeMint'],
+        'inputMint': json['inputMint'],
+        'outputMint': json['outputMint'],
+        'inAmount': json['inAmount'],
+        'outAmount': json['outAmount'],
+        'feeAmount': json['feeAmount'],
+        'feeMint': json['feeMint'],
     };
 }
 

@@ -24,13 +24,13 @@ export interface IndexedRouteMapResponse {
      * @type {Array<string>}
      * @memberof IndexedRouteMapResponse
      */
-    mintKeys?: Array<string>;
+    mintKeys: Array<string>;
     /**
      * All the possible route and their corresponding output mints
      * @type {{ [key: string]: Array<number>; }}
      * @memberof IndexedRouteMapResponse
      */
-    indexedRouteMap?: { [key: string]: Array<number>; };
+    indexedRouteMap: { [key: string]: Array<number>; };
 }
 
 /**
@@ -38,6 +38,8 @@ export interface IndexedRouteMapResponse {
  */
 export function instanceOfIndexedRouteMapResponse(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "mintKeys" in value;
+    isInstance = isInstance && "indexedRouteMap" in value;
 
     return isInstance;
 }
@@ -52,8 +54,8 @@ export function IndexedRouteMapResponseFromJSONTyped(json: any, ignoreDiscrimina
     }
     return {
         
-        'mintKeys': !exists(json, 'mintKeys') ? undefined : json['mintKeys'],
-        'indexedRouteMap': !exists(json, 'indexedRouteMap') ? undefined : json['indexedRouteMap'],
+        'mintKeys': json['mintKeys'],
+        'indexedRouteMap': json['indexedRouteMap'],
     };
 }
 

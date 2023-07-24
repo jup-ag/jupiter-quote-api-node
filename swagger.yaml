@@ -20,6 +20,7 @@ paths:
         - $ref: '#/components/parameters/ExcludeDexesParameter'
         - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
         - $ref: '#/components/parameters/AsLegacyTransactionParameter'
+        - $ref: '#/components/parameters/platformFeeBpsParameter'
       responses:
         '200':
           description: Successful response
@@ -61,37 +62,38 @@ components:
   schemas:
     QuoteResponseV2:
       type: object
+      required:
+        - inputMint
+        - outputMint
+        - outAmount
+        - otherAmountThreshold
+        - swapMode
+        - slippageBps
+        - priceImpactPct
+        - routePlan
       properties:
         inputMint:
           type: string
-          required: true
         inAmount:
           type: string
-          required: true
         outputMint:
           type: string
-          required: true
         outAmount:
           type: string
-          required: true
         otherAmountThreshold:
           type: string
-          required: true
         swapMode:
           $ref: '#/components/schemas/SwapMode'
           required: true
         slippageBps:
           type: integer
           format: int32
-          required: true
         platformFee:
           $ref: '#/components/schemas/PlatformFee'
         priceImpactPct:
           type: number
-          required: true
         routePlan:
           type: array
-          required: true
           items:
             $ref: '#/components/schemas/RoutePlanStep'
         contextSlot:
@@ -125,31 +127,31 @@ components:
 
     SwapInfo:
       type: object
+      required:
+        - ammKey
+        - inputMint
+        - outputMint
+        - inAmount
+        - outAmount
+        - feeAmount
+        - feeMint
       properties:
         ammKey:
           type: string
-          required: true
         label:
           type: string
-          required: true
         inputMint:
           type: string
-          required: true
         outputMint:
           type: string
-          required: true
         inAmount:
           type: string
-          required: true
         outAmount:
           type: string
-          required: true
         feeAmount:
           type: string
-          required: true
         feeMint:
           type: string
-          required: true
 
     DexValue:
       type: string
@@ -181,6 +183,9 @@ components:
         
     SwapRequest:
       type: object
+      required:
+        - userPublicKey
+        - quoteResponse
       properties:
         userPublicKey:
           type: string
@@ -206,16 +211,17 @@ components:
 
     IndexedRouteMapResponse:
       type: object
+      required:
+        - mintKeys
+        - indexedRouteMap
       properties:
         mintKeys:
           type: array
-          required: true
           items:
             type: string
           description: All the mints that are indexed to match in indexedRouteMap
         indexedRouteMap:
           type: object
-          required: true
           description: All the possible route and their corresponding output mints
           additionalProperties:
             type: array
@@ -283,3 +289,8 @@ components:
       in: query
       schema:
         type: boolean
+    platformFeeBpsParameter:
+      name: platformFeeBps
+      in: query
+      schema:
+        type: integer

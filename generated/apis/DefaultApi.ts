@@ -47,6 +47,7 @@ export interface QuoteGetRequest {
     excludeDexes?: Array<DexValue>;
     onlyDirectRoutes?: boolean;
     asLegacyTransaction?: boolean;
+    platformFeeBps?: number;
 }
 
 export interface SwapPostRequest {
@@ -138,6 +139,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.asLegacyTransaction !== undefined) {
             queryParameters['asLegacyTransaction'] = requestParameters.asLegacyTransaction;
+        }
+
+        if (requestParameters.platformFeeBps !== undefined) {
+            queryParameters['platformFeeBps'] = requestParameters.platformFeeBps;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

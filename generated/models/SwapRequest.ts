@@ -37,13 +37,13 @@ export interface SwapRequest {
      * @type {string}
      * @memberof SwapRequest
      */
-    userPublicKey?: string;
+    userPublicKey: string;
     /**
      * 
      * @type {QuoteResponseV2}
      * @memberof SwapRequest
      */
-    quoteResponse?: QuoteResponseV2;
+    quoteResponse: QuoteResponseV2;
     /**
      * 
      * @type {boolean}
@@ -69,6 +69,8 @@ export interface SwapRequest {
  */
 export function instanceOfSwapRequest(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "userPublicKey" in value;
+    isInstance = isInstance && "quoteResponse" in value;
 
     return isInstance;
 }
@@ -83,8 +85,8 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'userPublicKey': !exists(json, 'userPublicKey') ? undefined : json['userPublicKey'],
-        'quoteResponse': !exists(json, 'quoteResponse') ? undefined : QuoteResponseV2FromJSON(json['quoteResponse']),
+        'userPublicKey': json['userPublicKey'],
+        'quoteResponse': QuoteResponseV2FromJSON(json['quoteResponse']),
         'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
         'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : SwapRequestComputeUnitPriceMicroLamportsFromJSON(json['computeUnitPriceMicroLamports']),
