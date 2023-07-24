@@ -1,22 +1,21 @@
 import fetch from "cross-fetch";
-import { Configuration, DefaultApi } from "../generated";
-
-interface IndexedRouteMapResult {
-  mintKeys: string[];
-  indexedRouteMap: Record<number, number[]>;
-}
+import {
+  Configuration,
+  DefaultApi,
+  IndexedRouteMapResponse,
+} from "../generated";
 
 type RouteMap = Record<string, string[]>;
 
 function inflateIndexedRouteMap(
-  result: IndexedRouteMapResult
+  result: IndexedRouteMapResponse
 ): Record<string, string[]> {
   const { mintKeys, indexedRouteMap } = result;
 
-  return Object.entries(indexedRouteMap).reduce<RouteMap>(
+  return Object.entries(indexedRouteMap!).reduce<RouteMap>(
     (acc, [inputMintIndexString, outputMintIndices]) => {
       const inputMintIndex = Number(inputMintIndexString);
-      const inputMint = mintKeys[inputMintIndex];
+      const inputMint = mintKeys?.[inputMintIndex];
       if (!inputMint)
         throw new Error(`Could no find mint key for index ${inputMintIndex}`);
 
@@ -36,22 +35,38 @@ function inflateIndexedRouteMap(
 
 export async function main() {
   const config = new Configuration({
-    basePath: "https://quote-api.jup.ag",
+    basePath: "https://quote-api.jup.ag/v5",
     fetchApi: fetch,
   });
   const jupiterQuoteApi = new DefaultApi(config);
 
-  const quote = await jupiterQuoteApi.v3QuoteGet({
+  // get quote
+  const quote = await jupiterQuoteApi.quoteGet({
     inputMint: "So11111111111111111111111111111111111111112",
     outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     amount: "100000000",
+    // asLegacyTransaction: true, // legacy transaction, default is versoined transaction
   });
-  console.log(quote?.data ? quote.data[0] : "Nothing");
 
-  const result = (await (
-    await fetch("https://quote-api.jup.ag/v1/indexed-route-map")
-  ).json()) as IndexedRouteMapResult;
+  console.log(quote);
 
+  if (!quote) {
+    console.error("unable to quote");
+    return;
+  }
+
+  // get serialized transaction
+  const swapResult = await jupiterQuoteApi.swapPost({
+    swapRequest: {
+      quoteResponse: quote,
+      userPublicKey: "HAPdsaZFfQDG4bD8vzBbPCUawUWKSJxvhQ7TGg1BeAxZ",
+    },
+  });
+
+  console.log(`Transaction: ${swapResult.swapTransaction}`);
+
+  // get route map
+  const result = await jupiterQuoteApi.indexedRouteMapGet();
   const routeMap = inflateIndexedRouteMap(result);
   console.log(Object.keys(routeMap).length);
 }
