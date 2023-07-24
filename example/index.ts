@@ -12,10 +12,10 @@ function inflateIndexedRouteMap(
 ): Record<string, string[]> {
   const { mintKeys, indexedRouteMap } = result;
 
-  return Object.entries(indexedRouteMap!).reduce<RouteMap>(
+  return Object.entries(indexedRouteMap).reduce<RouteMap>(
     (acc, [inputMintIndexString, outputMintIndices]) => {
       const inputMintIndex = Number(inputMintIndexString);
-      const inputMint = mintKeys?.[inputMintIndex];
+      const inputMint = mintKeys[inputMintIndex];
       if (!inputMint)
         throw new Error(`Could no find mint key for index ${inputMintIndex}`);
 
