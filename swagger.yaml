@@ -5,7 +5,7 @@ info:
   description: Jupiter quote and swap API
 
 servers:
-  - url: https://quote-api.jup.ag/v5
+  - url: https://quote-api.jup.ag/v6
 
 paths:
   /quote:

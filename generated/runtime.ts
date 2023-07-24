@@ -13,7 +13,7 @@
  */
 
 
-export const BASE_PATH = "https://quote-api.jup.ag/v5".replace(/\/+$/, "");
+export const BASE_PATH = "https://quote-api.jup.ag/v6".replace(/\/+$/, "");
 
 export interface ConfigurationParameters {
     basePath?: string; // override base path

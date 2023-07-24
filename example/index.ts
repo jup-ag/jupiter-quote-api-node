@@ -34,11 +34,7 @@ function inflateIndexedRouteMap(
 }
 
 export async function main() {
-  const config = new Configuration({
-    basePath: "https://quote-api.jup.ag/v5",
-    fetchApi: fetch,
-  });
-  const jupiterQuoteApi = new DefaultApi(config);
+  const jupiterQuoteApi = new DefaultApi();
 
   // get quote
   const quote = await jupiterQuoteApi.quoteGet({
