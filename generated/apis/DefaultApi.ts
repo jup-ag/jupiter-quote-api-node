@@ -15,15 +15,12 @@
 
 import * as runtime from '../runtime';
 import type {
-  DexValue,
   IndexedRouteMapResponse,
   QuoteResponseV2,
   SwapRequest,
   SwapResponse,
 } from '../models';
 import {
-    DexValueFromJSON,
-    DexValueToJSON,
     IndexedRouteMapResponseFromJSON,
     IndexedRouteMapResponseToJSON,
     QuoteResponseV2FromJSON,
@@ -43,8 +40,8 @@ export interface QuoteGetRequest {
     inputMint: string;
     amount: string;
     slippage?: number;
-    dexes?: Array<DexValue>;
-    excludeDexes?: Array<DexValue>;
+    dexes?: Array<string>;
+    excludeDexes?: Array<string>;
     onlyDirectRoutes?: boolean;
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
@@ -88,6 +85,34 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async indexedRouteMapGet(requestParameters: IndexedRouteMapGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IndexedRouteMapResponse> {
         const response = await this.indexedRouteMapGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
+     * GET /program-id-to-label
+     */
+    async programIdToLabelGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/program-id-to-label`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
+     * GET /program-id-to-label
+     */
+    async programIdToLabelGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.programIdToLabelGetRaw(initOverrides);
         return await response.value();
     }
 

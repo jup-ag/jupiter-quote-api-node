@@ -1,7 +1,6 @@
 apis/DefaultApi.ts
 apis/index.ts
 index.ts
-models/DexValue.ts
 models/IndexedRouteMapResponse.ts
 models/PlatformFee.ts
 models/QuoteResponseV2.ts

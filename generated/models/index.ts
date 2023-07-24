@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './DexValue';
 export * from './IndexedRouteMapResponse';
 export * from './PlatformFee';
 export * from './QuoteResponseV2';

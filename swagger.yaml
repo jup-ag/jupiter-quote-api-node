@@ -28,6 +28,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuoteResponseV2'
+  /program-id-to-label:
+    get:
+      summary: GET /program-id-to-label
+      description: Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter. 
+      responses:
+        '200':
+          description: Default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
   /indexed-route-map:
     get:
       summary: GET /indexed-route-map
@@ -153,34 +166,6 @@ components:
         feeMint:
           type: string
 
-    DexValue:
-      type: string
-      enum:
-        - Aldrin
-        - Lifinity V1
-        - Crema
-        - Whirlpool
-        - Orca V1
-        - Saber
-        - Aldrin V2
-        - Penguin
-        - Cropper
-        - Lifinity V2
-        - Openbook
-        - StepN
-        - Symmetry
-        - Marinade
-        - Raydium
-        - Oasis
-        - Phoenix
-        - Orca V2
-        - Saber (Decimals)
-        - Balansol
-        - Raydium CLMM
-        - Meteora
-        - Saros
-        - Mercurial
-        
     SwapRequest:
       type: object
       required:
@@ -267,18 +252,14 @@ components:
       schema:
         type: array
         items:
-          $ref: '#/components/schemas/DexValue'
-        style: form
-        explode: true
+          type: string
     ExcludeDexesParameter:
       name: excludeDexes
       in: query
       schema:
         type: array
         items:
-          $ref: '#/components/schemas/DexValue'
-        style: form
-        explode: true
+          type: string
     OnlyDirectRoutesParameter:
       name: onlyDirectRoutes
       in: query
