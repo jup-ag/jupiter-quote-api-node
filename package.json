@@ -7,7 +7,7 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "start": "ts-node ./example/index.ts",
-    "build": "tsup generated/index.ts --dts --format esm,cjs",
+    "build": "npm run openapi-gen && tsup src/index.ts --dts --format esm,cjs",
     "openapi-gen": "openapi-generator-cli generate -i swagger.yaml -o generated -g typescript-fetch --skip-validate-spec --additional-properties=supportsES6=true,typescriptThreePlus=true"
   },
   "author": "",

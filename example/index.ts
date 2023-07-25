@@ -1,9 +1,4 @@
-import fetch from "cross-fetch";
-import {
-  Configuration,
-  DefaultApi,
-  IndexedRouteMapResponse,
-} from "../generated";
+import { createJupiterApiClient, IndexedRouteMapResponse } from "../src/index";
 
 type RouteMap = Record<string, string[]>;
 
@@ -34,11 +29,7 @@ function inflateIndexedRouteMap(
 }
 
 export async function main() {
-  const config = new Configuration({
-    fetchApi: fetch,
-  });
-
-  const jupiterQuoteApi = new DefaultApi(config);
+  const jupiterQuoteApi = createJupiterApiClient();
 
   // get quote
   const quote = await jupiterQuoteApi.quoteGet({
