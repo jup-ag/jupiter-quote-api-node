@@ -1,0 +1,287 @@
+openapi: 3.0.0
+info:
+  title: Jupiter Api v6
+  version: 6.0.0
+  description: |
+    The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.
+
+    # Rate limits
+    The rate limits is 45 requests / 10 seconds. If you need a higher rate limits, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on discord.
+
+    # API Wrapper
+    - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)
+    - more to come...
+
+servers:
+  - url: https://quote-api.jup.ag/v6
+
+paths:
+  /quote:
+    get:
+      summary: GET /quote
+      parameters:
+        - $ref: '#/components/parameters/OutputMintParameter'
+        - $ref: '#/components/parameters/InputMintParameter'
+        - $ref: '#/components/parameters/AmountParameter'
+        - $ref: '#/components/parameters/SlippageParameter'
+        - $ref: '#/components/parameters/DexesParameter'
+        - $ref: '#/components/parameters/ExcludeDexesParameter'
+        - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
+        - $ref: '#/components/parameters/AsLegacyTransactionParameter'
+        - $ref: '#/components/parameters/platformFeeBpsParameter'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteResponseV2'
+  /program-id-to-label:
+    get:
+      summary: GET /program-id-to-label
+      description: Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter. 
+      responses:
+        '200':
+          description: Default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /indexed-route-map:
+    get:
+      summary: GET /indexed-route-map
+      description: Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
+      parameters:
+        - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
+      responses:
+        '200':
+          description: Default response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndexedRouteMapResponse'
+  /swap:
+    post:
+      summary: POST /swap
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwapRequest'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SwapResponse'
+
+components:
+  schemas:
+    QuoteResponseV2:
+      type: object
+      required:
+        - inputMint
+        - outputMint
+        - outAmount
+        - otherAmountThreshold
+        - swapMode
+        - slippageBps
+        - priceImpactPct
+        - routePlan
+      properties:
+        inputMint:
+          type: string
+        inAmount:
+          type: string
+        outputMint:
+          type: string
+        outAmount:
+          type: string
+        otherAmountThreshold:
+          type: string
+        swapMode:
+          $ref: '#/components/schemas/SwapMode'
+          required: true
+        slippageBps:
+          type: integer
+          format: int32
+        platformFee:
+          $ref: '#/components/schemas/PlatformFee'
+        priceImpactPct:
+          type: number
+        routePlan:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoutePlanStep'
+        contextSlot:
+          type: number
+        timeTaken:
+          type: number
+
+    SwapMode:
+      type: string
+      enum:
+        - ExactIn
+        - ExactOut
+
+    PlatformFee:
+      type: object
+      properties:
+        amount:
+          type: string
+        feeBps:
+          type: integer
+          format: int32
+
+    RoutePlanStep:
+      type: object
+      properties:
+        swapInfo:
+          $ref: '#/components/schemas/SwapInfo'
+        percent:
+          type: integer
+          format: int32
+
+    SwapInfo:
+      type: object
+      required:
+        - ammKey
+        - inputMint
+        - outputMint
+        - inAmount
+        - outAmount
+        - feeAmount
+        - feeMint
+      properties:
+        ammKey:
+          type: string
+        label:
+          type: string
+        inputMint:
+          type: string
+        outputMint:
+          type: string
+        inAmount:
+          type: string
+        outAmount:
+          type: string
+        feeAmount:
+          type: string
+        feeMint:
+          type: string
+
+    SwapRequest:
+      type: object
+      required:
+        - userPublicKey
+        - quoteResponse
+      properties:
+        userPublicKey:
+          type: string
+        quoteResponse:
+          $ref: '#/components/schemas/QuoteResponseV2'
+        wrapAndUnwrapSol:
+          type: boolean
+        useSharedAccounts:
+          type: boolean
+        feeAccount:
+          type: string
+        computeUnitPriceMicroLamports:
+          anyOf:
+            - type: number
+              format: double
+            - type: string
+              enum:
+                - auto
+
+    SwapResponse:
+      type: object
+      properties:
+        swapTransaction:
+          type: string
+
+    IndexedRouteMapResponse:
+      type: object
+      required:
+        - mintKeys
+        - indexedRouteMap
+      properties:
+        mintKeys:
+          type: array
+          items:
+            type: string
+          description: All the mints that are indexed to match in indexedRouteMap
+        indexedRouteMap:
+          type: object
+          description: All the possible route and their corresponding output mints
+          additionalProperties:
+            type: array
+            items:
+              type: number
+          example:
+            '1':
+              - 2
+              - 3
+              - 4
+            '2':
+              - 1
+              - 3
+              - 4
+
+  parameters:
+    OutputMintParameter:
+      name: outputMint
+      in: query
+      required: true
+      schema:
+        type: string
+    InputMintParameter:
+      name: inputMint
+      in: query
+      required: true
+      schema:
+        type: string
+    AmountParameter:
+      name: amount
+      in: query
+      required: true
+      schema:
+        type: string
+    SlippageParameter:
+      name: slippage
+      in: query
+      schema:
+        type: number
+    DexesParameter:
+      name: dexes
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+    ExcludeDexesParameter:
+      name: excludeDexes
+      in: query
+      schema:
+        type: array
+        items:
+          type: string
+    OnlyDirectRoutesParameter:
+      name: onlyDirectRoutes
+      in: query
+      schema:
+        type: boolean
+    AsLegacyTransactionParameter:
+      name: asLegacyTransaction
+      in: query
+      schema:
+        type: boolean
+    platformFeeBpsParameter:
+      name: platformFeeBps
+      in: query
+      schema:
+        type: integer
