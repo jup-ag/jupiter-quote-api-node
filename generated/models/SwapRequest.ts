@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter Api v6
- * Jupiter quote and swap API
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  # Rate limits The rate limits is 45 requests / 10 seconds. If you need a higher rate limits, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on discord.  # API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node) - more to come... 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -52,6 +52,12 @@ export interface SwapRequest {
     wrapAndUnwrapSol?: boolean;
     /**
      * 
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    useSharedAccounts?: boolean;
+    /**
+     * 
      * @type {string}
      * @memberof SwapRequest
      */
@@ -88,6 +94,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'userPublicKey': json['userPublicKey'],
         'quoteResponse': QuoteResponseV2FromJSON(json['quoteResponse']),
         'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
+        'useSharedAccounts': !exists(json, 'useSharedAccounts') ? undefined : json['useSharedAccounts'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
         'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : SwapRequestComputeUnitPriceMicroLamportsFromJSON(json['computeUnitPriceMicroLamports']),
     };
@@ -105,6 +112,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'userPublicKey': value.userPublicKey,
         'quoteResponse': QuoteResponseV2ToJSON(value.quoteResponse),
         'wrapAndUnwrapSol': value.wrapAndUnwrapSol,
+        'useSharedAccounts': value.useSharedAccounts,
         'feeAccount': value.feeAccount,
         'computeUnitPriceMicroLamports': SwapRequestComputeUnitPriceMicroLamportsToJSON(value.computeUnitPriceMicroLamports),
     };

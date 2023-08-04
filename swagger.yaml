@@ -2,7 +2,15 @@ openapi: 3.0.0
 info:
   title: Jupiter Api v6
   version: 6.0.0
-  description: Jupiter quote and swap API
+  description: |
+    The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.
+
+    # Rate limits
+    The rate limits is 45 requests / 10 seconds. If you need a higher rate limits, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on discord.
+
+    # API Wrapper
+    - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)
+    - more to come...
 
 servers:
   - url: https://quote-api.jup.ag/v6
@@ -177,6 +185,8 @@ components:
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponseV2'
         wrapAndUnwrapSol:
+          type: boolean
+        useSharedAccounts:
           type: boolean
         feeAccount:
           type: string
