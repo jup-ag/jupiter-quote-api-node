@@ -28,6 +28,7 @@ paths:
         - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
         - $ref: '#/components/parameters/AsLegacyTransactionParameter'
         - $ref: '#/components/parameters/PlatformFeeBpsParameter'
+        - $ref: '#/components/parameters/MaxAccountsParameter'
       responses:
         '200':
           description: Successful response

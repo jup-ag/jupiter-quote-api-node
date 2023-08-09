@@ -47,6 +47,7 @@ export interface QuoteGetRequest {
     onlyDirectRoutes?: boolean;
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
+    maxAccounts?: number;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -171,6 +172,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.platformFeeBps !== undefined) {
             queryParameters['platformFeeBps'] = requestParameters.platformFeeBps;
+        }
+
+        if (requestParameters.maxAccounts !== undefined) {
+            queryParameters['maxAccounts'] = requestParameters.maxAccounts;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
