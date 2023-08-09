@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
+  "sideEffects": false,
   "scripts": {
     "start": "ts-node ./example/index.ts",
     "build": "npm run openapi-gen && tsup src/index.ts --dts --format esm,cjs",
