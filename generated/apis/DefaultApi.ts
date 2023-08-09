@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Jupiter Api v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  # Rate limits The rate limits is 45 requests / 10 seconds. If you need a higher rate limits, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on discord.  # API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node) - more to come... 
+ * Jupiter API v6
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node) 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -16,15 +16,18 @@
 import * as runtime from '../runtime';
 import type {
   IndexedRouteMapResponse,
-  QuoteResponseV2,
+  QuoteResponse,
+  SwapInstructionsResponse,
   SwapRequest,
   SwapResponse,
 } from '../models';
 import {
     IndexedRouteMapResponseFromJSON,
     IndexedRouteMapResponseToJSON,
-    QuoteResponseV2FromJSON,
-    QuoteResponseV2ToJSON,
+    QuoteResponseFromJSON,
+    QuoteResponseToJSON,
+    SwapInstructionsResponseFromJSON,
+    SwapInstructionsResponseToJSON,
     SwapRequestFromJSON,
     SwapRequestToJSON,
     SwapResponseFromJSON,
@@ -36,15 +39,18 @@ export interface IndexedRouteMapGetRequest {
 }
 
 export interface QuoteGetRequest {
-    outputMint: string;
     inputMint: string;
-    amount: string;
-    slippage?: number;
-    dexes?: Array<string>;
+    outputMint: string;
+    amount: number;
+    slippageBps?: number;
     excludeDexes?: Array<string>;
     onlyDirectRoutes?: boolean;
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
+}
+
+export interface SwapInstructionsPostRequest {
+    swapRequest: SwapRequest;
 }
 
 export interface SwapPostRequest {
@@ -117,15 +123,16 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Sends a GET request to the Jupiter API to get the best priced quote.
      * GET /quote
      */
-    async quoteGetRaw(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<QuoteResponseV2>> {
-        if (requestParameters.outputMint === null || requestParameters.outputMint === undefined) {
-            throw new runtime.RequiredError('outputMint','Required parameter requestParameters.outputMint was null or undefined when calling quoteGet.');
-        }
-
+    async quoteGetRaw(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<QuoteResponse>> {
         if (requestParameters.inputMint === null || requestParameters.inputMint === undefined) {
             throw new runtime.RequiredError('inputMint','Required parameter requestParameters.inputMint was null or undefined when calling quoteGet.');
+        }
+
+        if (requestParameters.outputMint === null || requestParameters.outputMint === undefined) {
+            throw new runtime.RequiredError('outputMint','Required parameter requestParameters.outputMint was null or undefined when calling quoteGet.');
         }
 
         if (requestParameters.amount === null || requestParameters.amount === undefined) {
@@ -134,24 +141,20 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
-        if (requestParameters.outputMint !== undefined) {
-            queryParameters['outputMint'] = requestParameters.outputMint;
-        }
-
         if (requestParameters.inputMint !== undefined) {
             queryParameters['inputMint'] = requestParameters.inputMint;
+        }
+
+        if (requestParameters.outputMint !== undefined) {
+            queryParameters['outputMint'] = requestParameters.outputMint;
         }
 
         if (requestParameters.amount !== undefined) {
             queryParameters['amount'] = requestParameters.amount;
         }
 
-        if (requestParameters.slippage !== undefined) {
-            queryParameters['slippage'] = requestParameters.slippage;
-        }
-
-        if (requestParameters.dexes) {
-            queryParameters['dexes'] = requestParameters.dexes;
+        if (requestParameters.slippageBps !== undefined) {
+            queryParameters['slippageBps'] = requestParameters.slippageBps;
         }
 
         if (requestParameters.excludeDexes) {
@@ -179,18 +182,55 @@ export class DefaultApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => QuoteResponseV2FromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => QuoteResponseFromJSON(jsonValue));
     }
 
     /**
+     * Sends a GET request to the Jupiter API to get the best priced quote.
      * GET /quote
      */
-    async quoteGet(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QuoteResponseV2> {
+    async quoteGet(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QuoteResponse> {
         const response = await this.quoteGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
+     * Returns instructions that you can use from the quote you get from `/quote`.
+     * POST /swap-instructions
+     */
+    async swapInstructionsPostRaw(requestParameters: SwapInstructionsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SwapInstructionsResponse>> {
+        if (requestParameters.swapRequest === null || requestParameters.swapRequest === undefined) {
+            throw new runtime.RequiredError('swapRequest','Required parameter requestParameters.swapRequest was null or undefined when calling swapInstructionsPost.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/swap-instructions`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SwapRequestToJSON(requestParameters.swapRequest),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => SwapInstructionsResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Returns instructions that you can use from the quote you get from `/quote`.
+     * POST /swap-instructions
+     */
+    async swapInstructionsPost(requestParameters: SwapInstructionsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SwapInstructionsResponse> {
+        const response = await this.swapInstructionsPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Returns a transaction that you can use from the quote you get from `/quote`.
      * POST /swap
      */
     async swapPostRaw(requestParameters: SwapPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SwapResponse>> {
@@ -216,6 +256,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
+     * Returns a transaction that you can use from the quote you get from `/quote`.
      * POST /swap
      */
     async swapPost(requestParameters: SwapPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SwapResponse> {

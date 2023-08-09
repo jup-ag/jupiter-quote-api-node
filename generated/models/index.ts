@@ -2,10 +2,12 @@
 /* eslint-disable */
 export * from './IndexedRouteMapResponse';
 export * from './PlatformFee';
-export * from './QuoteResponseV2';
+export * from './QuoteResponse';
 export * from './RoutePlanStep';
 export * from './SwapInfo';
+export * from './SwapInstructionsResponse';
 export * from './SwapMode';
 export * from './SwapRequest';
-export * from './SwapRequestComputeUnitPriceMicroLamports';
 export * from './SwapResponse';
+export * from './TransactionObject';
+export * from './TransactionObjectAccounttsInner';

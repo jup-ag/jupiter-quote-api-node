@@ -3,12 +3,14 @@ apis/index.ts
 index.ts
 models/IndexedRouteMapResponse.ts
 models/PlatformFee.ts
-models/QuoteResponseV2.ts
+models/QuoteResponse.ts
 models/RoutePlanStep.ts
 models/SwapInfo.ts
+models/SwapInstructionsResponse.ts
 models/SwapMode.ts
 models/SwapRequest.ts
-models/SwapRequestComputeUnitPriceMicroLamports.ts
 models/SwapResponse.ts
+models/TransactionObject.ts
+models/TransactionObjectAccounttsInner.ts
 models/index.ts
 runtime.ts

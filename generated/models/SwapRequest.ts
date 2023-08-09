@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Jupiter Api v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  # Rate limits The rate limits is 45 requests / 10 seconds. If you need a higher rate limits, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on discord.  # API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node) - more to come... 
+ * Jupiter API v6
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node) 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -13,18 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { QuoteResponseV2 } from './QuoteResponseV2';
+import type { QuoteResponse } from './QuoteResponse';
 import {
-    QuoteResponseV2FromJSON,
-    QuoteResponseV2FromJSONTyped,
-    QuoteResponseV2ToJSON,
-} from './QuoteResponseV2';
-import type { SwapRequestComputeUnitPriceMicroLamports } from './SwapRequestComputeUnitPriceMicroLamports';
-import {
-    SwapRequestComputeUnitPriceMicroLamportsFromJSON,
-    SwapRequestComputeUnitPriceMicroLamportsFromJSONTyped,
-    SwapRequestComputeUnitPriceMicroLamportsToJSON,
-} from './SwapRequestComputeUnitPriceMicroLamports';
+    QuoteResponseFromJSON,
+    QuoteResponseFromJSONTyped,
+    QuoteResponseToJSON,
+} from './QuoteResponse';
 
 /**
  * 
@@ -33,41 +27,59 @@ import {
  */
 export interface SwapRequest {
     /**
-     * 
+     * The user public key.
      * @type {string}
      * @memberof SwapRequest
      */
     userPublicKey: string;
     /**
-     * 
-     * @type {QuoteResponseV2}
-     * @memberof SwapRequest
-     */
-    quoteResponse: QuoteResponseV2;
-    /**
-     * 
+     * Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.
      * @type {boolean}
      * @memberof SwapRequest
      */
     wrapAndUnwrapSol?: boolean;
     /**
-     * 
+     * Default is true. This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
      * @type {boolean}
      * @memberof SwapRequest
      */
     useSharedAccounts?: boolean;
     /**
-     * 
+     * Fee token account for the output token, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a `platformFeeBps` in `/quote` and make sure that the feeAccount has been created).
      * @type {string}
      * @memberof SwapRequest
      */
     feeAccount?: string;
     /**
-     * 
-     * @type {SwapRequestComputeUnitPriceMicroLamports}
+     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitSet (1400000) * computeUnitPriceMicroLamports`.
+     * @type {number}
      * @memberof SwapRequest
      */
-    computeUnitPriceMicroLamports?: SwapRequestComputeUnitPriceMicroLamports;
+    computeUnitPriceMicroLamports?: number;
+    /**
+     * Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    asLegacyTransaction?: boolean;
+    /**
+     * Default is false. This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    useTokenLedger?: boolean;
+    /**
+     * Public key of the token account that will be used to receive the token out of the swap. If not provided, the user's ATA will be used. If provided, we assume that the token account is already initialized.
+     * @type {string}
+     * @memberof SwapRequest
+     */
+    destinationTokenAccount?: string;
+    /**
+     * 
+     * @type {QuoteResponse}
+     * @memberof SwapRequest
+     */
+    quoteResponse: QuoteResponse;
 }
 
 /**
@@ -92,11 +104,14 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
     return {
         
         'userPublicKey': json['userPublicKey'],
-        'quoteResponse': QuoteResponseV2FromJSON(json['quoteResponse']),
         'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
         'useSharedAccounts': !exists(json, 'useSharedAccounts') ? undefined : json['useSharedAccounts'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
-        'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : SwapRequestComputeUnitPriceMicroLamportsFromJSON(json['computeUnitPriceMicroLamports']),
+        'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : json['computeUnitPriceMicroLamports'],
+        'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
+        'useTokenLedger': !exists(json, 'useTokenLedger') ? undefined : json['useTokenLedger'],
+        'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
+        'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
     };
 }
 
@@ -110,11 +125,14 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
     return {
         
         'userPublicKey': value.userPublicKey,
-        'quoteResponse': QuoteResponseV2ToJSON(value.quoteResponse),
         'wrapAndUnwrapSol': value.wrapAndUnwrapSol,
         'useSharedAccounts': value.useSharedAccounts,
         'feeAccount': value.feeAccount,
-        'computeUnitPriceMicroLamports': SwapRequestComputeUnitPriceMicroLamportsToJSON(value.computeUnitPriceMicroLamports),
+        'computeUnitPriceMicroLamports': value.computeUnitPriceMicroLamports,
+        'asLegacyTransaction': value.asLegacyTransaction,
+        'useTokenLedger': value.useTokenLedger,
+        'destinationTokenAccount': value.destinationTokenAccount,
+        'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
     };
 }
 
