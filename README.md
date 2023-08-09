@@ -8,7 +8,7 @@
 
 ## Installation
 
-To use the [Your Website] API client, you need to have Node.js and npm (Node Package Manager) installed. Then, you can install the package using npm:
+To use the Jupiter API client, you need to have Node.js and npm (Node Package Manager) installed. Then, you can install the package using npm:
 
 ```bash
 npm install @jup-ag/api
@@ -25,7 +25,7 @@ const jupiterQuoteApi = createJupiterApiClient(config); // config is optional
 
 ```
 
-Now, you can call methods provided by the API client to interact with [Your Website]'s API. For example:
+Now, you can call methods provided by the API client to interact with Jupiter's API. For example:
 
 ```typescript
 jupiterQuoteApi.quoteGet({
