@@ -1,6 +1,6 @@
 {
   "name": "@jup-ag/api",
-  "version": "6.0.1",
+  "version": "6.0.2",
   "description": "## Generate typescript types from swagger schema",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
