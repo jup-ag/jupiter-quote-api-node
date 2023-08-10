@@ -11,6 +11,10 @@ info:
     ### API Wrapper
     - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)
 
+    ### Data types
+    - Public keys are base58 encoded strings
+    - raw data such as Vec<u8> are base64 encoded strings
+
 servers:
   - url: https://quote-api.jup.ag/v6
 
@@ -99,24 +103,35 @@ paths:
 
 components:
   schemas:
-    InstructionObject:
+    Instruction:
       type: object
       properties:
         programId:
           type: string
-        data:
-          type: string
         accounts:
           type: array
           items:
-            type: object
-            properties:
-              pubkey:
-                type: string
-              isSigner:
-                type: boolean
-              isWritable:
-                type: boolean
+            $ref: '#/components/schemas/AccountMeta'
+        data:
+          type: string
+      required:
+        - programId
+        - accounts
+        - data
+
+    AccountMeta:
+      type: object
+      properties:
+        pubkey:
+          type: string
+        isSigner:
+          type: boolean
+        isWritable:
+          type: boolean
+      required:
+        - pubkey
+        - isSigner
+        - isWritable
 
     QuoteResponse:
       type: object
@@ -182,6 +197,9 @@ components:
         percent:
           type: integer
           format: int32
+      required:
+        - swapInfo
+        - percent
 
     SwapInfo:
       type: object
@@ -249,34 +267,41 @@ components:
       properties:
         swapTransaction:
           type: string
+      required:
+        - swapTransaction
 
     SwapInstructionsResponse:
       type: object
       properties:
         tokenLedgerInstruction:
           description: If you are using `useTokenLedger = true`.
-          $ref: '#/components/schemas/InstructionObject'
+          $ref: '#/components/schemas/Instruction'
         computeBudgetInstructions:
           description: The necessary instructions to setup the compute budget.
           type: array
           items:
-            $ref: '#/components/schemas/InstructionObject'
+            $ref: '#/components/schemas/Instruction'
         setupInstructions:
           description: Setup missing ATA for the users.
           type: array
           items:
-            $ref: '#/components/schemas/InstructionObject'
+            $ref: '#/components/schemas/Instruction'
         swapInstruction:
           description: The actual swap instruction.
-          $ref: '#/components/schemas/InstructionObject'
+          $ref: '#/components/schemas/Instruction'
         cleanupInstruction:
           description: Unwrap the SOL if `wrapUnwrapSOL = true`.
-          $ref: '#/components/schemas/InstructionObject'
+          $ref: '#/components/schemas/Instruction'
         addressLookupTableAddresses:
           description: The lookup table addresses that you can use if you are using versioned transaction.
           type: array
           items:
             type: string
+      required:
+        - computeBudgetInstructions
+        - setupInstructions
+        - swapInstruction
+        - addressLookupTableAddresses
 
     IndexedRouteMapResponse:
       type: object

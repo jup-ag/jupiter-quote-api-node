@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node) 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { InstructionObject } from './InstructionObject';
+import type { Instruction } from './Instruction';
 import {
-    InstructionObjectFromJSON,
-    InstructionObjectFromJSONTyped,
-    InstructionObjectToJSON,
-} from './InstructionObject';
+    InstructionFromJSON,
+    InstructionFromJSONTyped,
+    InstructionToJSON,
+} from './Instruction';
 
 /**
  * 
@@ -28,40 +28,40 @@ import {
 export interface SwapInstructionsResponse {
     /**
      * 
-     * @type {InstructionObject}
+     * @type {Instruction}
      * @memberof SwapInstructionsResponse
      */
-    tokenLedgerInstruction?: InstructionObject;
+    tokenLedgerInstruction?: Instruction;
     /**
      * The necessary instructions to setup the compute budget.
-     * @type {Array<InstructionObject>}
+     * @type {Array<Instruction>}
      * @memberof SwapInstructionsResponse
      */
-    computeBudgetInstructions?: Array<InstructionObject>;
+    computeBudgetInstructions: Array<Instruction>;
     /**
      * Setup missing ATA for the users.
-     * @type {Array<InstructionObject>}
+     * @type {Array<Instruction>}
      * @memberof SwapInstructionsResponse
      */
-    setupInstructions?: Array<InstructionObject>;
+    setupInstructions: Array<Instruction>;
     /**
      * 
-     * @type {InstructionObject}
+     * @type {Instruction}
      * @memberof SwapInstructionsResponse
      */
-    swapInstruction?: InstructionObject;
+    swapInstruction: Instruction;
     /**
      * 
-     * @type {InstructionObject}
+     * @type {Instruction}
      * @memberof SwapInstructionsResponse
      */
-    cleanupInstruction?: InstructionObject;
+    cleanupInstruction?: Instruction;
     /**
      * The lookup table addresses that you can use if you are using versioned transaction.
      * @type {Array<string>}
      * @memberof SwapInstructionsResponse
      */
-    addressLookupTableAddresses?: Array<string>;
+    addressLookupTableAddresses: Array<string>;
 }
 
 /**
@@ -69,6 +69,10 @@ export interface SwapInstructionsResponse {
  */
 export function instanceOfSwapInstructionsResponse(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "computeBudgetInstructions" in value;
+    isInstance = isInstance && "setupInstructions" in value;
+    isInstance = isInstance && "swapInstruction" in value;
+    isInstance = isInstance && "addressLookupTableAddresses" in value;
 
     return isInstance;
 }
@@ -83,12 +87,12 @@ export function SwapInstructionsResponseFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'tokenLedgerInstruction': !exists(json, 'tokenLedgerInstruction') ? undefined : InstructionObjectFromJSON(json['tokenLedgerInstruction']),
-        'computeBudgetInstructions': !exists(json, 'computeBudgetInstructions') ? undefined : ((json['computeBudgetInstructions'] as Array<any>).map(InstructionObjectFromJSON)),
-        'setupInstructions': !exists(json, 'setupInstructions') ? undefined : ((json['setupInstructions'] as Array<any>).map(InstructionObjectFromJSON)),
-        'swapInstruction': !exists(json, 'swapInstruction') ? undefined : InstructionObjectFromJSON(json['swapInstruction']),
-        'cleanupInstruction': !exists(json, 'cleanupInstruction') ? undefined : InstructionObjectFromJSON(json['cleanupInstruction']),
-        'addressLookupTableAddresses': !exists(json, 'addressLookupTableAddresses') ? undefined : json['addressLookupTableAddresses'],
+        'tokenLedgerInstruction': !exists(json, 'tokenLedgerInstruction') ? undefined : InstructionFromJSON(json['tokenLedgerInstruction']),
+        'computeBudgetInstructions': ((json['computeBudgetInstructions'] as Array<any>).map(InstructionFromJSON)),
+        'setupInstructions': ((json['setupInstructions'] as Array<any>).map(InstructionFromJSON)),
+        'swapInstruction': InstructionFromJSON(json['swapInstruction']),
+        'cleanupInstruction': !exists(json, 'cleanupInstruction') ? undefined : InstructionFromJSON(json['cleanupInstruction']),
+        'addressLookupTableAddresses': json['addressLookupTableAddresses'],
     };
 }
 
@@ -101,11 +105,11 @@ export function SwapInstructionsResponseToJSON(value?: SwapInstructionsResponse 
     }
     return {
         
-        'tokenLedgerInstruction': InstructionObjectToJSON(value.tokenLedgerInstruction),
-        'computeBudgetInstructions': value.computeBudgetInstructions === undefined ? undefined : ((value.computeBudgetInstructions as Array<any>).map(InstructionObjectToJSON)),
-        'setupInstructions': value.setupInstructions === undefined ? undefined : ((value.setupInstructions as Array<any>).map(InstructionObjectToJSON)),
-        'swapInstruction': InstructionObjectToJSON(value.swapInstruction),
-        'cleanupInstruction': InstructionObjectToJSON(value.cleanupInstruction),
+        'tokenLedgerInstruction': InstructionToJSON(value.tokenLedgerInstruction),
+        'computeBudgetInstructions': ((value.computeBudgetInstructions as Array<any>).map(InstructionToJSON)),
+        'setupInstructions': ((value.setupInstructions as Array<any>).map(InstructionToJSON)),
+        'swapInstruction': InstructionToJSON(value.swapInstruction),
+        'cleanupInstruction': InstructionToJSON(value.cleanupInstruction),
         'addressLookupTableAddresses': value.addressLookupTableAddresses,
     };
 }
