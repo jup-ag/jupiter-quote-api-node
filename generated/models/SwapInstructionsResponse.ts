@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { TransactionObject } from './TransactionObject';
+import type { InstructionObject } from './InstructionObject';
 import {
-    TransactionObjectFromJSON,
-    TransactionObjectFromJSONTyped,
-    TransactionObjectToJSON,
-} from './TransactionObject';
+    InstructionObjectFromJSON,
+    InstructionObjectFromJSONTyped,
+    InstructionObjectToJSON,
+} from './InstructionObject';
 
 /**
  * 
@@ -28,40 +28,40 @@ import {
 export interface SwapInstructionsResponse {
     /**
      * 
-     * @type {TransactionObject}
+     * @type {InstructionObject}
      * @memberof SwapInstructionsResponse
      */
-    tokenLedgerInstruction?: TransactionObject;
+    tokenLedgerInstruction?: InstructionObject;
     /**
      * The necessary instructions to setup the compute budget.
-     * @type {Array<TransactionObject>}
+     * @type {Array<InstructionObject>}
      * @memberof SwapInstructionsResponse
      */
-    computeBudgetInstructions?: Array<TransactionObject>;
+    computeBudgetInstructions?: Array<InstructionObject>;
     /**
      * Setup missing ATA for the users.
-     * @type {Array<TransactionObject>}
+     * @type {Array<InstructionObject>}
      * @memberof SwapInstructionsResponse
      */
-    setupInstructions?: Array<TransactionObject>;
+    setupInstructions?: Array<InstructionObject>;
     /**
      * 
-     * @type {TransactionObject}
+     * @type {InstructionObject}
      * @memberof SwapInstructionsResponse
      */
-    swapInstruction?: TransactionObject;
+    swapInstruction?: InstructionObject;
     /**
      * 
-     * @type {TransactionObject}
+     * @type {InstructionObject}
      * @memberof SwapInstructionsResponse
      */
-    cleanupInstruction?: TransactionObject;
+    cleanupInstruction?: InstructionObject;
     /**
      * The lookup table addresses that you can use if you are using versioned transaction.
-     * @type {Array<TransactionObject>}
+     * @type {Array<string>}
      * @memberof SwapInstructionsResponse
      */
-    addressLookupTableAddresses?: Array<TransactionObject>;
+    addressLookupTableAddresses?: Array<string>;
 }
 
 /**
@@ -83,12 +83,12 @@ export function SwapInstructionsResponseFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'tokenLedgerInstruction': !exists(json, 'tokenLedgerInstruction') ? undefined : TransactionObjectFromJSON(json['tokenLedgerInstruction']),
-        'computeBudgetInstructions': !exists(json, 'computeBudgetInstructions') ? undefined : ((json['computeBudgetInstructions'] as Array<any>).map(TransactionObjectFromJSON)),
-        'setupInstructions': !exists(json, 'setupInstructions') ? undefined : ((json['setupInstructions'] as Array<any>).map(TransactionObjectFromJSON)),
-        'swapInstruction': !exists(json, 'swapInstruction') ? undefined : TransactionObjectFromJSON(json['swapInstruction']),
-        'cleanupInstruction': !exists(json, 'cleanupInstruction') ? undefined : TransactionObjectFromJSON(json['cleanupInstruction']),
-        'addressLookupTableAddresses': !exists(json, 'addressLookupTableAddresses') ? undefined : ((json['addressLookupTableAddresses'] as Array<any>).map(TransactionObjectFromJSON)),
+        'tokenLedgerInstruction': !exists(json, 'tokenLedgerInstruction') ? undefined : InstructionObjectFromJSON(json['tokenLedgerInstruction']),
+        'computeBudgetInstructions': !exists(json, 'computeBudgetInstructions') ? undefined : ((json['computeBudgetInstructions'] as Array<any>).map(InstructionObjectFromJSON)),
+        'setupInstructions': !exists(json, 'setupInstructions') ? undefined : ((json['setupInstructions'] as Array<any>).map(InstructionObjectFromJSON)),
+        'swapInstruction': !exists(json, 'swapInstruction') ? undefined : InstructionObjectFromJSON(json['swapInstruction']),
+        'cleanupInstruction': !exists(json, 'cleanupInstruction') ? undefined : InstructionObjectFromJSON(json['cleanupInstruction']),
+        'addressLookupTableAddresses': !exists(json, 'addressLookupTableAddresses') ? undefined : json['addressLookupTableAddresses'],
     };
 }
 
@@ -101,12 +101,12 @@ export function SwapInstructionsResponseToJSON(value?: SwapInstructionsResponse 
     }
     return {
         
-        'tokenLedgerInstruction': TransactionObjectToJSON(value.tokenLedgerInstruction),
-        'computeBudgetInstructions': value.computeBudgetInstructions === undefined ? undefined : ((value.computeBudgetInstructions as Array<any>).map(TransactionObjectToJSON)),
-        'setupInstructions': value.setupInstructions === undefined ? undefined : ((value.setupInstructions as Array<any>).map(TransactionObjectToJSON)),
-        'swapInstruction': TransactionObjectToJSON(value.swapInstruction),
-        'cleanupInstruction': TransactionObjectToJSON(value.cleanupInstruction),
-        'addressLookupTableAddresses': value.addressLookupTableAddresses === undefined ? undefined : ((value.addressLookupTableAddresses as Array<any>).map(TransactionObjectToJSON)),
+        'tokenLedgerInstruction': InstructionObjectToJSON(value.tokenLedgerInstruction),
+        'computeBudgetInstructions': value.computeBudgetInstructions === undefined ? undefined : ((value.computeBudgetInstructions as Array<any>).map(InstructionObjectToJSON)),
+        'setupInstructions': value.setupInstructions === undefined ? undefined : ((value.setupInstructions as Array<any>).map(InstructionObjectToJSON)),
+        'swapInstruction': InstructionObjectToJSON(value.swapInstruction),
+        'cleanupInstruction': InstructionObjectToJSON(value.cleanupInstruction),
+        'addressLookupTableAddresses': value.addressLookupTableAddresses,
     };
 }
 

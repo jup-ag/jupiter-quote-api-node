@@ -13,53 +13,53 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { TransactionObjectAccountsInner } from './TransactionObjectAccountsInner';
+import type { InstructionObjectAccountsInner } from './InstructionObjectAccountsInner';
 import {
-    TransactionObjectAccountsInnerFromJSON,
-    TransactionObjectAccountsInnerFromJSONTyped,
-    TransactionObjectAccountsInnerToJSON,
-} from './TransactionObjectAccountsInner';
+    InstructionObjectAccountsInnerFromJSON,
+    InstructionObjectAccountsInnerFromJSONTyped,
+    InstructionObjectAccountsInnerToJSON,
+} from './InstructionObjectAccountsInner';
 
 /**
  * 
  * @export
- * @interface TransactionObject
+ * @interface InstructionObject
  */
-export interface TransactionObject {
+export interface InstructionObject {
     /**
      * 
      * @type {string}
-     * @memberof TransactionObject
+     * @memberof InstructionObject
      */
     programId?: string;
     /**
      * 
      * @type {string}
-     * @memberof TransactionObject
+     * @memberof InstructionObject
      */
     data?: string;
     /**
      * 
-     * @type {Array<TransactionObjectAccountsInner>}
-     * @memberof TransactionObject
+     * @type {Array<InstructionObjectAccountsInner>}
+     * @memberof InstructionObject
      */
-    accounts?: Array<TransactionObjectAccountsInner>;
+    accounts?: Array<InstructionObjectAccountsInner>;
 }
 
 /**
- * Check if a given object implements the TransactionObject interface.
+ * Check if a given object implements the InstructionObject interface.
  */
-export function instanceOfTransactionObject(value: object): boolean {
+export function instanceOfInstructionObject(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function TransactionObjectFromJSON(json: any): TransactionObject {
-    return TransactionObjectFromJSONTyped(json, false);
+export function InstructionObjectFromJSON(json: any): InstructionObject {
+    return InstructionObjectFromJSONTyped(json, false);
 }
 
-export function TransactionObjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): TransactionObject {
+export function InstructionObjectFromJSONTyped(json: any, ignoreDiscriminator: boolean): InstructionObject {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -67,11 +67,11 @@ export function TransactionObjectFromJSONTyped(json: any, ignoreDiscriminator: b
         
         'programId': !exists(json, 'programId') ? undefined : json['programId'],
         'data': !exists(json, 'data') ? undefined : json['data'],
-        'accounts': !exists(json, 'accounts') ? undefined : ((json['accounts'] as Array<any>).map(TransactionObjectAccountsInnerFromJSON)),
+        'accounts': !exists(json, 'accounts') ? undefined : ((json['accounts'] as Array<any>).map(InstructionObjectAccountsInnerFromJSON)),
     };
 }
 
-export function TransactionObjectToJSON(value?: TransactionObject | null): any {
+export function InstructionObjectToJSON(value?: InstructionObject | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -82,7 +82,7 @@ export function TransactionObjectToJSON(value?: TransactionObject | null): any {
         
         'programId': value.programId,
         'data': value.data,
-        'accounts': value.accounts === undefined ? undefined : ((value.accounts as Array<any>).map(TransactionObjectAccountsInnerToJSON)),
+        'accounts': value.accounts === undefined ? undefined : ((value.accounts as Array<any>).map(InstructionObjectAccountsInnerToJSON)),
     };
 }
 

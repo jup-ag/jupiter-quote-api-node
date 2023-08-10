@@ -99,14 +99,14 @@ paths:
 
 components:
   schemas:
-    TransactionObject:
+    InstructionObject:
       type: object
       properties:
         programId:
           type: string
         data:
           type: string
-        accountts:
+        accounts:
           type: array
           items:
             type: object
@@ -255,28 +255,28 @@ components:
       properties:
         tokenLedgerInstruction:
           description: If you are using `useTokenLedger = true`.
-          $ref: '#/components/schemas/TransactionObject'
+          $ref: '#/components/schemas/InstructionObject'
         computeBudgetInstructions:
           description: The necessary instructions to setup the compute budget.
           type: array
           items:
-            $ref: '#/components/schemas/TransactionObject'
+            $ref: '#/components/schemas/InstructionObject'
         setupInstructions:
           description: Setup missing ATA for the users.
           type: array
           items:
-            $ref: '#/components/schemas/TransactionObject'
+            $ref: '#/components/schemas/InstructionObject'
         swapInstruction:
           description: The actual swap instruction.
-          $ref: '#/components/schemas/TransactionObject'
+          $ref: '#/components/schemas/InstructionObject'
         cleanupInstruction:
           description: Unwrap the SOL if `wrapUnwrapSOL = true`.
-          $ref: '#/components/schemas/TransactionObject'
+          $ref: '#/components/schemas/InstructionObject'
         addressLookupTableAddresses:
           description: The lookup table addresses that you can use if you are using versioned transaction.
           type: array
           items:
-            $ref: '#/components/schemas/TransactionObject'
+            type: string
 
     IndexedRouteMapResponse:
       type: object

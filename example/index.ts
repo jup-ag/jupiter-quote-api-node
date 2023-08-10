@@ -33,11 +33,12 @@ export async function main() {
 
   // get quote
   const quote = await jupiterQuoteApi.quoteGet({
-    inputMint: "So11111111111111111111111111111111111111112",
-    outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-    amount: "100000000",
-    // platformFeeBps: 10,
-    // asLegacyTransaction: true, // legacy transaction, default is versoined transaction
+    inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    outputMint: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+    amount: 35281,
+    slippageBps: 100,
+    onlyDirectRoutes: false,
+    asLegacyTransaction: false,
   });
 
   console.log(quote);
@@ -48,14 +49,14 @@ export async function main() {
   }
 
   // get serialized transaction
-  const swapResult = await jupiterQuoteApi.swapPost({
+  const swapResult = await jupiterQuoteApi.swapInstructionsPost({
     swapRequest: {
       quoteResponse: quote,
       userPublicKey: "HAPdsaZFfQDG4bD8vzBbPCUawUWKSJxvhQ7TGg1BeAxZ",
     },
   });
 
-  console.log(`Transaction: ${swapResult.swapTransaction}`);
+  console.log(swapResult);
 
   // get route map
   const result = await jupiterQuoteApi.indexedRouteMapGet();

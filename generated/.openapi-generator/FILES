@@ -2,6 +2,8 @@ apis/DefaultApi.ts
 apis/index.ts
 index.ts
 models/IndexedRouteMapResponse.ts
+models/InstructionObject.ts
+models/InstructionObjectAccountsInner.ts
 models/PlatformFee.ts
 models/QuoteResponse.ts
 models/RoutePlanStep.ts
@@ -10,7 +12,5 @@ models/SwapInstructionsResponse.ts
 models/SwapMode.ts
 models/SwapRequest.ts
 models/SwapResponse.ts
-models/TransactionObject.ts
-models/TransactionObjectAccounttsInner.ts
 models/index.ts
 runtime.ts
