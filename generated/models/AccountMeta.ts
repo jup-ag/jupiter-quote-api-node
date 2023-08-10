@@ -16,42 +16,58 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface SwapResponse
+ * @interface AccountMeta
  */
-export interface SwapResponse {
+export interface AccountMeta {
     /**
      * 
      * @type {string}
-     * @memberof SwapResponse
+     * @memberof AccountMeta
      */
-    swapTransaction: string;
+    pubkey: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AccountMeta
+     */
+    isSigner: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof AccountMeta
+     */
+    isWritable: boolean;
 }
 
 /**
- * Check if a given object implements the SwapResponse interface.
+ * Check if a given object implements the AccountMeta interface.
  */
-export function instanceOfSwapResponse(value: object): boolean {
+export function instanceOfAccountMeta(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "swapTransaction" in value;
+    isInstance = isInstance && "pubkey" in value;
+    isInstance = isInstance && "isSigner" in value;
+    isInstance = isInstance && "isWritable" in value;
 
     return isInstance;
 }
 
-export function SwapResponseFromJSON(json: any): SwapResponse {
-    return SwapResponseFromJSONTyped(json, false);
+export function AccountMetaFromJSON(json: any): AccountMeta {
+    return AccountMetaFromJSONTyped(json, false);
 }
 
-export function SwapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): SwapResponse {
+export function AccountMetaFromJSONTyped(json: any, ignoreDiscriminator: boolean): AccountMeta {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'swapTransaction': json['swapTransaction'],
+        'pubkey': json['pubkey'],
+        'isSigner': json['isSigner'],
+        'isWritable': json['isWritable'],
     };
 }
 
-export function SwapResponseToJSON(value?: SwapResponse | null): any {
+export function AccountMetaToJSON(value?: AccountMeta | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -60,7 +76,9 @@ export function SwapResponseToJSON(value?: SwapResponse | null): any {
     }
     return {
         
-        'swapTransaction': value.swapTransaction,
+        'pubkey': value.pubkey,
+        'isSigner': value.isSigner,
+        'isWritable': value.isWritable,
     };
 }
 

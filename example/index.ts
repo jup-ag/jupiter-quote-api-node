@@ -41,8 +41,6 @@ export async function main() {
     asLegacyTransaction: false,
   });
 
-  console.log(quote);
-
   if (!quote) {
     console.error("unable to quote");
     return;
@@ -56,7 +54,7 @@ export async function main() {
     },
   });
 
-  console.log(swapResult);
+  console.dir(swapResult, { depth: null });
 
   // get route map
   const result = await jupiterQuoteApi.indexedRouteMapGet();

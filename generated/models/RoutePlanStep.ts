@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node) 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -31,13 +31,13 @@ export interface RoutePlanStep {
      * @type {SwapInfo}
      * @memberof RoutePlanStep
      */
-    swapInfo?: SwapInfo;
+    swapInfo: SwapInfo;
     /**
      * 
      * @type {number}
      * @memberof RoutePlanStep
      */
-    percent?: number;
+    percent: number;
 }
 
 /**
@@ -45,6 +45,8 @@ export interface RoutePlanStep {
  */
 export function instanceOfRoutePlanStep(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "swapInfo" in value;
+    isInstance = isInstance && "percent" in value;
 
     return isInstance;
 }
@@ -59,8 +61,8 @@ export function RoutePlanStepFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'swapInfo': !exists(json, 'swapInfo') ? undefined : SwapInfoFromJSON(json['swapInfo']),
-        'percent': !exists(json, 'percent') ? undefined : json['percent'],
+        'swapInfo': SwapInfoFromJSON(json['swapInfo']),
+        'percent': json['percent'],
     };
 }
 

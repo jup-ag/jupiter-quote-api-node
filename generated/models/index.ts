@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './AccountMeta';
 export * from './IndexedRouteMapResponse';
-export * from './InstructionObject';
-export * from './InstructionObjectAccountsInner';
+export * from './Instruction';
 export * from './PlatformFee';
 export * from './QuoteResponse';
 export * from './RoutePlanStep';
