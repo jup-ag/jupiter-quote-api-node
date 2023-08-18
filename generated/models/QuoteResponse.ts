@@ -88,10 +88,10 @@ export interface QuoteResponse {
     platformFee?: PlatformFee;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof QuoteResponse
      */
-    priceImpactPct: number;
+    priceImpactPct: string;
     /**
      * 
      * @type {Array<RoutePlanStep>}
