@@ -164,7 +164,7 @@ components:
         platformFee:
           $ref: '#/components/schemas/PlatformFee'
         priceImpactPct:
-          type: number
+          type: string
         routePlan:
           type: array
           items:
