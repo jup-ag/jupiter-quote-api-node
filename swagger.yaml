@@ -138,6 +138,7 @@ components:
       required:
         - inputMint
         - outputMint
+        - inAmount
         - outAmount
         - otherAmountThreshold
         - swapMode

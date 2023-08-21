@@ -49,7 +49,7 @@ export interface QuoteResponse {
      * @type {string}
      * @memberof QuoteResponse
      */
-    inAmount?: string;
+    inAmount: string;
     /**
      * 
      * @type {string}
@@ -118,6 +118,7 @@ export interface QuoteResponse {
 export function instanceOfQuoteResponse(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "inputMint" in value;
+    isInstance = isInstance && "inAmount" in value;
     isInstance = isInstance && "outputMint" in value;
     isInstance = isInstance && "outAmount" in value;
     isInstance = isInstance && "otherAmountThreshold" in value;
@@ -140,7 +141,7 @@ export function QuoteResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'inputMint': json['inputMint'],
-        'inAmount': !exists(json, 'inAmount') ? undefined : json['inAmount'],
+        'inAmount': json['inAmount'],
         'outputMint': json['outputMint'],
         'outAmount': json['outAmount'],
         'otherAmountThreshold': json['otherAmountThreshold'],
