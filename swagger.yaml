@@ -268,8 +268,11 @@ components:
       properties:
         swapTransaction:
           type: string
+        lastValidBlockHeight:
+          type: number
       required:
         - swapTransaction
+        - lastValidBlockHeight
 
     SwapInstructionsResponse:
       type: object
