@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -43,7 +43,8 @@ export interface QuoteGetRequest {
     outputMint: string;
     amount: number;
     slippageBps?: number;
-    excludeDexes?: Array<string>;
+    swapMode?: QuoteGetSwapModeEnum;
+    excludeDexes?: Array<QuoteGetExcludeDexesEnum>;
     onlyDirectRoutes?: boolean;
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
@@ -99,7 +100,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
      * GET /program-id-to-label
      */
-    async programIdToLabelGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+    async programIdToLabelGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: string; }>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -118,7 +119,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
      * GET /program-id-to-label
      */
-    async programIdToLabelGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+    async programIdToLabelGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: string; }> {
         const response = await this.programIdToLabelGetRaw(initOverrides);
         return await response.value();
     }
@@ -156,6 +157,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.slippageBps !== undefined) {
             queryParameters['slippageBps'] = requestParameters.slippageBps;
+        }
+
+        if (requestParameters.swapMode !== undefined) {
+            queryParameters['swapMode'] = requestParameters.swapMode;
         }
 
         if (requestParameters.excludeDexes) {
@@ -270,3 +275,48 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
 }
+
+/**
+ * @export
+ */
+export const QuoteGetSwapModeEnum = {
+    ExactIn: 'ExactIn',
+    ExactOut: 'ExactOut'
+} as const;
+export type QuoteGetSwapModeEnum = typeof QuoteGetSwapModeEnum[keyof typeof QuoteGetSwapModeEnum];
+/**
+ * @export
+ */
+export const QuoteGetExcludeDexesEnum = {
+    Aldrin: 'Aldrin',
+    AldrinV2: 'Aldrin V2',
+    Balansol: 'Balansol',
+    Crema: 'Crema',
+    Cropper: 'Cropper',
+    FluxBeam: 'FluxBeam',
+    LifinityV1: 'Lifinity V1',
+    LifinityV2: 'Lifinity V2',
+    Oasis: 'Oasis',
+    Bonkswap: 'Bonkswap',
+    Marinade: 'Marinade',
+    Mercurial: 'Mercurial',
+    Meteora: 'Meteora',
+    Phoenix: 'Phoenix',
+    Raydium: 'Raydium',
+    RaydiumClmm: 'Raydium CLMM',
+    Saber: 'Saber',
+    SaberDecimals: 'Saber (Decimals)',
+    Openbook: 'Openbook',
+    Saros: 'Saros',
+    OrcaV2: 'Orca V2',
+    StepN: 'StepN',
+    OrcaV1: 'Orca V1',
+    Penguin: 'Penguin',
+    Symmetry: 'Symmetry',
+    Whirlpool: 'Whirlpool',
+    Invariant: 'Invariant',
+    HeliumNetwork: 'Helium Network',
+    JupiterLo: 'Jupiter LO',
+    Sanctum: 'Sanctum'
+} as const;
+export type QuoteGetExcludeDexesEnum = typeof QuoteGetExcludeDexesEnum[keyof typeof QuoteGetExcludeDexesEnum];
