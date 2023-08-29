@@ -25,6 +25,12 @@ export interface SwapResponse {
      * @memberof SwapResponse
      */
     swapTransaction: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SwapResponse
+     */
+    lastValidBlockHeight: number;
 }
 
 /**
@@ -33,6 +39,7 @@ export interface SwapResponse {
 export function instanceOfSwapResponse(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "swapTransaction" in value;
+    isInstance = isInstance && "lastValidBlockHeight" in value;
 
     return isInstance;
 }
@@ -48,6 +55,7 @@ export function SwapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
     return {
         
         'swapTransaction': json['swapTransaction'],
+        'lastValidBlockHeight': json['lastValidBlockHeight'],
     };
 }
 
@@ -61,6 +69,7 @@ export function SwapResponseToJSON(value?: SwapResponse | null): any {
     return {
         
         'swapTransaction': value.swapTransaction,
+        'lastValidBlockHeight': value.lastValidBlockHeight,
     };
 }
 
