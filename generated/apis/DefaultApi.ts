@@ -99,7 +99,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
      * GET /program-id-to-label
      */
-    async programIdToLabelGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+    async programIdToLabelGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: string; }>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -118,7 +118,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
      * GET /program-id-to-label
      */
-    async programIdToLabelGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+    async programIdToLabelGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: string; }> {
         const response = await this.programIdToLabelGetRaw(initOverrides);
         return await response.value();
     }
