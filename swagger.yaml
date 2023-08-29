@@ -13,7 +13,7 @@ info:
 
     ### Data types
     - Public keys are base58 encoded strings
-    - raw data such as Vec<u8> are base64 encoded strings
+    - raw data such as Vec<u8\> are base64 encoded strings
 
 servers:
   - url: https://quote-api.jup.ag/v6
@@ -28,6 +28,7 @@ paths:
         - $ref: '#/components/parameters/OutputMintParameter'
         - $ref: '#/components/parameters/AmountParameter'
         - $ref: '#/components/parameters/SlippageParameter'
+        - $ref: '#/components/parameters/SwapModeParameter'
         - $ref: '#/components/parameters/ExcludeDexesParameter'
         - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
         - $ref: '#/components/parameters/AsLegacyTransactionParameter'
@@ -294,7 +295,7 @@ components:
           description: The actual swap instruction.
           $ref: '#/components/schemas/Instruction'
         cleanupInstruction:
-          description: Unwrap the SOL if `wrapUnwrapSOL = true`.
+          description: Unwrap the SOL if `wrapAndUnwrapSol = true`.
           $ref: '#/components/schemas/Instruction'
         addressLookupTableAddresses:
           description: The lookup table addresses that you can use if you are using versioned transaction.
@@ -363,6 +364,13 @@ components:
       in: query
       schema:
         type: integer
+    SwapModeParameter:
+      name: swapMode
+      description: (ExactIn or ExactOut) Defaults to ExactIn. ExactOut is for supporting use cases where you need an exact token amount, like payments. In this case the slippage is on the input token.
+      in: query
+      schema:
+        type: string
+        enum: ['ExactIn', 'ExactOut']
     DexesParameter:
       name: dexes
       in: query
@@ -372,12 +380,13 @@ components:
           type: string
     ExcludeDexesParameter:
       name: excludeDexes
-      description: Default is that all DEXes are included. You can pass in the DEXes that you want to exclude and separate them by `,`. For example, `Aldrin,Saber`.
+      description: Default is that all DEXes are included. You can pass in the DEXes that you want to exclude and separate them by `,`.
       in: query
       schema:
         type: array
         items:
           type: string
+          enum: ["Aldrin", "Aldrin V2", "Balansol", "Crema", "Cropper", "FluxBeam", "Lifinity V1", "Lifinity V2", "Oasis", "Bonkswap", "Marinade", "Mercurial", "Meteora", "Phoenix", "Raydium", "Raydium CLMM", "Saber", "Saber (Decimals)", "Openbook", "Saros", "Orca V2", "StepN", "Orca V1", "Penguin", "Symmetry", "Whirlpool", "Invariant", "Helium Network", "Jupiter LO", "Sanctum"]
     OnlyDirectRoutesParameter:
       name: onlyDirectRoutes
       description: Default is false. Direct Routes limits Jupiter routing to single hop routes only.
