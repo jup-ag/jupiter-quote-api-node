@@ -44,7 +44,7 @@ paths:
   /swap:
     post:
       summary: POST /swap
-      description: Returns a transaction that you can use from the quote you get from `/quote`.
+      description: Returns a transaction for the QuoteResponse of `/quote`.
       requestBody:
         required: true
         content:
@@ -61,7 +61,7 @@ paths:
   /swap-instructions:
     post:
       summary: POST /swap-instructions
-      description: Returns instructions that you can use from the quote you get from `/quote`.
+      description: Returns instructions for the QuoteResponse of `/quote`.
       requestBody:
         required: true
         content:
@@ -78,7 +78,7 @@ paths:
   /program-id-to-label:
     get:
       summary: GET /program-id-to-label
-      description: Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
+      description: Returns a mapping from program id to pogram label. This is used to help map errors from transaction by identifying the erring program id. The labels can be used in the `excludeDexes` or `dexes` parameter when calling `/quote`.
       responses:
         '200':
           description: Default response
@@ -91,7 +91,7 @@ paths:
   /indexed-route-map:
     get:
       summary: GET /indexed-route-map
-      description: Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
+      description: Returns a mapping of token mint to valid output token mints, token mints are indexed to reduce the file size
       parameters:
         - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
       responses:
@@ -298,7 +298,7 @@ components:
           description: Unwrap the SOL if `wrapAndUnwrapSol = true`.
           $ref: '#/components/schemas/Instruction'
         addressLookupTableAddresses:
-          description: The lookup table addresses that you can use if you are using versioned transaction.
+          description: The lookup table addresses to compress the swaps
           type: array
           items:
             type: string
@@ -360,7 +360,7 @@ components:
         type: integer
     SlippageParameter:
       name: slippageBps
-      description: The slippage % in BPS. If the output token amount exceeds the slippage then the swap transaction will fail.
+      description: The slippage in basis points, 1 basis point is 0.01%. If the output token amount exceeds the slippage then the swap transaction will fail.
       in: query
       schema:
         type: integer
