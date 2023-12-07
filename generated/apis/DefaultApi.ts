@@ -44,7 +44,8 @@ export interface QuoteGetRequest {
     amount: number;
     slippageBps?: number;
     swapMode?: QuoteGetSwapModeEnum;
-    excludeDexes?: Array<QuoteGetExcludeDexesEnum>;
+    dexes?: Array<string>;
+    excludeDexes?: Array<string>;
     onlyDirectRoutes?: boolean;
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
@@ -161,6 +162,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.swapMode !== undefined) {
             queryParameters['swapMode'] = requestParameters.swapMode;
+        }
+
+        if (requestParameters.dexes) {
+            queryParameters['dexes'] = requestParameters.dexes;
         }
 
         if (requestParameters.excludeDexes) {
@@ -284,39 +289,3 @@ export const QuoteGetSwapModeEnum = {
     ExactOut: 'ExactOut'
 } as const;
 export type QuoteGetSwapModeEnum = typeof QuoteGetSwapModeEnum[keyof typeof QuoteGetSwapModeEnum];
-/**
- * @export
- */
-export const QuoteGetExcludeDexesEnum = {
-    Aldrin: 'Aldrin',
-    AldrinV2: 'Aldrin V2',
-    Balansol: 'Balansol',
-    Crema: 'Crema',
-    Cropper: 'Cropper',
-    FluxBeam: 'FluxBeam',
-    LifinityV1: 'Lifinity V1',
-    LifinityV2: 'Lifinity V2',
-    Oasis: 'Oasis',
-    Bonkswap: 'Bonkswap',
-    Marinade: 'Marinade',
-    Mercurial: 'Mercurial',
-    Meteora: 'Meteora',
-    Phoenix: 'Phoenix',
-    Raydium: 'Raydium',
-    RaydiumClmm: 'Raydium CLMM',
-    Saber: 'Saber',
-    SaberDecimals: 'Saber (Decimals)',
-    Openbook: 'Openbook',
-    Saros: 'Saros',
-    OrcaV2: 'Orca V2',
-    StepN: 'StepN',
-    OrcaV1: 'Orca V1',
-    Penguin: 'Penguin',
-    Symmetry: 'Symmetry',
-    Whirlpool: 'Whirlpool',
-    Invariant: 'Invariant',
-    HeliumNetwork: 'Helium Network',
-    JupiterLo: 'Jupiter LO',
-    Sanctum: 'Sanctum'
-} as const;
-export type QuoteGetExcludeDexesEnum = typeof QuoteGetExcludeDexesEnum[keyof typeof QuoteGetExcludeDexesEnum];

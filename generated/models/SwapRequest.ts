@@ -33,7 +33,7 @@ export interface SwapRequest {
      */
     userPublicKey: string;
     /**
-     * Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.
+     * Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
      * @type {boolean}
      * @memberof SwapRequest
      */
@@ -51,7 +51,7 @@ export interface SwapRequest {
      */
     feeAccount?: string;
     /**
-     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitSet (1400000) * computeUnitPriceMicroLamports`.
+     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitSet (1400000) * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 1,000,000 lamports.
      * @type {number}
      * @memberof SwapRequest
      */
@@ -74,6 +74,12 @@ export interface SwapRequest {
      * @memberof SwapRequest
      */
     destinationTokenAccount?: string;
+    /**
+     * When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    dynamicComputeUnitLimit?: boolean;
     /**
      * 
      * @type {QuoteResponse}
@@ -111,6 +117,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
         'useTokenLedger': !exists(json, 'useTokenLedger') ? undefined : json['useTokenLedger'],
         'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
+        'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
     };
 }
@@ -132,6 +139,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'asLegacyTransaction': value.asLegacyTransaction,
         'useTokenLedger': value.useTokenLedger,
         'destinationTokenAccount': value.destinationTokenAccount,
+        'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
     };
 }

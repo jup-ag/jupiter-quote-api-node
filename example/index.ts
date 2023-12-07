@@ -33,7 +33,7 @@ export async function main() {
 
   // get quote
   const quote = await jupiterQuoteApi.quoteGet({
-    inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    inputMint: "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
     outputMint: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
     amount: 35281,
     slippageBps: 100,
@@ -47,10 +47,11 @@ export async function main() {
   }
 
   // get serialized transaction
-  const swapResult = await jupiterQuoteApi.swapInstructionsPost({
+  const swapResult = await jupiterQuoteApi.swapPost({
     swapRequest: {
       quoteResponse: quote,
       userPublicKey: "HAPdsaZFfQDG4bD8vzBbPCUawUWKSJxvhQ7TGg1BeAxZ",
+      dynamicComputeUnitLimit: true,
     },
   });
 
