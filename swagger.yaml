@@ -256,7 +256,7 @@ components:
           description: The prioritization fee to pay in addition to the signature fee to prioritize the transaction.
           type: integer
         computeUnitPriceMicroLamports:
-          description: The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 1,000,000 lamports.
+          description: The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports.
           type: integer
         asLegacyTransaction:
           description: Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
