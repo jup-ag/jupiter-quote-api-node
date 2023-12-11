@@ -57,7 +57,7 @@ export interface SwapRequest {
      */
     prioritizationFeeLamports?: number;
     /**
-     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 1,000,000 lamports.
+     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports.
      * @type {number}
      * @memberof SwapRequest
      */
