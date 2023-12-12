@@ -15,6 +15,11 @@
   },
   "author": "",
   "license": "MIT",
+  "dependencies": {
+    "@project-serum/anchor": "^0.26.0",
+    "@solana/web3.js": "^1.87.6",
+    "bs58": "^5.0.0"
+  },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.7.0",
     "cross-fetch": "^3.1.5",
