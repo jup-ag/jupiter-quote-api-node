@@ -13,7 +13,7 @@ info:
 
     ### Data types
     - Public keys are base58 encoded strings
-    - raw data such as Vec<u8> are base64 encoded strings
+    - raw data such as Vec<u8\> are base64 encoded strings
 
 servers:
   - url: https://quote-api.jup.ag/v6
@@ -28,6 +28,8 @@ paths:
         - $ref: '#/components/parameters/OutputMintParameter'
         - $ref: '#/components/parameters/AmountParameter'
         - $ref: '#/components/parameters/SlippageParameter'
+        - $ref: '#/components/parameters/SwapModeParameter'
+        - $ref: '#/components/parameters/DexesParameter'
         - $ref: '#/components/parameters/ExcludeDexesParameter'
         - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
         - $ref: '#/components/parameters/AsLegacyTransactionParameter'
@@ -84,8 +86,8 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
+                type: object
+                additionalProperties:
                   type: string
   /indexed-route-map:
     get:
@@ -138,6 +140,7 @@ components:
       required:
         - inputMint
         - outputMint
+        - inAmount
         - outAmount
         - otherAmountThreshold
         - swapMode
@@ -164,7 +167,7 @@ components:
         platformFee:
           $ref: '#/components/schemas/PlatformFee'
         priceImpactPct:
-          type: number
+          type: string
         routePlan:
           type: array
           items:
@@ -239,26 +242,36 @@ components:
           description: The user public key.
           type: string
         wrapAndUnwrapSol:
-          description: Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.
+          description: Automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
           type: boolean
+          default: true
         useSharedAccounts:
-          description: Default is true. This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
+          description: This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
           type: boolean
+          default: true
         feeAccount:
           description: Fee token account for the output token, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a `platformFeeBps` in `/quote` and make sure that the feeAccount has been created).
           type: string
+        prioritizationFeeLamports:
+          description: The prioritization fee to pay in addition to the signature fee to prioritize the transaction.
+          type: integer
         computeUnitPriceMicroLamports:
-          description: The compute unit price to prioritize the transaction, the additional fee will be `computeUnitSet (1400000) * computeUnitPriceMicroLamports`.
+          description: The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports.
           type: integer
         asLegacyTransaction:
-          description: Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
+          description: Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
           type: boolean
+          default: false
         useTokenLedger:
-          description: Default is false. This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
+          description: This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
           type: boolean
+          default: false
         destinationTokenAccount:
           description: Public key of the token account that will be used to receive the token out of the swap. If not provided, the user's ATA will be used. If provided, we assume that the token account is already initialized.
           type: string
+        dynamicComputeUnitLimit:
+          description: Simulate the swap transaction to get the compute unit consumed, factor in a margin and set the ComputeBudget's compute unit limit.
+          type: boolean
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
 
@@ -267,8 +280,11 @@ components:
       properties:
         swapTransaction:
           type: string
+        lastValidBlockHeight:
+          type: number
       required:
         - swapTransaction
+        - lastValidBlockHeight
 
     SwapInstructionsResponse:
       type: object
@@ -290,7 +306,7 @@ components:
           description: The actual swap instruction.
           $ref: '#/components/schemas/Instruction'
         cleanupInstruction:
-          description: Unwrap the SOL if `wrapUnwrapSOL = true`.
+          description: Unwrap the SOL if `wrapAndUnwrapSol = true`.
           $ref: '#/components/schemas/Instruction'
         addressLookupTableAddresses:
           description: The lookup table addresses that you can use if you are using versioned transaction.
@@ -359,8 +375,16 @@ components:
       in: query
       schema:
         type: integer
+    SwapModeParameter:
+      name: swapMode
+      description: (ExactIn or ExactOut) Defaults to ExactIn. ExactOut is for supporting use cases where you need an exact token amount, like payments. In this case the slippage is on the input token.
+      in: query
+      schema:
+        type: string
+        enum: ['ExactIn', 'ExactOut']
     DexesParameter:
       name: dexes
+      description: Default is that all DEXes are included. You can pass in the DEXes that you want to include only and separate them by `,`. You can check out the full list [here](https://quote-api.jup.ag/v6/program-id-to-label).
       in: query
       schema:
         type: array
@@ -368,7 +392,7 @@ components:
           type: string
     ExcludeDexesParameter:
       name: excludeDexes
-      description: Default is that all DEXes are included. You can pass in the DEXes that you want to exclude and separate them by `,`. For example, `Aldrin,Saber`.
+      description: Default is that all DEXes are included. You can pass in the DEXes that you want to exclude and separate them by `,`. You can check out the full list [here](https://quote-api.jup.ag/v6/program-id-to-label).
       in: query
       schema:
         type: array

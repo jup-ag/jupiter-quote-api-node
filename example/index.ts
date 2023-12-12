@@ -44,7 +44,7 @@ export async function main() {
 
   // get quote
   const quote = await jupiterQuoteApi.quoteGet({
-    inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    inputMint: "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
     outputMint: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
     amount: 35281,
     slippageBps: 100,
@@ -62,6 +62,7 @@ export async function main() {
     swapRequest: {
       quoteResponse: quote,
       userPublicKey: wallet.publicKey.toBase58(),
+      dynamicComputeUnitLimit: true,
     },
   });
 

@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -33,13 +33,13 @@ export interface SwapRequest {
      */
     userPublicKey: string;
     /**
-     * Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.
+     * Automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
      * @type {boolean}
      * @memberof SwapRequest
      */
     wrapAndUnwrapSol?: boolean;
     /**
-     * Default is true. This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
+     * This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
      * @type {boolean}
      * @memberof SwapRequest
      */
@@ -51,19 +51,25 @@ export interface SwapRequest {
      */
     feeAccount?: string;
     /**
-     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitSet (1400000) * computeUnitPriceMicroLamports`.
+     * The prioritization fee to pay in addition to the signature fee to prioritize the transaction.
+     * @type {number}
+     * @memberof SwapRequest
+     */
+    prioritizationFeeLamports?: number;
+    /**
+     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports.
      * @type {number}
      * @memberof SwapRequest
      */
     computeUnitPriceMicroLamports?: number;
     /**
-     * Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
+     * Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
      * @type {boolean}
      * @memberof SwapRequest
      */
     asLegacyTransaction?: boolean;
     /**
-     * Default is false. This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
+     * This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
      * @type {boolean}
      * @memberof SwapRequest
      */
@@ -74,6 +80,12 @@ export interface SwapRequest {
      * @memberof SwapRequest
      */
     destinationTokenAccount?: string;
+    /**
+     * Simulate the swap transaction to get the compute unit consumed, factor in a margin and set the ComputeBudget's compute unit limit.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    dynamicComputeUnitLimit?: boolean;
     /**
      * 
      * @type {QuoteResponse}
@@ -107,10 +119,12 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
         'useSharedAccounts': !exists(json, 'useSharedAccounts') ? undefined : json['useSharedAccounts'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
+        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
         'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : json['computeUnitPriceMicroLamports'],
         'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
         'useTokenLedger': !exists(json, 'useTokenLedger') ? undefined : json['useTokenLedger'],
         'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
+        'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
     };
 }
@@ -128,10 +142,12 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'wrapAndUnwrapSol': value.wrapAndUnwrapSol,
         'useSharedAccounts': value.useSharedAccounts,
         'feeAccount': value.feeAccount,
+        'prioritizationFeeLamports': value.prioritizationFeeLamports,
         'computeUnitPriceMicroLamports': value.computeUnitPriceMicroLamports,
         'asLegacyTransaction': value.asLegacyTransaction,
         'useTokenLedger': value.useTokenLedger,
         'destinationTokenAccount': value.destinationTokenAccount,
+        'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
     };
 }

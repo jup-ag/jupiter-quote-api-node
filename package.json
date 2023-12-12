@@ -1,6 +1,6 @@
 {
   "name": "@jup-ag/api",
-  "version": "6.0.2",
+  "version": "6.0.8",
   "description": "## Generate typescript types from swagger schema",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -8,8 +8,10 @@
   "sideEffects": false,
   "scripts": {
     "start": "ts-node ./example/index.ts",
+    "test": "vitest",
     "build": "npm run openapi-gen && tsup src/index.ts --dts --format esm,cjs",
-    "openapi-gen": "openapi-generator-cli generate -i swagger.yaml -o generated -g typescript-fetch --skip-validate-spec --additional-properties=supportsES6=true,typescriptThreePlus=true"
+    "openapi-gen": "openapi-generator-cli generate -i swagger.yaml -o generated -g typescript-fetch --skip-validate-spec --additional-properties=supportsES6=true,typescriptThreePlus=true",
+    "openapi-gen-rust": "openapi-generator-cli generate -i swagger.yaml -o generated -g rust"
   },
   "author": "",
   "license": "MIT",
@@ -23,7 +25,8 @@
     "cross-fetch": "^3.1.5",
     "ts-node": "^10.5.0",
     "tsup": "^7.1.0",
-    "typescript": "^5.1.6"
+    "typescript": "^5.1.6",
+    "vitest": "^0.34.1"
   },
   "files": [
     "dist"

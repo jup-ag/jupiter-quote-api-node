@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -49,7 +49,7 @@ export interface QuoteResponse {
      * @type {string}
      * @memberof QuoteResponse
      */
-    inAmount?: string;
+    inAmount: string;
     /**
      * 
      * @type {string}
@@ -88,10 +88,10 @@ export interface QuoteResponse {
     platformFee?: PlatformFee;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof QuoteResponse
      */
-    priceImpactPct: number;
+    priceImpactPct: string;
     /**
      * 
      * @type {Array<RoutePlanStep>}
@@ -118,6 +118,7 @@ export interface QuoteResponse {
 export function instanceOfQuoteResponse(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "inputMint" in value;
+    isInstance = isInstance && "inAmount" in value;
     isInstance = isInstance && "outputMint" in value;
     isInstance = isInstance && "outAmount" in value;
     isInstance = isInstance && "otherAmountThreshold" in value;
@@ -140,7 +141,7 @@ export function QuoteResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'inputMint': json['inputMint'],
-        'inAmount': !exists(json, 'inAmount') ? undefined : json['inAmount'],
+        'inAmount': json['inAmount'],
         'outputMint': json['outputMint'],
         'outAmount': json['outAmount'],
         'otherAmountThreshold': json['otherAmountThreshold'],
