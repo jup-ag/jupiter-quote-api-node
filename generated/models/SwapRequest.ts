@@ -52,22 +52,28 @@ export interface SwapRequest {
     feeAccount?: string;
     /**
      * The prioritization fee to pay in addition to the signature fee to prioritize the transaction.
-     * @type {number}
+     * @type {any}
      * @memberof SwapRequest
      */
-    prioritizationFeeLamports?: number;
+    prioritizationFeeLamports?: any | null;
     /**
      * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports.
-     * @type {number}
+     * @type {any}
      * @memberof SwapRequest
      */
-    computeUnitPriceMicroLamports?: number;
+    computeUnitPriceMicroLamports?: any | null;
     /**
      * Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
      * @type {boolean}
      * @memberof SwapRequest
      */
     asLegacyTransaction?: boolean;
+    /**
+     * Restrict intermediate tokens to a top token set that has stable liquidity. This will help to ease potential high slippage error rate when swapping with minimal impact on pricing.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    restrictIntermediateTokens?: boolean;
     /**
      * This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
      * @type {boolean}
@@ -122,6 +128,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
         'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : json['computeUnitPriceMicroLamports'],
         'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
+        'restrictIntermediateTokens': !exists(json, 'restrictIntermediateTokens') ? undefined : json['restrictIntermediateTokens'],
         'useTokenLedger': !exists(json, 'useTokenLedger') ? undefined : json['useTokenLedger'],
         'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
         'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
@@ -145,6 +152,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'prioritizationFeeLamports': value.prioritizationFeeLamports,
         'computeUnitPriceMicroLamports': value.computeUnitPriceMicroLamports,
         'asLegacyTransaction': value.asLegacyTransaction,
+        'restrictIntermediateTokens': value.restrictIntermediateTokens,
         'useTokenLedger': value.useTokenLedger,
         'destinationTokenAccount': value.destinationTokenAccount,
         'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
