@@ -254,14 +254,17 @@ components:
           type: string
         prioritizationFeeLamports:
           description: The prioritization fee to pay in addition to the signature fee to prioritize the transaction.
-          type: integer
+          type: [integer, string]
         computeUnitPriceMicroLamports:
           description: The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports.
-          type: integer
+          type: [integer, string]
         asLegacyTransaction:
           description: Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
           type: boolean
           default: false
+        restrictIntermediateTokens:
+          description: Restrict intermediate tokens to a top token set that has stable liquidity. This will help to ease potential high slippage error rate when swapping with minimal impact on pricing.
+          type: boolean
         useTokenLedger:
           description: This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
           type: boolean
