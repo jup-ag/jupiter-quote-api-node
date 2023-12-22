@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 150 requests / 60 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -31,6 +31,12 @@ export interface SwapResponse {
      * @memberof SwapResponse
      */
     lastValidBlockHeight: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SwapResponse
+     */
+    prioritizationFeeLamports?: number;
 }
 
 /**
@@ -56,6 +62,7 @@ export function SwapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'swapTransaction': json['swapTransaction'],
         'lastValidBlockHeight': json['lastValidBlockHeight'],
+        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
     };
 }
 
@@ -70,6 +77,7 @@ export function SwapResponseToJSON(value?: SwapResponse | null): any {
         
         'swapTransaction': value.swapTransaction,
         'lastValidBlockHeight': value.lastValidBlockHeight,
+        'prioritizationFeeLamports': value.prioritizationFeeLamports,
     };
 }
 

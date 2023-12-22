@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 150 requests / 60 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -33,13 +33,13 @@ export interface SwapRequest {
      */
     userPublicKey: string;
     /**
-     * Automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
+     * Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
      * @type {boolean}
      * @memberof SwapRequest
      */
     wrapAndUnwrapSol?: boolean;
     /**
-     * This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
+     * Default is true. This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
      * @type {boolean}
      * @memberof SwapRequest
      */
@@ -51,19 +51,19 @@ export interface SwapRequest {
      */
     feeAccount?: string;
     /**
-     * The prioritization fee to pay in addition to the signature fee to prioritize the transaction.
-     * @type {any}
-     * @memberof SwapRequest
-     */
-    prioritizationFeeLamports?: any | null;
-    /**
-     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports.
+     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
      * @type {any}
      * @memberof SwapRequest
      */
     computeUnitPriceMicroLamports?: any | null;
     /**
-     * Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
+     * Prioritization fee lamports paid for the transaction in addition to the signatures fee. Mutually exclusive with compute_unit_price_micro_lamports. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
+     * @type {any}
+     * @memberof SwapRequest
+     */
+    prioritizationFeeLamports?: any | null;
+    /**
+     * Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
      * @type {boolean}
      * @memberof SwapRequest
      */
@@ -75,7 +75,7 @@ export interface SwapRequest {
      */
     restrictIntermediateTokens?: boolean;
     /**
-     * This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
+     * Default is false. This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
      * @type {boolean}
      * @memberof SwapRequest
      */
@@ -87,11 +87,17 @@ export interface SwapRequest {
      */
     destinationTokenAccount?: string;
     /**
-     * Simulate the swap transaction to get the compute unit consumed, factor in a margin and set the ComputeBudget's compute unit limit.
+     * When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit. This will increase latency slightly since there will be one extra RPC call to simulate this. Default is `false`.
      * @type {boolean}
      * @memberof SwapRequest
      */
     dynamicComputeUnitLimit?: boolean;
+    /**
+     * When enabled, it will not do any rpc calls check on user's accounts. Enable it only when you already setup all the accounts needed for the trasaction, like wrapping or unwrapping sol, destination account is already created.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    skipUserAccountsRpcCalls?: boolean;
     /**
      * 
      * @type {QuoteResponse}
@@ -125,13 +131,14 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
         'useSharedAccounts': !exists(json, 'useSharedAccounts') ? undefined : json['useSharedAccounts'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
-        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
         'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : json['computeUnitPriceMicroLamports'],
+        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
         'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
         'restrictIntermediateTokens': !exists(json, 'restrictIntermediateTokens') ? undefined : json['restrictIntermediateTokens'],
         'useTokenLedger': !exists(json, 'useTokenLedger') ? undefined : json['useTokenLedger'],
         'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
         'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
+        'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
     };
 }
@@ -149,13 +156,14 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'wrapAndUnwrapSol': value.wrapAndUnwrapSol,
         'useSharedAccounts': value.useSharedAccounts,
         'feeAccount': value.feeAccount,
-        'prioritizationFeeLamports': value.prioritizationFeeLamports,
         'computeUnitPriceMicroLamports': value.computeUnitPriceMicroLamports,
+        'prioritizationFeeLamports': value.prioritizationFeeLamports,
         'asLegacyTransaction': value.asLegacyTransaction,
         'restrictIntermediateTokens': value.restrictIntermediateTokens,
         'useTokenLedger': value.useTokenLedger,
         'destinationTokenAccount': value.destinationTokenAccount,
         'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
+        'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
     };
 }
