@@ -2,9 +2,12 @@
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Examples](#examples)
+- [JavaScript API Client for Jupiter V6](#javascript-api-client-for-jupiter-v6)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Examples](#examples)
+    - [Using custom URLs](#using-custom-urls)
 
 ## Installation
 
@@ -40,3 +43,17 @@ jupiterQuoteApi.quoteGet({
 ## Examples
 
 Checkout the example in the repo. [link](/example/index.ts)
+
+### Using custom URLs
+
+You can set custom URLs via the configuration for any self-hosted Jupiter APIs, like the [V6 Swap API](https://station.jup.ag/docs/apis/self-hosted) or [QuickNode's Metis API](https://marketplace.quicknode.com/add-on/metis-jupiter-v6-swap-api). Here is an example
+
+```typescript
+import { createJupiterApiClient } from '@jup-ag/api';
+
+const config = {
+    basePath: 'https://jupiter-swaps.quiknode.pro/D3ADB33F'
+};
+const jupiterQuoteApi = createJupiterApiClient(config);
+
+```
