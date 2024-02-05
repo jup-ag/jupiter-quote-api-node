@@ -5,6 +5,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [Examples](#examples)
+  - [Paid Hosted APIs](#paid-hosted-apis)
 
 ## Installation
 
@@ -40,3 +41,7 @@ jupiterQuoteApi.quoteGet({
 ## Examples
 
 Checkout the example in the repo. [link](/example/index.ts)
+
+### Paid Hosted APIs
+
+You can also check out some of the [paid hosted APIs](https://station.jup.ag/docs/apis/self-hosted#paid-hosted-apis).
