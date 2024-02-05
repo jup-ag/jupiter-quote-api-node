@@ -5,6 +5,8 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [Examples](#examples)
+  - [Using Custom URLs](#using-custom-urls)
+  - [Paid Hosted APIs](#paid-hosted-apis)
 
 ## Installation
 
@@ -40,3 +42,20 @@ jupiterQuoteApi.quoteGet({
 ## Examples
 
 Checkout the example in the repo. [link](/example/index.ts)
+
+### Using Custom URLs
+
+You can set custom URLs via the configuration for any self-hosted Jupiter APIs, like the [V6 Swap API](https://station.jup.ag/docs/apis/self-hosted) or the [paid hosted APIs](#paid-hosted-apis)
+
+```typescript
+import { createJupiterApiClient } from '@jup-ag/api';
+
+const config = {
+    basePath: 'https://hosted.api'
+};
+const jupiterQuoteApi = createJupiterApiClient(config);
+```
+
+### Paid Hosted APIs
+
+You can also check out some of the [paid hosted APIs](https://station.jup.ag/docs/apis/self-hosted#paid-hosted-apis).
