@@ -10,4 +10,6 @@ export * from './SwapInfo';
 export * from './SwapInstructionsResponse';
 export * from './SwapMode';
 export * from './SwapRequest';
+export * from './SwapRequestComputeUnitPriceMicroLamports';
+export * from './SwapRequestPrioritizationFeeLamports';
 export * from './SwapResponse';

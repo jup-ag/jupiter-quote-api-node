@@ -1,4 +1,4 @@
-openapi: 3.0.3
+openapi: '3.0.2'
 info:
   title: Jupiter API v6
   version: 6.0.0
@@ -6,7 +6,7 @@ info:
     The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.
 
     ### Rate Limit
-    The rate limit is 150 requests / 60 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.
+    We update our rate limit from time to time depending on the load of our servers. We recommend running your own instance of the API if you want to have high rate limit, here to learn how to run the [self-hosted API](https://station.jup.ag/docs/apis/self-hosted).
 
     ### API Wrapper
     - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)
@@ -31,6 +31,7 @@ paths:
         - $ref: '#/components/parameters/SwapModeParameter'
         - $ref: '#/components/parameters/DexesParameter'
         - $ref: '#/components/parameters/ExcludeDexesParameter'
+        - $ref: '#/components/parameters/RestrictIntermediateTokensParameter'
         - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
         - $ref: '#/components/parameters/AsLegacyTransactionParameter'
         - $ref: '#/components/parameters/PlatformFeeBpsParameter'
@@ -45,7 +46,7 @@ paths:
   /swap:
     post:
       summary: POST /swap
-      description: Returns a transaction for the QuoteResponse of `/quote`.
+      description: Returns a transaction that you can use from the quote you get from `/quote`.
       requestBody:
         required: true
         content:
@@ -62,7 +63,7 @@ paths:
   /swap-instructions:
     post:
       summary: POST /swap-instructions
-      description: Returns instructions for the QuoteResponse of `/quote`.
+      description: Returns instructions that you can use from the quote you get from `/quote`.
       requestBody:
         required: true
         content:
@@ -79,7 +80,7 @@ paths:
   /program-id-to-label:
     get:
       summary: GET /program-id-to-label
-      description: Returns a mapping from program id to pogram label. This is used to help map errors from transaction by identifying the erring program id. The labels can be used in the `excludeDexes` or `dexes` parameter when calling `/quote`.
+      description: Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
       responses:
         '200':
           description: Default response
@@ -92,7 +93,8 @@ paths:
   /indexed-route-map:
     get:
       summary: GET /indexed-route-map
-      description: Returns a mapping of token mint to valid output token mints, token mints are indexed to reduce the file size
+      description: DEPRECATED, please use /tokens for tradable mints. Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
+      deprecated: true
       parameters:
         - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
       responses:
@@ -102,6 +104,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndexedRouteMapResponse'
+  /tokens:
+    get:
+      summary: GET /tokens
+      description: Returns a list of all the tradable mints
+      responses:
+        '200':
+          description: Default response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  - 'So11111111111111111111111111111111111111112'
+                  - 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+                  - 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'
 
 components:
   schemas:
@@ -250,21 +269,24 @@ components:
           type: boolean
           default: true
         feeAccount:
-          description: Fee token account for the output token, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a `platformFeeBps` in `/quote` and make sure that the feeAccount has been created).
+          description: Fee token account, same as the output token for ExactIn and as the input token for ExactOut, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a feeBps and make sure that the feeAccount has been created).
           type: string
         computeUnitPriceMicroLamports:
           description: The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
-          type: [integer, string]
+          anyOf:
+            - type: integer
+            - type: string
+              enum: ['auto']
         prioritizationFeeLamports:
           description: Prioritization fee lamports paid for the transaction in addition to the signatures fee. Mutually exclusive with compute_unit_price_micro_lamports. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
-          type: [integer, string]
+          anyOf:
+            - type: integer
+            - type: string
+              enum: ['auto']
         asLegacyTransaction:
           description: Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
           type: boolean
           default: false
-        restrictIntermediateTokens:
-          description: Restrict intermediate tokens to a top token set that has stable liquidity. This will help to ease potential high slippage error rate when swapping with minimal impact on pricing.
-          type: boolean
         useTokenLedger:
           description: Default is false. This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
           type: boolean
@@ -317,7 +339,7 @@ components:
           description: Unwrap the SOL if `wrapAndUnwrapSol = true`.
           $ref: '#/components/schemas/Instruction'
         addressLookupTableAddresses:
-          description: The lookup table addresses to compress the swaps
+          description: The lookup table addresses that you can use if you are using versioned transaction.
           type: array
           items:
             type: string
@@ -406,6 +428,12 @@ components:
         type: array
         items:
           type: string
+    RestrictIntermediateTokensParameter:
+      name: restrictIntermediateTokens
+      description: Restrict intermediate tokens to a top token set that has stable liquidity. This will help to ease potential high slippage error rate when swapping with minimal impact on pricing.
+      in: query
+      schema:
+        type: boolean
     OnlyDirectRoutesParameter:
       name: onlyDirectRoutes
       description: Default is false. Direct Routes limits Jupiter routing to single hop routes only.

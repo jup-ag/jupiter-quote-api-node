@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 150 requests / 60 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit We update our rate limit from time to time depending on the load of our servers. We recommend running your own instance of the API if you want to have high rate limit, here to learn how to run the [self-hosted API](https://station.jup.ag/docs/apis/self-hosted).  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -19,6 +19,18 @@ import {
     QuoteResponseFromJSONTyped,
     QuoteResponseToJSON,
 } from './QuoteResponse';
+import type { SwapRequestComputeUnitPriceMicroLamports } from './SwapRequestComputeUnitPriceMicroLamports';
+import {
+    SwapRequestComputeUnitPriceMicroLamportsFromJSON,
+    SwapRequestComputeUnitPriceMicroLamportsFromJSONTyped,
+    SwapRequestComputeUnitPriceMicroLamportsToJSON,
+} from './SwapRequestComputeUnitPriceMicroLamports';
+import type { SwapRequestPrioritizationFeeLamports } from './SwapRequestPrioritizationFeeLamports';
+import {
+    SwapRequestPrioritizationFeeLamportsFromJSON,
+    SwapRequestPrioritizationFeeLamportsFromJSONTyped,
+    SwapRequestPrioritizationFeeLamportsToJSON,
+} from './SwapRequestPrioritizationFeeLamports';
 
 /**
  * 
@@ -45,35 +57,29 @@ export interface SwapRequest {
      */
     useSharedAccounts?: boolean;
     /**
-     * Fee token account for the output token, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a `platformFeeBps` in `/quote` and make sure that the feeAccount has been created).
+     * Fee token account, same as the output token for ExactIn and as the input token for ExactOut, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a feeBps and make sure that the feeAccount has been created).
      * @type {string}
      * @memberof SwapRequest
      */
     feeAccount?: string;
     /**
-     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
-     * @type {any}
+     * 
+     * @type {SwapRequestComputeUnitPriceMicroLamports}
      * @memberof SwapRequest
      */
-    computeUnitPriceMicroLamports?: any | null;
+    computeUnitPriceMicroLamports?: SwapRequestComputeUnitPriceMicroLamports;
     /**
-     * Prioritization fee lamports paid for the transaction in addition to the signatures fee. Mutually exclusive with compute_unit_price_micro_lamports. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
-     * @type {any}
+     * 
+     * @type {SwapRequestPrioritizationFeeLamports}
      * @memberof SwapRequest
      */
-    prioritizationFeeLamports?: any | null;
+    prioritizationFeeLamports?: SwapRequestPrioritizationFeeLamports;
     /**
      * Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
      * @type {boolean}
      * @memberof SwapRequest
      */
     asLegacyTransaction?: boolean;
-    /**
-     * Restrict intermediate tokens to a top token set that has stable liquidity. This will help to ease potential high slippage error rate when swapping with minimal impact on pricing.
-     * @type {boolean}
-     * @memberof SwapRequest
-     */
-    restrictIntermediateTokens?: boolean;
     /**
      * Default is false. This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
      * @type {boolean}
@@ -131,10 +137,9 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
         'useSharedAccounts': !exists(json, 'useSharedAccounts') ? undefined : json['useSharedAccounts'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
-        'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : json['computeUnitPriceMicroLamports'],
-        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
+        'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : SwapRequestComputeUnitPriceMicroLamportsFromJSON(json['computeUnitPriceMicroLamports']),
+        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : SwapRequestPrioritizationFeeLamportsFromJSON(json['prioritizationFeeLamports']),
         'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
-        'restrictIntermediateTokens': !exists(json, 'restrictIntermediateTokens') ? undefined : json['restrictIntermediateTokens'],
         'useTokenLedger': !exists(json, 'useTokenLedger') ? undefined : json['useTokenLedger'],
         'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
         'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
@@ -156,10 +161,9 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'wrapAndUnwrapSol': value.wrapAndUnwrapSol,
         'useSharedAccounts': value.useSharedAccounts,
         'feeAccount': value.feeAccount,
-        'computeUnitPriceMicroLamports': value.computeUnitPriceMicroLamports,
-        'prioritizationFeeLamports': value.prioritizationFeeLamports,
+        'computeUnitPriceMicroLamports': SwapRequestComputeUnitPriceMicroLamportsToJSON(value.computeUnitPriceMicroLamports),
+        'prioritizationFeeLamports': SwapRequestPrioritizationFeeLamportsToJSON(value.prioritizationFeeLamports),
         'asLegacyTransaction': value.asLegacyTransaction,
-        'restrictIntermediateTokens': value.restrictIntermediateTokens,
         'useTokenLedger': value.useTokenLedger,
         'destinationTokenAccount': value.destinationTokenAccount,
         'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
