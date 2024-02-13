@@ -11,6 +11,8 @@ models/SwapInfo.ts
 models/SwapInstructionsResponse.ts
 models/SwapMode.ts
 models/SwapRequest.ts
+models/SwapRequestComputeUnitPriceMicroLamports.ts
+models/SwapRequestPrioritizationFeeLamports.ts
 models/SwapResponse.ts
 models/index.ts
 runtime.ts

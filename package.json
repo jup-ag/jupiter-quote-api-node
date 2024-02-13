@@ -1,6 +1,6 @@
 {
   "name": "@jup-ag/api",
-  "version": "6.0.10",
+  "version": "6.0.11",
   "description": "## Generate typescript types from swagger schema",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -21,7 +21,7 @@
     "bs58": "^5.0.0"
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.7.0",
+    "@openapitools/openapi-generator-cli": "^2.9.0",
     "cross-fetch": "^3.1.5",
     "ts-node": "^10.5.0",
     "tsup": "^7.1.0",

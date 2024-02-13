@@ -3,34 +3,6 @@ import { Connection, Keypair, VersionedTransaction } from "@solana/web3.js";
 import { Wallet } from "@project-serum/anchor";
 import bs58 from "bs58";
 
-type RouteMap = Record<string, string[]>;
-
-function inflateIndexedRouteMap(
-  result: IndexedRouteMapResponse
-): Record<string, string[]> {
-  const { mintKeys, indexedRouteMap } = result;
-
-  return Object.entries(indexedRouteMap).reduce<RouteMap>(
-    (acc, [inputMintIndexString, outputMintIndices]) => {
-      const inputMintIndex = Number(inputMintIndexString);
-      const inputMint = mintKeys[inputMintIndex];
-      if (!inputMint)
-        throw new Error(`Could no find mint key for index ${inputMintIndex}`);
-
-      acc[inputMint] = outputMintIndices.map((index) => {
-        const outputMint = mintKeys[index];
-        if (!outputMint)
-          throw new Error(`Could no find mint key for index ${index}`);
-
-        return outputMint;
-      });
-
-      return acc;
-    },
-    {}
-  );
-}
-
 export async function main() {
   const jupiterQuoteApi = createJupiterApiClient();
   const wallet = new Wallet(
@@ -85,9 +57,8 @@ export async function main() {
   console.log(`https://solscan.io/tx/${txid}`);
 
   // get route map
-  const result = await jupiterQuoteApi.indexedRouteMapGet();
-  const routeMap = inflateIndexedRouteMap(result);
-  console.log(Object.keys(routeMap).length);
+  const tokens = await jupiterQuoteApi.tokensGet();
+  console.log(Object.keys(tokens).length);
 }
 
 main();

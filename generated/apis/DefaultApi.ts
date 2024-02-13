@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 150 requests / 60 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit We update our rate limit from time to time depending on the load of our servers. We recommend running your own instance of the API if you want to have high rate limit, here to learn how to run the [self-hosted API](https://station.jup.ag/docs/apis/self-hosted).  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -20,7 +20,7 @@ import type {
   SwapInstructionsResponse,
   SwapRequest,
   SwapResponse,
-} from '../models';
+} from '../models/index';
 import {
     IndexedRouteMapResponseFromJSON,
     IndexedRouteMapResponseToJSON,
@@ -32,7 +32,7 @@ import {
     SwapRequestToJSON,
     SwapResponseFromJSON,
     SwapResponseToJSON,
-} from '../models';
+} from '../models/index';
 
 export interface IndexedRouteMapGetRequest {
     onlyDirectRoutes?: boolean;
@@ -46,6 +46,7 @@ export interface QuoteGetRequest {
     swapMode?: QuoteGetSwapModeEnum;
     dexes?: Array<string>;
     excludeDexes?: Array<string>;
+    restrictIntermediateTokens?: boolean;
     onlyDirectRoutes?: boolean;
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
@@ -66,8 +67,9 @@ export interface SwapPostRequest {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
-     * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
+     * DEPRECATED, please use /tokens for tradable mints. Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      * GET /indexed-route-map
+     * @deprecated
      */
     async indexedRouteMapGetRaw(requestParameters: IndexedRouteMapGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IndexedRouteMapResponse>> {
         const queryParameters: any = {};
@@ -89,8 +91,9 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
+     * DEPRECATED, please use /tokens for tradable mints. Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      * GET /indexed-route-map
+     * @deprecated
      */
     async indexedRouteMapGet(requestParameters: IndexedRouteMapGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IndexedRouteMapResponse> {
         const response = await this.indexedRouteMapGetRaw(requestParameters, initOverrides);
@@ -170,6 +173,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.excludeDexes) {
             queryParameters['excludeDexes'] = requestParameters.excludeDexes;
+        }
+
+        if (requestParameters.restrictIntermediateTokens !== undefined) {
+            queryParameters['restrictIntermediateTokens'] = requestParameters.restrictIntermediateTokens;
         }
 
         if (requestParameters.onlyDirectRoutes !== undefined) {
@@ -276,6 +283,34 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async swapPost(requestParameters: SwapPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SwapResponse> {
         const response = await this.swapPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Returns a list of all the tradable mints
+     * GET /tokens
+     */
+    async tokensGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/tokens`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Returns a list of all the tradable mints
+     * GET /tokens
+     */
+    async tokensGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.tokensGetRaw(initOverrides);
         return await response.value();
     }
 
