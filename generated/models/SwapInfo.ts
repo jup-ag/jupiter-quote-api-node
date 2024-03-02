@@ -30,7 +30,7 @@ export interface SwapInfo {
      * @type {string}
      * @memberof SwapInfo
      */
-    label?: string;
+    label: string;
     /**
      * 
      * @type {string}
@@ -75,6 +75,7 @@ export interface SwapInfo {
 export function instanceOfSwapInfo(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "ammKey" in value;
+    isInstance = isInstance && "label" in value;
     isInstance = isInstance && "inputMint" in value;
     isInstance = isInstance && "outputMint" in value;
     isInstance = isInstance && "inAmount" in value;
@@ -96,7 +97,7 @@ export function SwapInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     return {
         
         'ammKey': json['ammKey'],
-        'label': !exists(json, 'label') ? undefined : json['label'],
+        'label': json['label'],
         'inputMint': json['inputMint'],
         'outputMint': json['outputMint'],
         'inAmount': json['inAmount'],

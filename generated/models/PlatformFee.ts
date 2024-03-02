@@ -24,13 +24,13 @@ export interface PlatformFee {
      * @type {string}
      * @memberof PlatformFee
      */
-    amount?: string;
+    amount: string;
     /**
      * 
      * @type {number}
      * @memberof PlatformFee
      */
-    feeBps?: number;
+    feeBps: number;
 }
 
 /**
@@ -38,6 +38,8 @@ export interface PlatformFee {
  */
 export function instanceOfPlatformFee(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "amount" in value;
+    isInstance = isInstance && "feeBps" in value;
 
     return isInstance;
 }
@@ -52,8 +54,8 @@ export function PlatformFeeFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'amount': !exists(json, 'amount') ? undefined : json['amount'],
-        'feeBps': !exists(json, 'feeBps') ? undefined : json['feeBps'],
+        'amount': json['amount'],
+        'feeBps': json['feeBps'],
     };
 }
 
