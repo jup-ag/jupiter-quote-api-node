@@ -29,6 +29,7 @@ paths:
         - $ref: '#/components/parameters/AmountParameter'
         - $ref: '#/components/parameters/SlippageParameter'
         - $ref: '#/components/parameters/AutoSlippageParameter'
+        - $ref: '#/components/parameters/AutoSlippageCollisionValueParameter'
         - $ref: '#/components/parameters/SwapModeParameter'
         - $ref: '#/components/parameters/DexesParameter'
         - $ref: '#/components/parameters/ExcludeDexesParameter'
@@ -413,6 +414,12 @@ components:
       schema:
         type: string
         enum: ['true']
+    AutoSlippageCollisionValueParameter:
+      name: autoSlippageCollisionUsdValue
+      description: Automatic slippage collision value.
+      in: query
+      schema:
+        type: integer
     SwapModeParameter:
       name: swapMode
       description: (ExactIn or ExactOut) Defaults to ExactIn. ExactOut is for supporting use cases where you need an exact token amount, like payments. In this case the slippage is on the input token.
