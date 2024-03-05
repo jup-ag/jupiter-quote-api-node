@@ -325,7 +325,7 @@ export class DefaultApi extends runtime.BaseAPI {
  * @export
  */
 export const QuoteGetAutoSlippageEnum = {
-    Auto: 'auto'
+    True: 'true'
 } as const;
 export type QuoteGetAutoSlippageEnum = typeof QuoteGetAutoSlippageEnum[keyof typeof QuoteGetAutoSlippageEnum];
 /**

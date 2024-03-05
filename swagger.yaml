@@ -412,7 +412,7 @@ components:
       in: query
       schema:
         type: string
-        enum: ['auto']
+        enum: ['true']
     SwapModeParameter:
       name: swapMode
       description: (ExactIn or ExactOut) Defaults to ExactIn. ExactOut is for supporting use cases where you need an exact token amount, like payments. In this case the slippage is on the input token.
