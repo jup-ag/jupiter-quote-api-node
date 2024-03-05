@@ -28,6 +28,7 @@ paths:
         - $ref: '#/components/parameters/OutputMintParameter'
         - $ref: '#/components/parameters/AmountParameter'
         - $ref: '#/components/parameters/SlippageParameter'
+        - $ref: '#/components/parameters/SlippageAutoParameter'
         - $ref: '#/components/parameters/SwapModeParameter'
         - $ref: '#/components/parameters/DexesParameter'
         - $ref: '#/components/parameters/ExcludeDexesParameter'
@@ -405,6 +406,13 @@ components:
       in: query
       schema:
         type: integer
+    SlippageAutoParameter:
+      name: slippage
+      description: Automatically calculate the slippage based on pairs.
+      in: query
+      schema:
+        type: string
+        enum: ['auto']
     SwapModeParameter:
       name: swapMode
       description: (ExactIn or ExactOut) Defaults to ExactIn. ExactOut is for supporting use cases where you need an exact token amount, like payments. In this case the slippage is on the input token.

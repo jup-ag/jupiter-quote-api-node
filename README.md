@@ -16,6 +16,11 @@ To use the Jupiter API client, you need to have Node.js and npm (Node Package Ma
 npm install @jup-ag/api
 ```
 
+## Developer to publish
+- bump version
+- pnpm build
+- npm publish --access public
+
 ## Usage
 
 To start using the API client, you need to require it in your Node.js project:
