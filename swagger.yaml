@@ -28,7 +28,7 @@ paths:
         - $ref: '#/components/parameters/OutputMintParameter'
         - $ref: '#/components/parameters/AmountParameter'
         - $ref: '#/components/parameters/SlippageParameter'
-        - $ref: '#/components/parameters/SlippageAutoParameter'
+        - $ref: '#/components/parameters/AutoSlippageParameter'
         - $ref: '#/components/parameters/SwapModeParameter'
         - $ref: '#/components/parameters/DexesParameter'
         - $ref: '#/components/parameters/ExcludeDexesParameter'
@@ -406,8 +406,8 @@ components:
       in: query
       schema:
         type: integer
-    SlippageAutoParameter:
-      name: slippage
+    AutoSlippageParameter:
+      name: autoSlippage
       description: Automatically calculate the slippage based on pairs.
       in: query
       schema:

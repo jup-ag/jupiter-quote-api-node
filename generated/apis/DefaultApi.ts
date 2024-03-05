@@ -43,7 +43,7 @@ export interface QuoteGetRequest {
     outputMint: string;
     amount: number;
     slippageBps?: number;
-    slippage?: QuoteGetSlippageEnum;
+    autoSlippage?: QuoteGetAutoSlippageEnum;
     swapMode?: QuoteGetSwapModeEnum;
     dexes?: Array<string>;
     excludeDexes?: Array<string>;
@@ -164,8 +164,8 @@ export class DefaultApi extends runtime.BaseAPI {
             queryParameters['slippageBps'] = requestParameters.slippageBps;
         }
 
-        if (requestParameters.slippage !== undefined) {
-            queryParameters['slippage'] = requestParameters.slippage;
+        if (requestParameters.autoSlippage !== undefined) {
+            queryParameters['autoSlippage'] = requestParameters.autoSlippage;
         }
 
         if (requestParameters.swapMode !== undefined) {
@@ -324,10 +324,10 @@ export class DefaultApi extends runtime.BaseAPI {
 /**
  * @export
  */
-export const QuoteGetSlippageEnum = {
+export const QuoteGetAutoSlippageEnum = {
     Auto: 'auto'
 } as const;
-export type QuoteGetSlippageEnum = typeof QuoteGetSlippageEnum[keyof typeof QuoteGetSlippageEnum];
+export type QuoteGetAutoSlippageEnum = typeof QuoteGetAutoSlippageEnum[keyof typeof QuoteGetAutoSlippageEnum];
 /**
  * @export
  */
