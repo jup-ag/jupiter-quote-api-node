@@ -38,6 +38,10 @@ export async function main() {
       quoteResponse: quote,
       userPublicKey: wallet.publicKey.toBase58(),
       dynamicComputeUnitLimit: true,
+      prioritizationFeeLamports: "auto",
+      // prioritizationFeeLamports: {
+      //   autoMultiplier: 2,
+      // },
     },
   });
 
