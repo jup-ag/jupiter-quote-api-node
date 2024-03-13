@@ -186,6 +186,9 @@ components:
         slippageBps:
           type: integer
           format: int32
+        computedAutoSlippage:
+          type: integer
+          format: int32
         platformFee:
           $ref: '#/components/schemas/PlatformFee'
         priceImpactPct:
