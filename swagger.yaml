@@ -28,6 +28,9 @@ paths:
         - $ref: '#/components/parameters/OutputMintParameter'
         - $ref: '#/components/parameters/AmountParameter'
         - $ref: '#/components/parameters/SlippageParameter'
+        - $ref: '#/components/parameters/AutoSlippageParameter'
+        - $ref: '#/components/parameters/AutoSlippageCollisionValueParameter'
+        - $ref: '#/components/parameters/ComputeAutoSlippageParameter'
         - $ref: '#/components/parameters/SwapModeParameter'
         - $ref: '#/components/parameters/DexesParameter'
         - $ref: '#/components/parameters/ExcludeDexesParameter'
@@ -181,6 +184,9 @@ components:
           $ref: '#/components/schemas/SwapMode'
           required: true
         slippageBps:
+          type: integer
+          format: int32
+        computedAutoSlippage:
           type: integer
           format: int32
         platformFee:
@@ -405,6 +411,24 @@ components:
       in: query
       schema:
         type: integer
+    AutoSlippageParameter:
+      name: autoSlippage
+      description: Automatically calculate the slippage based on pairs.
+      in: query
+      schema:
+        type: boolean
+    AutoSlippageCollisionValueParameter:
+      name: autoSlippageCollisionUsdValue
+      description: Automatic slippage collision value.
+      in: query
+      schema:
+        type: integer
+    ComputeAutoSlippageParameter:
+      name: computeAutoSlippage
+      description: Compute auto slippage value without using it.
+      in: query
+      schema:
+        type: boolean
     SwapModeParameter:
       name: swapMode
       description: (ExactIn or ExactOut) Defaults to ExactIn. ExactOut is for supporting use cases where you need an exact token amount, like payments. In this case the slippage is on the input token.

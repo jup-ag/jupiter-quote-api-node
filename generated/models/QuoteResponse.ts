@@ -82,6 +82,12 @@ export interface QuoteResponse {
     slippageBps: number;
     /**
      * 
+     * @type {number}
+     * @memberof QuoteResponse
+     */
+    computedAutoSlippage?: number;
+    /**
+     * 
      * @type {PlatformFee}
      * @memberof QuoteResponse
      */
@@ -147,6 +153,7 @@ export function QuoteResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
         'otherAmountThreshold': json['otherAmountThreshold'],
         'swapMode': SwapModeFromJSON(json['swapMode']),
         'slippageBps': json['slippageBps'],
+        'computedAutoSlippage': !exists(json, 'computedAutoSlippage') ? undefined : json['computedAutoSlippage'],
         'platformFee': !exists(json, 'platformFee') ? undefined : PlatformFeeFromJSON(json['platformFee']),
         'priceImpactPct': json['priceImpactPct'],
         'routePlan': ((json['routePlan'] as Array<any>).map(RoutePlanStepFromJSON)),
@@ -171,6 +178,7 @@ export function QuoteResponseToJSON(value?: QuoteResponse | null): any {
         'otherAmountThreshold': value.otherAmountThreshold,
         'swapMode': SwapModeToJSON(value.swapMode),
         'slippageBps': value.slippageBps,
+        'computedAutoSlippage': value.computedAutoSlippage,
         'platformFee': PlatformFeeToJSON(value.platformFee),
         'priceImpactPct': value.priceImpactPct,
         'routePlan': ((value.routePlan as Array<any>).map(RoutePlanStepToJSON)),
