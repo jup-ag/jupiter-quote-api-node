@@ -43,7 +43,7 @@ export interface QuoteGetRequest {
     outputMint: string;
     amount: number;
     slippageBps?: number;
-    autoSlippage?: QuoteGetAutoSlippageEnum;
+    autoSlippage?: boolean;
     autoSlippageCollisionUsdValue?: number;
     computeAutoSlippage?: boolean;
     swapMode?: QuoteGetSwapModeEnum;
@@ -331,13 +331,6 @@ export class DefaultApi extends runtime.BaseAPI {
 
 }
 
-/**
- * @export
- */
-export const QuoteGetAutoSlippageEnum = {
-    True: 'true'
-} as const;
-export type QuoteGetAutoSlippageEnum = typeof QuoteGetAutoSlippageEnum[keyof typeof QuoteGetAutoSlippageEnum];
 /**
  * @export
  */

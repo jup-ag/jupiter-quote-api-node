@@ -416,8 +416,7 @@ components:
       description: Automatically calculate the slippage based on pairs.
       in: query
       schema:
-        type: string
-        enum: ['true']
+        type: boolean
     AutoSlippageCollisionValueParameter:
       name: autoSlippageCollisionUsdValue
       description: Automatic slippage collision value.
