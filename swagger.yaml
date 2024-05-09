@@ -31,6 +31,7 @@ paths:
         - $ref: '#/components/parameters/AutoSlippageParameter'
         - $ref: '#/components/parameters/AutoSlippageCollisionValueParameter'
         - $ref: '#/components/parameters/ComputeAutoSlippageParameter'
+        - $ref: '#/components/parameters/MaxAutoSlippageBpsParameter'
         - $ref: '#/components/parameters/SwapModeParameter'
         - $ref: '#/components/parameters/DexesParameter'
         - $ref: '#/components/parameters/ExcludeDexesParameter'
@@ -420,6 +421,12 @@ components:
     AutoSlippageCollisionValueParameter:
       name: autoSlippageCollisionUsdValue
       description: Automatic slippage collision value.
+      in: query
+      schema:
+        type: integer
+    MaxAutoSlippageBpsParameter:
+      name: maxAutoSlippageBps
+      description: Max slippage in basis points for auto slippage calculation. Default is 400.
       in: query
       schema:
         type: integer
