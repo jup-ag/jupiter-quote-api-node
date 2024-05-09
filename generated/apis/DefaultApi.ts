@@ -46,6 +46,7 @@ export interface QuoteGetRequest {
     autoSlippage?: boolean;
     autoSlippageCollisionUsdValue?: number;
     computeAutoSlippage?: boolean;
+    maxAutoSlippageBps?: number;
     swapMode?: QuoteGetSwapModeEnum;
     dexes?: Array<string>;
     excludeDexes?: Array<string>;
@@ -176,6 +177,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.computeAutoSlippage !== undefined) {
             queryParameters['computeAutoSlippage'] = requestParameters.computeAutoSlippage;
+        }
+
+        if (requestParameters.maxAutoSlippageBps !== undefined) {
+            queryParameters['maxAutoSlippageBps'] = requestParameters.maxAutoSlippageBps;
         }
 
         if (requestParameters.swapMode !== undefined) {
