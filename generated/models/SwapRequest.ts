@@ -105,6 +105,12 @@ export interface SwapRequest {
      */
     skipUserAccountsRpcCalls?: boolean;
     /**
+     * The program authority id [0;7], load balanced across the available set by default
+     * @type {number}
+     * @memberof SwapRequest
+     */
+    programAuthorityId?: number;
+    /**
      * 
      * @type {QuoteResponse}
      * @memberof SwapRequest
@@ -144,6 +150,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
         'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
         'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
+        'programAuthorityId': !exists(json, 'programAuthorityId') ? undefined : json['programAuthorityId'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
     };
 }
@@ -168,6 +175,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'destinationTokenAccount': value.destinationTokenAccount,
         'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
         'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,
+        'programAuthorityId': value.programAuthorityId,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
     };
 }
