@@ -307,6 +307,9 @@ components:
         skipUserAccountsRpcCalls:
           description: When enabled, it will not do any rpc calls check on user's accounts. Enable it only when you already setup all the accounts needed for the trasaction, like wrapping or unwrapping sol, destination account is already created.
           type: boolean
+        programAuthorityId:
+          description: The program authority id [0;7], load balanced across the available set by default
+          type: integer
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
 
