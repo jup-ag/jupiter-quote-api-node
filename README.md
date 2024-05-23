@@ -16,10 +16,12 @@ To use the Jupiter API client, you need to have Node.js and npm (Node Package Ma
 npm install @jup-ag/api
 ```
 
-## Developer to publish
-- bump version
-- pnpm build
-- npm publish --access public
+## Developing
+- pnpm dev-quote
+  - just get a quote, without needing wallet
+- pnpm dev-swap
+  - get a quote, perform swap
+  - please setup `process.env.PRIVATE_KEY`
 
 ## Usage
 

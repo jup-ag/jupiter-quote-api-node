@@ -1,54 +1,85 @@
-import { createJupiterApiClient } from "../src/index";
+import {
+  QuoteGetRequest,
+  QuoteResponse,
+  SwapResponse,
+  createJupiterApiClient,
+} from "../src/index";
 import { Connection, Keypair, VersionedTransaction } from "@solana/web3.js";
 import { Wallet } from "@project-serum/anchor";
 import bs58 from "bs58";
 import { transactionSenderAndConfirmationWaiter } from "./utils/transactionSender";
 import { getSignature } from "./utils/getSignature";
 
-export async function main() {
-  const jupiterQuoteApi = createJupiterApiClient();
-  const wallet = new Wallet(
-    Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ""))
-  );
-  console.log("Wallet:", wallet.publicKey.toBase58());
+// Make sure that you are using your own RPC endpoint.
+const connection = new Connection(
+  "https://neat-hidden-sanctuary.solana-mainnet.discover.quiknode.pro/2af5315d336f9ae920028bbb90a73b724dc1bbed/"
+);
+const jupiterQuoteApi = createJupiterApiClient();
 
-  // Make sure that you are using your own RPC endpoint.
-  const connection = new Connection(
-    "https://neat-hidden-sanctuary.solana-mainnet.discover.quiknode.pro/2af5315d336f9ae920028bbb90a73b724dc1bbed/"
-  );
+async function getQuote() {
+  // basic params
+  // const params: QuoteGetRequest = {
+  //   inputMint: "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
+  //   outputMint: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+  //   amount: 35281,
+  //   slippageBps: 50,
+  //   onlyDirectRoutes: false,
+  //   asLegacyTransaction: false,
+  // }
 
-  // get quote
-  const quote = await jupiterQuoteApi.quoteGet({
-    inputMint: "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
-    outputMint: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
-    amount: 35281,
-    slippageBps: 50,
+  // auto slippage w/ minimizeSlippage params
+  const params: QuoteGetRequest = {
+    inputMint: "So11111111111111111111111111111111111111112",
+    outputMint: "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", // $WIF
+    amount: 100000000, // 0.1 SOL
+    autoSlippage: true,
+    autoSlippageCollisionUsdValue: 1_000,
+    maxAutoSlippageBps: 1000, // 10%
+    minimizeSlippage: true,
     onlyDirectRoutes: false,
     asLegacyTransaction: false,
-  });
+  };
+
+  // get quote
+  const quote = await jupiterQuoteApi.quoteGet(params);
 
   if (!quote) {
-    console.error("unable to quote");
-    return;
+    throw new Error("unable to quote");
   }
+  return quote;
+}
 
+async function getSwapObj(wallet: Wallet, quote: QuoteResponse) {
   // Get serialized transaction
-  const swapResult = await jupiterQuoteApi.swapPost({
+  const swapObj = await jupiterQuoteApi.swapPost({
     swapRequest: {
       quoteResponse: quote,
       userPublicKey: wallet.publicKey.toBase58(),
       dynamicComputeUnitLimit: true,
       prioritizationFeeLamports: "auto",
-      // prioritizationFeeLamports: {
-      //   autoMultiplier: 2,
-      // },
     },
   });
+  return swapObj;
+}
 
-  console.dir(swapResult, { depth: null });
+async function flowQuote() {
+  const quote = await getQuote();
+  console.dir(quote, { depth: null });
+}
+
+async function flowQuoteAndSwap() {
+  const wallet = new Wallet(
+    Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ""))
+  );
+  console.log("Wallet:", wallet.publicKey.toBase58());
+
+  const quote = await getQuote();
+  console.dir(quote, { depth: null });
+  const swapObj = await getSwapObj(wallet, quote);
+  console.dir(swapObj, { depth: null });
 
   // Serialize the transaction
-  const swapTransactionBuf = Buffer.from(swapResult.swapTransaction, "base64");
+  const swapTransactionBuf = Buffer.from(swapObj.swapTransaction, "base64");
   var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
 
   // Sign the transaction
@@ -79,7 +110,7 @@ export async function main() {
     serializedTransaction,
     blockhashWithExpiryBlockHeight: {
       blockhash,
-      lastValidBlockHeight: swapResult.lastValidBlockHeight,
+      lastValidBlockHeight: swapObj.lastValidBlockHeight,
     },
   });
 
@@ -94,6 +125,24 @@ export async function main() {
   }
 
   console.log(`https://solscan.io/tx/${signature}`);
+}
+
+export async function main() {
+  switch (process.env.FLOW) {
+    case "quote": {
+      await flowQuote();
+      break;
+    }
+
+    case "quoteAndSwap": {
+      await flowQuoteAndSwap();
+      break;
+    }
+
+    default: {
+      console.error("Please set the FLOW environment");
+    }
+  }
 }
 
 main();
