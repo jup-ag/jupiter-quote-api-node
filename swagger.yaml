@@ -40,6 +40,7 @@ paths:
         - $ref: '#/components/parameters/AsLegacyTransactionParameter'
         - $ref: '#/components/parameters/PlatformFeeBpsParameter'
         - $ref: '#/components/parameters/MaxAccountsParameter'
+        - $ref: '#/components/parameters/MinimizeSlippage'
       responses:
         '200':
           description: Successful response
@@ -492,3 +493,9 @@ components:
       in: query
       schema:
         type: integer
+    MinimizeSlippage:
+      name: minimizeSlippage
+      description: Default is false. Miminize slippage attempts to find routes with lower slippage.
+      in: query
+      schema:
+        type: boolean

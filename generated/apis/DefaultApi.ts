@@ -55,6 +55,7 @@ export interface QuoteGetRequest {
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
     maxAccounts?: number;
+    minimizeSlippage?: boolean;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -213,6 +214,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.maxAccounts !== undefined) {
             queryParameters['maxAccounts'] = requestParameters.maxAccounts;
+        }
+
+        if (requestParameters.minimizeSlippage !== undefined) {
+            queryParameters['minimizeSlippage'] = requestParameters.minimizeSlippage;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
