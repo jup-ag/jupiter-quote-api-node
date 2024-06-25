@@ -11,10 +11,16 @@ import { transactionSenderAndConfirmationWaiter } from "./utils/transactionSende
 import { getSignature } from "./utils/getSignature";
 
 // Make sure that you are using your own RPC endpoint.
-const connection = new Connection(
-  "https://neat-hidden-sanctuary.solana-mainnet.discover.quiknode.pro/2af5315d336f9ae920028bbb90a73b724dc1bbed/"
-);
-const jupiterQuoteApi = createJupiterApiClient();
+const endpoint = "https://neat-hidden-sanctuary.solana-mainnet.discover.quiknode.pro/2af5315d336f9ae920028bbb90a73b724dc1bbed"; // NO END SLASH HERE
+
+// This is the way you call the api with the endpoint, no trailing forward slash
+const config = {
+  basePath: endpoint,
+};
+const jupiterQuoteApi = createJupiterApiClient(config);
+
+// This is the way to open a connection with same endpoint using web3.js
+const connection = new Connection(RPC_ENDPOINT + "/");
 
 async function getQuote() {
   // basic params
