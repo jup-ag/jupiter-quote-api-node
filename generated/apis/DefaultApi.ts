@@ -56,6 +56,7 @@ export interface QuoteGetRequest {
     platformFeeBps?: number;
     maxAccounts?: number;
     minimizeSlippage?: boolean;
+    preferLiquidDexes?: boolean;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -218,6 +219,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.minimizeSlippage !== undefined) {
             queryParameters['minimizeSlippage'] = requestParameters.minimizeSlippage;
+        }
+
+        if (requestParameters.preferLiquidDexes !== undefined) {
+            queryParameters['preferLiquidDexes'] = requestParameters.preferLiquidDexes;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
