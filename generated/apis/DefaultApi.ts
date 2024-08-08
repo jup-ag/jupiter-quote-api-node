@@ -57,6 +57,7 @@ export interface QuoteGetRequest {
     maxAccounts?: number;
     minimizeSlippage?: boolean;
     preferLiquidDexes?: boolean;
+    allowOptimizedWrappedSolTokenAccount?: boolean;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -223,6 +224,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.preferLiquidDexes !== undefined) {
             queryParameters['preferLiquidDexes'] = requestParameters.preferLiquidDexes;
+        }
+
+        if (requestParameters.allowOptimizedWrappedSolTokenAccount !== undefined) {
+            queryParameters['allowOptimizedWrappedSolTokenAccount'] = requestParameters.allowOptimizedWrappedSolTokenAccount;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
