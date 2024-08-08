@@ -42,7 +42,6 @@ paths:
         - $ref: '#/components/parameters/MaxAccountsParameter'
         - $ref: '#/components/parameters/MinimizeSlippage'
         - $ref: '#/components/parameters/PreferLiquidDexes'
-        - $ref: '#/components/parameters/AllowOptimizedWrappedSolTokenAccount'
       responses:
         '200':
           description: Successful response
@@ -313,6 +312,10 @@ components:
         programAuthorityId:
           description: The program authority id [0;7], load balanced across the available set by default
           type: integer
+        allowOptimizedWrappedSolTokenAccount:
+          description: Default is false. Enabling it would reduce use an optimized way to open WSOL that reduce compute unit.
+          type: boolean
+          default: false
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
 
@@ -504,12 +507,6 @@ components:
     PreferLiquidDexes:
       name: preferLiquidDexes
       description: Default is false. Enabling it would only consider markets with high liquidity to reduce slippage.
-      in: query
-      schema:
-        type: boolean
-    AllowOptimizedWrappedSolTokenAccount:
-      name: allowOptimizedWrappedSolTokenAccount
-      description: Default is false. Enabling it would reduce use an optimized way to open WSOL that reduce compute unit.
       in: query
       schema:
         type: boolean

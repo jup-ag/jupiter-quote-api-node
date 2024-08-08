@@ -111,6 +111,12 @@ export interface SwapRequest {
      */
     programAuthorityId?: number;
     /**
+     * Default is false. Enabling it would reduce use an optimized way to open WSOL that reduce compute unit.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    allowOptimizedWrappedSolTokenAccount?: boolean;
+    /**
      * 
      * @type {QuoteResponse}
      * @memberof SwapRequest
@@ -151,6 +157,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
         'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
         'programAuthorityId': !exists(json, 'programAuthorityId') ? undefined : json['programAuthorityId'],
+        'allowOptimizedWrappedSolTokenAccount': !exists(json, 'allowOptimizedWrappedSolTokenAccount') ? undefined : json['allowOptimizedWrappedSolTokenAccount'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
     };
 }
@@ -176,6 +183,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
         'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,
         'programAuthorityId': value.programAuthorityId,
+        'allowOptimizedWrappedSolTokenAccount': value.allowOptimizedWrappedSolTokenAccount,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
     };
 }
