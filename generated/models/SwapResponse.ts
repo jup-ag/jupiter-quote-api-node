@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { SwapResponseDynamicSlippageReport } from './SwapResponseDynamicSlippageReport';
+import {
+    SwapResponseDynamicSlippageReportFromJSON,
+    SwapResponseDynamicSlippageReportFromJSONTyped,
+    SwapResponseDynamicSlippageReportToJSON,
+} from './SwapResponseDynamicSlippageReport';
+
 /**
  * 
  * @export
@@ -37,6 +44,12 @@ export interface SwapResponse {
      * @memberof SwapResponse
      */
     prioritizationFeeLamports?: number;
+    /**
+     * 
+     * @type {SwapResponseDynamicSlippageReport}
+     * @memberof SwapResponse
+     */
+    dynamicSlippageReport?: SwapResponseDynamicSlippageReport;
 }
 
 /**
@@ -63,6 +76,7 @@ export function SwapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'swapTransaction': json['swapTransaction'],
         'lastValidBlockHeight': json['lastValidBlockHeight'],
         'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
+        'dynamicSlippageReport': !exists(json, 'dynamicSlippageReport') ? undefined : SwapResponseDynamicSlippageReportFromJSON(json['dynamicSlippageReport']),
     };
 }
 
@@ -78,6 +92,7 @@ export function SwapResponseToJSON(value?: SwapResponse | null): any {
         'swapTransaction': value.swapTransaction,
         'lastValidBlockHeight': value.lastValidBlockHeight,
         'prioritizationFeeLamports': value.prioritizationFeeLamports,
+        'dynamicSlippageReport': SwapResponseDynamicSlippageReportToJSON(value.dynamicSlippageReport),
     };
 }
 

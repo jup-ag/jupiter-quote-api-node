@@ -25,6 +25,12 @@ import {
     SwapRequestComputeUnitPriceMicroLamportsFromJSONTyped,
     SwapRequestComputeUnitPriceMicroLamportsToJSON,
 } from './SwapRequestComputeUnitPriceMicroLamports';
+import type { SwapRequestDynamicSlippage } from './SwapRequestDynamicSlippage';
+import {
+    SwapRequestDynamicSlippageFromJSON,
+    SwapRequestDynamicSlippageFromJSONTyped,
+    SwapRequestDynamicSlippageToJSON,
+} from './SwapRequestDynamicSlippage';
 import type { SwapRequestPrioritizationFeeLamports } from './SwapRequestPrioritizationFeeLamports';
 import {
     SwapRequestPrioritizationFeeLamportsFromJSON,
@@ -122,6 +128,12 @@ export interface SwapRequest {
      * @memberof SwapRequest
      */
     quoteResponse: QuoteResponse;
+    /**
+     * 
+     * @type {SwapRequestDynamicSlippage}
+     * @memberof SwapRequest
+     */
+    dynamicSlippage?: SwapRequestDynamicSlippage;
 }
 
 /**
@@ -159,6 +171,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'programAuthorityId': !exists(json, 'programAuthorityId') ? undefined : json['programAuthorityId'],
         'allowOptimizedWrappedSolTokenAccount': !exists(json, 'allowOptimizedWrappedSolTokenAccount') ? undefined : json['allowOptimizedWrappedSolTokenAccount'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
+        'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : SwapRequestDynamicSlippageFromJSON(json['dynamicSlippage']),
     };
 }
 
@@ -185,6 +198,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'programAuthorityId': value.programAuthorityId,
         'allowOptimizedWrappedSolTokenAccount': value.allowOptimizedWrappedSolTokenAccount,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
+        'dynamicSlippage': SwapRequestDynamicSlippageToJSON(value.dynamicSlippage),
     };
 }
 

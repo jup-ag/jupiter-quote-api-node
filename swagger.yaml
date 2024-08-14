@@ -1,4 +1,4 @@
-openapi: '3.0.2'
+openapi: "3.0.2"
 info:
   title: Jupiter API v6
   version: 6.0.0
@@ -24,31 +24,31 @@ paths:
       summary: GET /quote
       description: Sends a GET request to the Jupiter API to get the best priced quote.
       parameters:
-        - $ref: '#/components/parameters/InputMintParameter'
-        - $ref: '#/components/parameters/OutputMintParameter'
-        - $ref: '#/components/parameters/AmountParameter'
-        - $ref: '#/components/parameters/SlippageParameter'
-        - $ref: '#/components/parameters/AutoSlippageParameter'
-        - $ref: '#/components/parameters/AutoSlippageCollisionValueParameter'
-        - $ref: '#/components/parameters/ComputeAutoSlippageParameter'
-        - $ref: '#/components/parameters/MaxAutoSlippageBpsParameter'
-        - $ref: '#/components/parameters/SwapModeParameter'
-        - $ref: '#/components/parameters/DexesParameter'
-        - $ref: '#/components/parameters/ExcludeDexesParameter'
-        - $ref: '#/components/parameters/RestrictIntermediateTokensParameter'
-        - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
-        - $ref: '#/components/parameters/AsLegacyTransactionParameter'
-        - $ref: '#/components/parameters/PlatformFeeBpsParameter'
-        - $ref: '#/components/parameters/MaxAccountsParameter'
-        - $ref: '#/components/parameters/MinimizeSlippage'
-        - $ref: '#/components/parameters/PreferLiquidDexes'
+        - $ref: "#/components/parameters/InputMintParameter"
+        - $ref: "#/components/parameters/OutputMintParameter"
+        - $ref: "#/components/parameters/AmountParameter"
+        - $ref: "#/components/parameters/SlippageParameter"
+        - $ref: "#/components/parameters/AutoSlippageParameter"
+        - $ref: "#/components/parameters/AutoSlippageCollisionValueParameter"
+        - $ref: "#/components/parameters/ComputeAutoSlippageParameter"
+        - $ref: "#/components/parameters/MaxAutoSlippageBpsParameter"
+        - $ref: "#/components/parameters/SwapModeParameter"
+        - $ref: "#/components/parameters/DexesParameter"
+        - $ref: "#/components/parameters/ExcludeDexesParameter"
+        - $ref: "#/components/parameters/RestrictIntermediateTokensParameter"
+        - $ref: "#/components/parameters/OnlyDirectRoutesParameter"
+        - $ref: "#/components/parameters/AsLegacyTransactionParameter"
+        - $ref: "#/components/parameters/PlatformFeeBpsParameter"
+        - $ref: "#/components/parameters/MaxAccountsParameter"
+        - $ref: "#/components/parameters/MinimizeSlippage"
+        - $ref: "#/components/parameters/PreferLiquidDexes"
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/QuoteResponse'
+                $ref: "#/components/schemas/QuoteResponse"
   /swap:
     post:
       summary: POST /swap
@@ -58,14 +58,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SwapRequest'
+              $ref: "#/components/schemas/SwapRequest"
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SwapResponse'
+                $ref: "#/components/schemas/SwapResponse"
   /swap-instructions:
     post:
       summary: POST /swap-instructions
@@ -75,20 +75,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SwapRequest'
+              $ref: "#/components/schemas/SwapRequest"
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SwapInstructionsResponse'
+                $ref: "#/components/schemas/SwapInstructionsResponse"
   /program-id-to-label:
     get:
       summary: GET /program-id-to-label
       description: Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
       responses:
-        '200':
+        "200":
           description: Default response
           content:
             application/json:
@@ -102,20 +102,20 @@ paths:
       description: DEPRECATED, please use /tokens for tradable mints. Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
       deprecated: true
       parameters:
-        - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
+        - $ref: "#/components/parameters/OnlyDirectRoutesParameter"
       responses:
-        '200':
+        "200":
           description: Default response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/IndexedRouteMapResponse'
+                $ref: "#/components/schemas/IndexedRouteMapResponse"
   /tokens:
     get:
       summary: GET /tokens
       description: Returns a list of all the tradable mints
       responses:
-        '200':
+        "200":
           description: Default response
           content:
             application/json:
@@ -124,9 +124,9 @@ paths:
                 items:
                   type: string
                 example:
-                  - 'So11111111111111111111111111111111111111112'
-                  - 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
-                  - 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'
+                  - "So11111111111111111111111111111111111111112"
+                  - "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                  - "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 
 components:
   schemas:
@@ -138,7 +138,7 @@ components:
         accounts:
           type: array
           items:
-            $ref: '#/components/schemas/AccountMeta'
+            $ref: "#/components/schemas/AccountMeta"
         data:
           type: string
       required:
@@ -159,6 +159,18 @@ components:
         - pubkey
         - isSigner
         - isWritable
+
+    PriorityFeeWithMaxLamports:
+      priorityLevelWithMaxLamports:
+      type: object
+      properties:
+        global:
+          type: boolean
+        maxLamports:
+          type: integer
+        priorityLevel:
+          type: string
+          enum: ["medium", "high", "veryHigh"]
 
     QuoteResponse:
       type: object
@@ -184,7 +196,7 @@ components:
         otherAmountThreshold:
           type: string
         swapMode:
-          $ref: '#/components/schemas/SwapMode'
+          $ref: "#/components/schemas/SwapMode"
           required: true
         slippageBps:
           type: integer
@@ -193,13 +205,13 @@ components:
           type: integer
           format: int32
         platformFee:
-          $ref: '#/components/schemas/PlatformFee'
+          $ref: "#/components/schemas/PlatformFee"
         priceImpactPct:
           type: string
         routePlan:
           type: array
           items:
-            $ref: '#/components/schemas/RoutePlanStep'
+            $ref: "#/components/schemas/RoutePlanStep"
         contextSlot:
           type: number
         timeTaken:
@@ -224,7 +236,7 @@ components:
       type: object
       properties:
         swapInfo:
-          $ref: '#/components/schemas/SwapInfo'
+          $ref: "#/components/schemas/SwapInfo"
         percent:
           type: integer
           format: int32
@@ -285,13 +297,17 @@ components:
           anyOf:
             - type: integer
             - type: string
-              enum: ['auto']
+              enum: ["auto"]
         prioritizationFeeLamports:
-          description: Prioritization fee lamports paid for the transaction in addition to the signatures fee. Mutually exclusive with compute_unit_price_micro_lamports. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
+          description: \* PriorityFeeWithMaxLamports is impossible to be typed. Prioritization fee lamports paid for the transaction in addition to the signatures fee. Mutually exclusive with compute_unit_price_micro_lamports. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
           anyOf:
             - type: integer
             - type: string
-              enum: ['auto']
+              enum: ["auto"]
+            # It's impossible to type this, with Swagger 2.0, anyOf, oneOf typing is not supported
+            # - type: object
+            #   $ref: "#/components/schemas/PriorityFeeWithMaxLamports"
+
         asLegacyTransaction:
           description: Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
           type: boolean
@@ -317,7 +333,14 @@ components:
           type: boolean
           default: false
         quoteResponse:
-          $ref: '#/components/schemas/QuoteResponse'
+          $ref: "#/components/schemas/QuoteResponse"
+        dynamicSlippage:
+          type: object
+          properties:
+            minBps:
+              type: integer
+            maxBps:
+              type: integer
 
     SwapResponse:
       type: object
@@ -328,6 +351,17 @@ components:
           type: number
         prioritizationFeeLamports:
           type: number
+        dynamicSlippageReport:
+          type: object
+          properties:
+            amplificationRatio:
+              type: string
+            otherAmount:
+              type: integer
+            simulatedIncurredSlippageBps:
+              type: integer
+            slippageBps:
+              type: integer
       required:
         - swapTransaction
         - lastValidBlockHeight
@@ -337,23 +371,23 @@ components:
       properties:
         tokenLedgerInstruction:
           description: If you are using `useTokenLedger = true`.
-          $ref: '#/components/schemas/Instruction'
+          $ref: "#/components/schemas/Instruction"
         computeBudgetInstructions:
           description: The necessary instructions to setup the compute budget.
           type: array
           items:
-            $ref: '#/components/schemas/Instruction'
+            $ref: "#/components/schemas/Instruction"
         setupInstructions:
           description: Setup missing ATA for the users.
           type: array
           items:
-            $ref: '#/components/schemas/Instruction'
+            $ref: "#/components/schemas/Instruction"
         swapInstruction:
           description: The actual swap instruction.
-          $ref: '#/components/schemas/Instruction'
+          $ref: "#/components/schemas/Instruction"
         cleanupInstruction:
           description: Unwrap the SOL if `wrapAndUnwrapSol = true`.
-          $ref: '#/components/schemas/Instruction'
+          $ref: "#/components/schemas/Instruction"
         addressLookupTableAddresses:
           description: The lookup table addresses that you can use if you are using versioned transaction.
           type: array
@@ -384,11 +418,11 @@ components:
             items:
               type: number
           example:
-            '1':
+            "1":
               - 2
               - 3
               - 4
-            '2':
+            "2":
               - 1
               - 3
               - 4
@@ -451,7 +485,7 @@ components:
       in: query
       schema:
         type: string
-        enum: ['ExactIn', 'ExactOut']
+        enum: ["ExactIn", "ExactOut"]
     DexesParameter:
       name: dexes
       description: Default is that all DEXes are included. You can pass in the DEXes that you want to include only and separate them by `,`. You can check out the full list [here](https://quote-api.jup.ag/v6/program-id-to-label).

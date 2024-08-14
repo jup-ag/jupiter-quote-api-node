@@ -5,6 +5,7 @@ models/AccountMeta.ts
 models/IndexedRouteMapResponse.ts
 models/Instruction.ts
 models/PlatformFee.ts
+models/PriorityFeeWithMaxLamports.ts
 models/QuoteResponse.ts
 models/RoutePlanStep.ts
 models/SwapInfo.ts
@@ -12,7 +13,9 @@ models/SwapInstructionsResponse.ts
 models/SwapMode.ts
 models/SwapRequest.ts
 models/SwapRequestComputeUnitPriceMicroLamports.ts
+models/SwapRequestDynamicSlippage.ts
 models/SwapRequestPrioritizationFeeLamports.ts
 models/SwapResponse.ts
+models/SwapResponseDynamicSlippageReport.ts
 models/index.ts
 runtime.ts
