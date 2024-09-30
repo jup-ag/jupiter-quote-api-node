@@ -341,6 +341,9 @@ components:
               type: integer
             maxBps:
               type: integer
+        blockhashSlotsToExpiry:
+          description: Optional. When passed in, Swap object will be returned with your desired slots to epxiry.
+          type: number
 
     SwapResponse:
       type: object

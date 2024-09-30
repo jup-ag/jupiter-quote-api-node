@@ -134,6 +134,12 @@ export interface SwapRequest {
      * @memberof SwapRequest
      */
     dynamicSlippage?: SwapRequestDynamicSlippage;
+    /**
+     * Optional. When passed in, Swap object will be returned with your desired slots to epxiry.
+     * @type {number}
+     * @memberof SwapRequest
+     */
+    blockhashSlotsToExpiry?: number;
 }
 
 /**
@@ -172,6 +178,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'allowOptimizedWrappedSolTokenAccount': !exists(json, 'allowOptimizedWrappedSolTokenAccount') ? undefined : json['allowOptimizedWrappedSolTokenAccount'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
         'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : SwapRequestDynamicSlippageFromJSON(json['dynamicSlippage']),
+        'blockhashSlotsToExpiry': !exists(json, 'blockhashSlotsToExpiry') ? undefined : json['blockhashSlotsToExpiry'],
     };
 }
 
@@ -199,6 +206,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'allowOptimizedWrappedSolTokenAccount': value.allowOptimizedWrappedSolTokenAccount,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
         'dynamicSlippage': SwapRequestDynamicSlippageToJSON(value.dynamicSlippage),
+        'blockhashSlotsToExpiry': value.blockhashSlotsToExpiry,
     };
 }
 
