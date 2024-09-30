@@ -344,6 +344,9 @@ components:
         blockhashSlotsToExpiry:
           description: Optional. When passed in, Swap object will be returned with your desired slots to epxiry.
           type: number
+        correctLastValidBlockHeight:
+          description: Optional. Default to false. Request Swap object to be returned with the correct blockhash prior to Agave 2.0.
+          type: boolean
 
     SwapResponse:
       type: object

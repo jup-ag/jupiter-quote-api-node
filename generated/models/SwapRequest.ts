@@ -140,6 +140,12 @@ export interface SwapRequest {
      * @memberof SwapRequest
      */
     blockhashSlotsToExpiry?: number;
+    /**
+     * Optional. Default to false. Request Swap object to be returned with the correct blockhash prior to Agave 2.0.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    correctLastValidBlockHeight?: boolean;
 }
 
 /**
@@ -179,6 +185,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
         'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : SwapRequestDynamicSlippageFromJSON(json['dynamicSlippage']),
         'blockhashSlotsToExpiry': !exists(json, 'blockhashSlotsToExpiry') ? undefined : json['blockhashSlotsToExpiry'],
+        'correctLastValidBlockHeight': !exists(json, 'correctLastValidBlockHeight') ? undefined : json['correctLastValidBlockHeight'],
     };
 }
 
@@ -207,6 +214,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
         'dynamicSlippage': SwapRequestDynamicSlippageToJSON(value.dynamicSlippage),
         'blockhashSlotsToExpiry': value.blockhashSlotsToExpiry,
+        'correctLastValidBlockHeight': value.correctLastValidBlockHeight,
     };
 }
 
