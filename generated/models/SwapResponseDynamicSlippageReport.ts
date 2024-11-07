@@ -43,6 +43,18 @@ export interface SwapResponseDynamicSlippageReport {
      * @memberof SwapResponseDynamicSlippageReport
      */
     slippageBps?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof SwapResponseDynamicSlippageReport
+     */
+    categoryName?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SwapResponseDynamicSlippageReport
+     */
+    heuristicMaxSlippageBps?: number;
 }
 
 /**
@@ -68,6 +80,8 @@ export function SwapResponseDynamicSlippageReportFromJSONTyped(json: any, ignore
         'otherAmount': !exists(json, 'otherAmount') ? undefined : json['otherAmount'],
         'simulatedIncurredSlippageBps': !exists(json, 'simulatedIncurredSlippageBps') ? undefined : json['simulatedIncurredSlippageBps'],
         'slippageBps': !exists(json, 'slippageBps') ? undefined : json['slippageBps'],
+        'categoryName': !exists(json, 'categoryName') ? undefined : json['categoryName'],
+        'heuristicMaxSlippageBps': !exists(json, 'heuristicMaxSlippageBps') ? undefined : json['heuristicMaxSlippageBps'],
     };
 }
 
@@ -84,6 +98,8 @@ export function SwapResponseDynamicSlippageReportToJSON(value?: SwapResponseDyna
         'otherAmount': value.otherAmount,
         'simulatedIncurredSlippageBps': value.simulatedIncurredSlippageBps,
         'slippageBps': value.slippageBps,
+        'categoryName': value.categoryName,
+        'heuristicMaxSlippageBps': value.heuristicMaxSlippageBps,
     };
 }
 
