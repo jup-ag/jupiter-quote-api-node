@@ -48,7 +48,7 @@ export interface SwapResponseDynamicSlippageReport {
      * @type {string}
      * @memberof SwapResponseDynamicSlippageReport
      */
-    categoryName?: string;
+    categoryName?: SwapResponseDynamicSlippageReportCategoryNameEnum;
     /**
      * 
      * @type {number}
@@ -56,6 +56,19 @@ export interface SwapResponseDynamicSlippageReport {
      */
     heuristicMaxSlippageBps?: number;
 }
+
+
+/**
+ * @export
+ */
+export const SwapResponseDynamicSlippageReportCategoryNameEnum = {
+    Stable: 'stable',
+    Lst: 'lst',
+    Bluechip: 'bluechip',
+    Verified: 'verified'
+} as const;
+export type SwapResponseDynamicSlippageReportCategoryNameEnum = typeof SwapResponseDynamicSlippageReportCategoryNameEnum[keyof typeof SwapResponseDynamicSlippageReportCategoryNameEnum];
+
 
 /**
  * Check if a given object implements the SwapResponseDynamicSlippageReport interface.
