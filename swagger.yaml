@@ -368,6 +368,11 @@ components:
               type: integer
             slippageBps:
               type: integer
+            categoryName:
+              type: string
+              enum: ["stable", "lst", "bluechip", "verified"]
+            heuristicMaxSlippageBps:
+              type: integer
       required:
         - swapTransaction
         - lastValidBlockHeight
