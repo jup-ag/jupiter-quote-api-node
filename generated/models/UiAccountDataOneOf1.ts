@@ -13,71 +13,60 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { QuoteResponseValue } from './QuoteResponseValue';
+import type { UiAccountEncoding } from './UiAccountEncoding';
 import {
-    QuoteResponseValueFromJSON,
-    QuoteResponseValueFromJSONTyped,
-    QuoteResponseValueToJSON,
-} from './QuoteResponseValue';
+    UiAccountEncodingFromJSON,
+    UiAccountEncodingFromJSONTyped,
+    UiAccountEncodingToJSON,
+} from './UiAccountEncoding';
 
 /**
  * 
  * @export
- * @interface QuoteResponse
+ * @interface UiAccountDataOneOf1
  */
-export interface QuoteResponse {
+export interface UiAccountDataOneOf1 {
     /**
      * 
      * @type {string}
-     * @memberof QuoteResponse
+     * @memberof UiAccountDataOneOf1
      */
-    kind: QuoteResponseKindEnum;
+    binary: string;
     /**
      * 
-     * @type {QuoteResponseValue}
-     * @memberof QuoteResponse
+     * @type {UiAccountEncoding}
+     * @memberof UiAccountDataOneOf1
      */
-    value: QuoteResponseValue;
+    encoding: UiAccountEncoding;
 }
 
-
 /**
- * @export
+ * Check if a given object implements the UiAccountDataOneOf1 interface.
  */
-export const QuoteResponseKindEnum = {
-    Aggregator: 'Aggregator',
-    Rfq: 'Rfq'
-} as const;
-export type QuoteResponseKindEnum = typeof QuoteResponseKindEnum[keyof typeof QuoteResponseKindEnum];
-
-
-/**
- * Check if a given object implements the QuoteResponse interface.
- */
-export function instanceOfQuoteResponse(value: object): boolean {
+export function instanceOfUiAccountDataOneOf1(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "kind" in value;
-    isInstance = isInstance && "value" in value;
+    isInstance = isInstance && "binary" in value;
+    isInstance = isInstance && "encoding" in value;
 
     return isInstance;
 }
 
-export function QuoteResponseFromJSON(json: any): QuoteResponse {
-    return QuoteResponseFromJSONTyped(json, false);
+export function UiAccountDataOneOf1FromJSON(json: any): UiAccountDataOneOf1 {
+    return UiAccountDataOneOf1FromJSONTyped(json, false);
 }
 
-export function QuoteResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): QuoteResponse {
+export function UiAccountDataOneOf1FromJSONTyped(json: any, ignoreDiscriminator: boolean): UiAccountDataOneOf1 {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'kind': json['kind'],
-        'value': QuoteResponseValueFromJSON(json['value']),
+        'binary': json['binary'],
+        'encoding': UiAccountEncodingFromJSON(json['encoding']),
     };
 }
 
-export function QuoteResponseToJSON(value?: QuoteResponse | null): any {
+export function UiAccountDataOneOf1ToJSON(value?: UiAccountDataOneOf1 | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -86,8 +75,8 @@ export function QuoteResponseToJSON(value?: QuoteResponse | null): any {
     }
     return {
         
-        'kind': value.kind,
-        'value': QuoteResponseValueToJSON(value.value),
+        'binary': value.binary,
+        'encoding': UiAccountEncodingToJSON(value.encoding),
     };
 }
 

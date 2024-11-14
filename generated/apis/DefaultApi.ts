@@ -57,6 +57,8 @@ export interface QuoteGetRequest {
     maxAccounts?: number;
     minimizeSlippage?: boolean;
     preferLiquidDexes?: boolean;
+    swapType?: QuoteGetSwapTypeEnum;
+    taker?: string;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -135,7 +137,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Sends a GET request to the Jupiter API to get the best priced quote.
+     * Sends a GET request to the Jupiter API to get the best priced quote. Supports both Aggregator and RFQ quotes.
      * GET /quote
      */
     async quoteGetRaw(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<QuoteResponse>> {
@@ -225,6 +227,14 @@ export class DefaultApi extends runtime.BaseAPI {
             queryParameters['preferLiquidDexes'] = requestParameters.preferLiquidDexes;
         }
 
+        if (requestParameters.swapType !== undefined) {
+            queryParameters['swapType'] = requestParameters.swapType;
+        }
+
+        if (requestParameters.taker !== undefined) {
+            queryParameters['taker'] = requestParameters.taker;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
@@ -238,7 +248,7 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Sends a GET request to the Jupiter API to get the best priced quote.
+     * Sends a GET request to the Jupiter API to get the best priced quote. Supports both Aggregator and RFQ quotes.
      * GET /quote
      */
     async quoteGet(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QuoteResponse> {
@@ -354,3 +364,12 @@ export const QuoteGetSwapModeEnum = {
     ExactOut: 'ExactOut'
 } as const;
 export type QuoteGetSwapModeEnum = typeof QuoteGetSwapModeEnum[keyof typeof QuoteGetSwapModeEnum];
+/**
+ * @export
+ */
+export const QuoteGetSwapTypeEnum = {
+    Aggregator: 'Aggregator',
+    Rfq: 'RFQ',
+    Both: 'Both'
+} as const;
+export type QuoteGetSwapTypeEnum = typeof QuoteGetSwapTypeEnum[keyof typeof QuoteGetSwapTypeEnum];

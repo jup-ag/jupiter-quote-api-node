@@ -13,30 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { QuoteResponse } from './QuoteResponse';
+import type { AggregatorSwapRequest } from './AggregatorSwapRequest';
 import {
-    QuoteResponseFromJSON,
-    QuoteResponseFromJSONTyped,
-    QuoteResponseToJSON,
-} from './QuoteResponse';
-import type { SwapRequestComputeUnitPriceMicroLamports } from './SwapRequestComputeUnitPriceMicroLamports';
+    AggregatorSwapRequestFromJSON,
+    AggregatorSwapRequestFromJSONTyped,
+    AggregatorSwapRequestToJSON,
+} from './AggregatorSwapRequest';
+import type { RfqSwapRequest } from './RfqSwapRequest';
 import {
-    SwapRequestComputeUnitPriceMicroLamportsFromJSON,
-    SwapRequestComputeUnitPriceMicroLamportsFromJSONTyped,
-    SwapRequestComputeUnitPriceMicroLamportsToJSON,
-} from './SwapRequestComputeUnitPriceMicroLamports';
-import type { SwapRequestDynamicSlippage } from './SwapRequestDynamicSlippage';
-import {
-    SwapRequestDynamicSlippageFromJSON,
-    SwapRequestDynamicSlippageFromJSONTyped,
-    SwapRequestDynamicSlippageToJSON,
-} from './SwapRequestDynamicSlippage';
-import type { SwapRequestPrioritizationFeeLamports } from './SwapRequestPrioritizationFeeLamports';
-import {
-    SwapRequestPrioritizationFeeLamportsFromJSON,
-    SwapRequestPrioritizationFeeLamportsFromJSONTyped,
-    SwapRequestPrioritizationFeeLamportsToJSON,
-} from './SwapRequestPrioritizationFeeLamports';
+    RfqSwapRequestFromJSON,
+    RfqSwapRequestFromJSONTyped,
+    RfqSwapRequestToJSON,
+} from './RfqSwapRequest';
 
 /**
  * 
@@ -45,116 +33,42 @@ import {
  */
 export interface SwapRequest {
     /**
-     * The user public key.
+     * 
      * @type {string}
      * @memberof SwapRequest
      */
-    userPublicKey: string;
-    /**
-     * Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
-     * @type {boolean}
-     * @memberof SwapRequest
-     */
-    wrapAndUnwrapSol?: boolean;
-    /**
-     * Default is true. This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
-     * @type {boolean}
-     * @memberof SwapRequest
-     */
-    useSharedAccounts?: boolean;
-    /**
-     * Fee token account, same as the output token for ExactIn and as the input token for ExactOut, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a feeBps and make sure that the feeAccount has been created).
-     * @type {string}
-     * @memberof SwapRequest
-     */
-    feeAccount?: string;
+    swapType: SwapRequestSwapTypeEnum;
     /**
      * 
-     * @type {SwapRequestComputeUnitPriceMicroLamports}
+     * @type {AggregatorSwapRequest}
      * @memberof SwapRequest
      */
-    computeUnitPriceMicroLamports?: SwapRequestComputeUnitPriceMicroLamports;
+    aggregatorSwap?: AggregatorSwapRequest;
     /**
      * 
-     * @type {SwapRequestPrioritizationFeeLamports}
+     * @type {RfqSwapRequest}
      * @memberof SwapRequest
      */
-    prioritizationFeeLamports?: SwapRequestPrioritizationFeeLamports;
-    /**
-     * Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
-     * @type {boolean}
-     * @memberof SwapRequest
-     */
-    asLegacyTransaction?: boolean;
-    /**
-     * Default is false. This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
-     * @type {boolean}
-     * @memberof SwapRequest
-     */
-    useTokenLedger?: boolean;
-    /**
-     * Public key of the token account that will be used to receive the token out of the swap. If not provided, the user's ATA will be used. If provided, we assume that the token account is already initialized.
-     * @type {string}
-     * @memberof SwapRequest
-     */
-    destinationTokenAccount?: string;
-    /**
-     * When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit. This will increase latency slightly since there will be one extra RPC call to simulate this. Default is `false`.
-     * @type {boolean}
-     * @memberof SwapRequest
-     */
-    dynamicComputeUnitLimit?: boolean;
-    /**
-     * When enabled, it will not do any rpc calls check on user's accounts. Enable it only when you already setup all the accounts needed for the trasaction, like wrapping or unwrapping sol, destination account is already created.
-     * @type {boolean}
-     * @memberof SwapRequest
-     */
-    skipUserAccountsRpcCalls?: boolean;
-    /**
-     * The program authority id [0;7], load balanced across the available set by default
-     * @type {number}
-     * @memberof SwapRequest
-     */
-    programAuthorityId?: number;
-    /**
-     * Default is false. Enabling it would reduce use an optimized way to open WSOL that reduce compute unit.
-     * @type {boolean}
-     * @memberof SwapRequest
-     */
-    allowOptimizedWrappedSolTokenAccount?: boolean;
-    /**
-     * 
-     * @type {QuoteResponse}
-     * @memberof SwapRequest
-     */
-    quoteResponse: QuoteResponse;
-    /**
-     * 
-     * @type {SwapRequestDynamicSlippage}
-     * @memberof SwapRequest
-     */
-    dynamicSlippage?: SwapRequestDynamicSlippage;
-    /**
-     * Optional. When passed in, Swap object will be returned with your desired slots to epxiry.
-     * @type {number}
-     * @memberof SwapRequest
-     */
-    blockhashSlotsToExpiry?: number;
-    /**
-     * Optional. Default to false. Request Swap object to be returned with the correct blockhash prior to Agave 2.0.
-     * @type {boolean}
-     * @memberof SwapRequest
-     */
-    correctLastValidBlockHeight?: boolean;
+    rfqSwap?: RfqSwapRequest;
 }
+
+
+/**
+ * @export
+ */
+export const SwapRequestSwapTypeEnum = {
+    Aggregator: 'Aggregator',
+    Rfq: 'Rfq'
+} as const;
+export type SwapRequestSwapTypeEnum = typeof SwapRequestSwapTypeEnum[keyof typeof SwapRequestSwapTypeEnum];
+
 
 /**
  * Check if a given object implements the SwapRequest interface.
  */
 export function instanceOfSwapRequest(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "userPublicKey" in value;
-    isInstance = isInstance && "quoteResponse" in value;
+    isInstance = isInstance && "swapType" in value;
 
     return isInstance;
 }
@@ -169,23 +83,9 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
     }
     return {
         
-        'userPublicKey': json['userPublicKey'],
-        'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
-        'useSharedAccounts': !exists(json, 'useSharedAccounts') ? undefined : json['useSharedAccounts'],
-        'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
-        'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : SwapRequestComputeUnitPriceMicroLamportsFromJSON(json['computeUnitPriceMicroLamports']),
-        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : SwapRequestPrioritizationFeeLamportsFromJSON(json['prioritizationFeeLamports']),
-        'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
-        'useTokenLedger': !exists(json, 'useTokenLedger') ? undefined : json['useTokenLedger'],
-        'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
-        'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
-        'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
-        'programAuthorityId': !exists(json, 'programAuthorityId') ? undefined : json['programAuthorityId'],
-        'allowOptimizedWrappedSolTokenAccount': !exists(json, 'allowOptimizedWrappedSolTokenAccount') ? undefined : json['allowOptimizedWrappedSolTokenAccount'],
-        'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
-        'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : SwapRequestDynamicSlippageFromJSON(json['dynamicSlippage']),
-        'blockhashSlotsToExpiry': !exists(json, 'blockhashSlotsToExpiry') ? undefined : json['blockhashSlotsToExpiry'],
-        'correctLastValidBlockHeight': !exists(json, 'correctLastValidBlockHeight') ? undefined : json['correctLastValidBlockHeight'],
+        'swapType': json['swapType'],
+        'aggregatorSwap': !exists(json, 'aggregatorSwap') ? undefined : AggregatorSwapRequestFromJSON(json['aggregatorSwap']),
+        'rfqSwap': !exists(json, 'rfqSwap') ? undefined : RfqSwapRequestFromJSON(json['rfqSwap']),
     };
 }
 
@@ -198,23 +98,9 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
     }
     return {
         
-        'userPublicKey': value.userPublicKey,
-        'wrapAndUnwrapSol': value.wrapAndUnwrapSol,
-        'useSharedAccounts': value.useSharedAccounts,
-        'feeAccount': value.feeAccount,
-        'computeUnitPriceMicroLamports': SwapRequestComputeUnitPriceMicroLamportsToJSON(value.computeUnitPriceMicroLamports),
-        'prioritizationFeeLamports': SwapRequestPrioritizationFeeLamportsToJSON(value.prioritizationFeeLamports),
-        'asLegacyTransaction': value.asLegacyTransaction,
-        'useTokenLedger': value.useTokenLedger,
-        'destinationTokenAccount': value.destinationTokenAccount,
-        'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
-        'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,
-        'programAuthorityId': value.programAuthorityId,
-        'allowOptimizedWrappedSolTokenAccount': value.allowOptimizedWrappedSolTokenAccount,
-        'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
-        'dynamicSlippage': SwapRequestDynamicSlippageToJSON(value.dynamicSlippage),
-        'blockhashSlotsToExpiry': value.blockhashSlotsToExpiry,
-        'correctLastValidBlockHeight': value.correctLastValidBlockHeight,
+        'swapType': value.swapType,
+        'aggregatorSwap': AggregatorSwapRequestToJSON(value.aggregatorSwap),
+        'rfqSwap': RfqSwapRequestToJSON(value.rfqSwap),
     };
 }
 

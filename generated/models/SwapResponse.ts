@@ -13,12 +13,18 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { SwapResponseDynamicSlippageReport } from './SwapResponseDynamicSlippageReport';
+import type { AggregatorSwapResponse } from './AggregatorSwapResponse';
 import {
-    SwapResponseDynamicSlippageReportFromJSON,
-    SwapResponseDynamicSlippageReportFromJSONTyped,
-    SwapResponseDynamicSlippageReportToJSON,
-} from './SwapResponseDynamicSlippageReport';
+    AggregatorSwapResponseFromJSON,
+    AggregatorSwapResponseFromJSONTyped,
+    AggregatorSwapResponseToJSON,
+} from './AggregatorSwapResponse';
+import type { RfqSwapResponse } from './RfqSwapResponse';
+import {
+    RfqSwapResponseFromJSON,
+    RfqSwapResponseFromJSONTyped,
+    RfqSwapResponseToJSON,
+} from './RfqSwapResponse';
 
 /**
  * 
@@ -31,34 +37,38 @@ export interface SwapResponse {
      * @type {string}
      * @memberof SwapResponse
      */
-    swapTransaction: string;
+    swapType: SwapResponseSwapTypeEnum;
     /**
      * 
-     * @type {number}
+     * @type {AggregatorSwapResponse}
      * @memberof SwapResponse
      */
-    lastValidBlockHeight: number;
+    aggregatorSwap?: AggregatorSwapResponse;
     /**
      * 
-     * @type {number}
+     * @type {RfqSwapResponse}
      * @memberof SwapResponse
      */
-    prioritizationFeeLamports?: number;
-    /**
-     * 
-     * @type {SwapResponseDynamicSlippageReport}
-     * @memberof SwapResponse
-     */
-    dynamicSlippageReport?: SwapResponseDynamicSlippageReport;
+    rfqSwap?: RfqSwapResponse;
 }
+
+
+/**
+ * @export
+ */
+export const SwapResponseSwapTypeEnum = {
+    Aggregator: 'Aggregator',
+    Rfq: 'Rfq'
+} as const;
+export type SwapResponseSwapTypeEnum = typeof SwapResponseSwapTypeEnum[keyof typeof SwapResponseSwapTypeEnum];
+
 
 /**
  * Check if a given object implements the SwapResponse interface.
  */
 export function instanceOfSwapResponse(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "swapTransaction" in value;
-    isInstance = isInstance && "lastValidBlockHeight" in value;
+    isInstance = isInstance && "swapType" in value;
 
     return isInstance;
 }
@@ -73,10 +83,9 @@ export function SwapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'swapTransaction': json['swapTransaction'],
-        'lastValidBlockHeight': json['lastValidBlockHeight'],
-        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
-        'dynamicSlippageReport': !exists(json, 'dynamicSlippageReport') ? undefined : SwapResponseDynamicSlippageReportFromJSON(json['dynamicSlippageReport']),
+        'swapType': json['swapType'],
+        'aggregatorSwap': !exists(json, 'aggregatorSwap') ? undefined : AggregatorSwapResponseFromJSON(json['aggregatorSwap']),
+        'rfqSwap': !exists(json, 'rfqSwap') ? undefined : RfqSwapResponseFromJSON(json['rfqSwap']),
     };
 }
 
@@ -89,10 +98,9 @@ export function SwapResponseToJSON(value?: SwapResponse | null): any {
     }
     return {
         
-        'swapTransaction': value.swapTransaction,
-        'lastValidBlockHeight': value.lastValidBlockHeight,
-        'prioritizationFeeLamports': value.prioritizationFeeLamports,
-        'dynamicSlippageReport': SwapResponseDynamicSlippageReportToJSON(value.dynamicSlippageReport),
+        'swapType': value.swapType,
+        'aggregatorSwap': AggregatorSwapResponseToJSON(value.aggregatorSwap),
+        'rfqSwap': RfqSwapResponseToJSON(value.rfqSwap),
     };
 }
 

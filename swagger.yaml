@@ -16,13 +16,13 @@ info:
     - raw data such as Vec<u8\> are base64 encoded strings
 
 servers:
-  - url: https://quote-api.jup.ag/v6
+  - url: https://quote-api.jup.ag/v6 # TODO: Update to quote-proxy api
 
 paths:
   /quote:
     get:
       summary: GET /quote
-      description: Sends a GET request to the Jupiter API to get the best priced quote.
+      description: Sends a GET request to the Jupiter API to get the best priced quote. Supports both Aggregator and RFQ quotes.
       parameters:
         - $ref: "#/components/parameters/InputMintParameter"
         - $ref: "#/components/parameters/OutputMintParameter"
@@ -42,6 +42,8 @@ paths:
         - $ref: "#/components/parameters/MaxAccountsParameter"
         - $ref: "#/components/parameters/MinimizeSlippage"
         - $ref: "#/components/parameters/PreferLiquidDexes"
+        - $ref: "#/components/parameters/SwapTypeParameter"
+        - $ref: "#/components/parameters/TakerParameter"
       responses:
         "200":
           description: Successful response
@@ -175,62 +177,26 @@ components:
     QuoteResponse:
       type: object
       required:
-        - inputMint
-        - outputMint
-        - inAmount
-        - outAmount
-        - otherAmountThreshold
-        - swapMode
-        - slippageBps
-        - priceImpactPct
+        - kind
+        - value
+      properties:
+        kind:
+          type: string
+          enum: ["Aggregator", "Rfq"]
+        value:
+          oneOf:
+            - $ref: "#/components/schemas/AggregatorQuoteResponse"
+            - $ref: "#/components/schemas/RfqQuoteResponse"
+
+    AggregatorQuoteResponse:
+      type: object
+      required:
         - routePlan
       properties:
-        inputMint:
-          type: string
-        inAmount:
-          type: string
-        outputMint:
-          type: string
-        outAmount:
-          type: string
-        otherAmountThreshold:
-          type: string
-        swapMode:
-          $ref: "#/components/schemas/SwapMode"
-          required: true
-        slippageBps:
-          type: integer
-          format: int32
-        computedAutoSlippage:
-          type: integer
-          format: int32
-        platformFee:
-          $ref: "#/components/schemas/PlatformFee"
-        priceImpactPct:
-          type: string
         routePlan:
           type: array
           items:
             $ref: "#/components/schemas/RoutePlanStep"
-        contextSlot:
-          type: number
-        timeTaken:
-          type: number
-
-    SwapMode:
-      type: string
-      enum:
-        - ExactIn
-        - ExactOut
-
-    PlatformFee:
-      type: object
-      properties:
-        amount:
-          type: string
-        feeBps:
-          type: integer
-          format: int32
 
     RoutePlanStep:
       type: object
@@ -248,6 +214,7 @@ components:
       type: object
       required:
         - ammKey
+        - label
         - inputMint
         - outputMint
         - inAmount
@@ -272,7 +239,86 @@ components:
         feeMint:
           type: string
 
+    RfqQuoteResponse:
+      type: object
+      required:
+        - routing
+        - requestId
+        - quoteId
+        - maker
+        - orderInfo
+      properties:
+        routing:
+          $ref: "#/components/schemas/Routing"
+        requestId:
+          type: string
+        quoteId:
+          type: string
+        maker:
+          type: string
+        orderInfo:
+          $ref: "#/components/schemas/OrderInfo"
+        transaction:
+          type: string
+          description: Base64 encoded versioned transaction
+        expireAt:
+          type: string
+          format: date-time
+
+    OrderInfo:
+      type: object
+      required:
+        - input
+        - output
+      properties:
+        input:
+          $ref: "#/components/schemas/OrderIO"
+        output:
+          $ref: "#/components/schemas/OrderIO"
+
+    OrderIO:
+      type: object
+      required:
+        - token
+        - startAmount
+        - endAmount
+      properties:
+        token:
+          type: string
+        startAmount:
+          type: string
+        endAmount:
+          type: string
+
+    SwapMode:
+      type: string
+      enum:
+        - ExactIn
+        - ExactOut
+
+    PlatformFee:
+      type: object
+      properties:
+        amount:
+          type: string
+        feeBps:
+          type: integer
+          format: int32
+
     SwapRequest:
+      type: object
+      required:
+        - swapType
+      properties:
+        swapType:
+          type: string
+          enum: ["Aggregator", "Rfq"]
+        aggregatorSwap:
+          $ref: "#/components/schemas/AggregatorSwapRequest"
+        rfqSwap:
+          $ref: "#/components/schemas/RfqSwapRequest"
+
+    AggregatorSwapRequest:
       type: object
       required:
         - userPublicKey
@@ -281,16 +327,23 @@ components:
         userPublicKey:
           description: The user public key.
           type: string
+        quoteResponse:
+          $ref: "#/components/schemas/AggregatorQuoteResponse"
         wrapAndUnwrapSol:
           description: Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
           type: boolean
           default: true
-        useSharedAccounts:
-          description: Default is true. This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
+        allowOptimizedWrappedSolTokenAccount:
+          description: Default is true. If true, will use the optimized wrapped SOL token account. If false, it will use the normal wrapped SOL token account.
           type: boolean
           default: true
         feeAccount:
           description: Fee token account, same as the output token for ExactIn and as the input token for ExactOut, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a feeBps and make sure that the feeAccount has been created).
+          type: string
+        destinationTokenAccount:
+          description: Public key of the token account that will be used to receive the token out of the swap. If not provided, the user's ATA will be used. If provided, we assume that the token account is already initialized.
+          type: string
+        trackingAccount:
           type: string
         computeUnitPriceMicroLamports:
           description: The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
@@ -307,75 +360,246 @@ components:
             # It's impossible to type this, with Swagger 2.0, anyOf, oneOf typing is not supported
             # - type: object
             #   $ref: "#/components/schemas/PriorityFeeWithMaxLamports"
-
+        dynamicComputeUnitLimit:
+          type: boolean
+          default: false
         asLegacyTransaction:
           description: Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
           type: boolean
           default: false
+        useSharedAccounts:
+          type: boolean
+          default: true
         useTokenLedger:
           description: Default is false. This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
           type: boolean
           default: false
-        destinationTokenAccount:
-          description: Public key of the token account that will be used to receive the token out of the swap. If not provided, the user's ATA will be used. If provided, we assume that the token account is already initialized.
-          type: string
         dynamicComputeUnitLimit:
           description: When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit. This will increase latency slightly since there will be one extra RPC call to simulate this. Default is `false`.
           type: boolean
         skipUserAccountsRpcCalls:
           description: When enabled, it will not do any rpc calls check on user's accounts. Enable it only when you already setup all the accounts needed for the trasaction, like wrapping or unwrapping sol, destination account is already created.
           type: boolean
+        keyedUiAccounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/KeyedUiAccount"
         programAuthorityId:
           description: The program authority id [0;7], load balanced across the available set by default
           type: integer
-        allowOptimizedWrappedSolTokenAccount:
-          description: Default is false. Enabling it would reduce use an optimized way to open WSOL that reduce compute unit.
-          type: boolean
-          default: false
-        quoteResponse:
-          $ref: "#/components/schemas/QuoteResponse"
+          format: int32
         dynamicSlippage:
+          $ref: "#/components/schemas/DynamicSlippageSettings"
+
+    RfqSwapRequest:
+      type: object
+      required:
+        - requestId
+        - quoteId
+        - transaction
+      properties:
+        requestId:
+          type: string
+        quoteId:
+          type: string
+        transaction:
+          type: string
+          description: Base64 encoded versioned transaction
+
+    KeyedUiAccount:
+      type: object
+      required:
+        - pubkey
+        - uiAccount
+      properties:
+        pubkey:
+          type: string
+        uiAccount:
+          $ref: "#/components/schemas/UiAccount"
+        params:
           type: object
-          properties:
-            minBps:
-              type: integer
-            maxBps:
-              type: integer
-        blockhashSlotsToExpiry:
-          description: Optional. When passed in, Swap object will be returned with your desired slots to epxiry.
-          type: number
-        correctLastValidBlockHeight:
-          description: Optional. Default to false. Request Swap object to be returned with the correct blockhash prior to Agave 2.0.
+
+    UiAccount:
+      type: object
+      required:
+        - lamports
+        - data
+        - owner
+        - executable
+        - rentEpoch
+      properties:
+        lamports:
+          type: integer
+          format: int64
+        data:
+          $ref: "#/components/schemas/UiAccountData"
+        owner:
+          type: string
+        executable:
           type: boolean
+        rentEpoch:
+          type: integer
+          format: int64
+        space:
+          type: integer
+          format: int64
+
+    UiAccountData:
+      oneOf:
+        - type: object
+          properties:
+            legacyBinary:
+              type: string
+          required:
+            - legacyBinary
+        - $ref: "#/components/schemas/ParsedAccount"
+        - type: object
+          properties:
+            binary:
+              type: string
+            encoding:
+              $ref: "#/components/schemas/UiAccountEncoding"
+          required:
+            - binary
+            - encoding
+
+    ParsedAccount:
+      type: object
+      required:
+        - program
+        - parsed
+        - space
+      properties:
+        program:
+          type: string
+        parsed:
+          type: object
+        space:
+          type: integer
+          format: int64
+
+    UiAccountEncoding:
+      type: string
+      enum:
+        - binary
+        - base58
+        - base64
+        - jsonParsed
+        - base64+zstd
+
+    DynamicSlippageSettings:
+      type: object
+      properties:
+        minBps:
+          type: integer
+          format: int32
+        maxBps:
+          type: integer
+          format: int32
 
     SwapResponse:
       type: object
+      required:
+        - swapType
+      properties:
+        swapType:
+          type: string
+          enum: ["Aggregator", "Rfq"]
+        aggregatorSwap:
+          $ref: "#/components/schemas/AggregatorSwapResponse"
+        rfqSwap:
+          $ref: "#/components/schemas/RfqSwapResponse"
+
+    AggregatorSwapResponse:
+      type: object
+      required:
+        - swapTransaction
+        - lastValidBlockHeight
+        - prioritizationFeeLamports
+        - computeUnitLimit
       properties:
         swapTransaction:
           type: string
+          description: Base64 encoded transaction bytes
         lastValidBlockHeight:
           type: number
         prioritizationFeeLamports:
           type: number
+        computeUnitLimit:
+          type: integer
+          format: int32
+        prioritizationType:
+          oneOf:
+            - type: object
+              required:
+                - jito
+              properties:
+                jito:
+                  type: object
+                  required:
+                    - lamports
+                  properties:
+                    lamports:
+                      type: integer
+                      format: int64
+            - type: object
+              required:
+                - computeBudget
+              properties:
+                computeBudget:
+                  type: object
+                  required:
+                    - microLamports
+                  properties:
+                    microLamports:
+                      type: integer
+                      format: int64
+                    estimatedMicroLamports:
+                      type: integer
+                      format: int64
         dynamicSlippageReport:
           type: object
+          required:
+            - slippageBps
           properties:
-            amplificationRatio:
-              type: string
+            slippageBps:
+              type: integer
+              format: int32
             otherAmount:
               type: integer
             simulatedIncurredSlippageBps:
               type: integer
-            slippageBps:
-              type: integer
-            categoryName:
+            amplificationRatio:
               type: string
-              enum: ["stable", "lst", "bluechip", "verified"]
-            heuristicMaxSlippageBps:
-              type: integer
+        simulationError:
+          type: object
+          required:
+            - errorCode
+            - error
+          properties:
+            errorCode:
+              type: string
+            error:
+              type: string
+
+    RfqSwapResponse:
+      type: object
       required:
-        - swapTransaction
-        - lastValidBlockHeight
+        - quoteId
+        - state
+      properties:
+        quoteId:
+          type: string
+        state:
+          type: string
+          enum:
+            - accepted
+            - rejected
+            - pending
+            - failed
+            - invalid
+        signature:
+          type: string
 
     SwapInstructionsResponse:
       type: object
@@ -438,6 +662,13 @@ components:
               - 3
               - 4
 
+    Routing:
+      type: string
+      enum:
+        - spot
+        - onchain
+      description: Defines the routing type for RFQ quotes
+
   parameters:
     InputMintParameter:
       name: inputMint
@@ -460,6 +691,15 @@ components:
       required: true
       schema:
         type: integer
+    SwapTypeParameter:
+      name: swapType
+      description: The type of swap to perform. Defaults to Both RFQ and Aggregator if not provided.
+      in: query
+      schema:
+        type: string
+        enum: ["Aggregator", "RFQ", "Both"]
+
+    # Aggregator Parameters
     SlippageParameter:
       name: slippageBps
       description: The slippage in basis points, 1 basis point is 0.01%. If the output token amount exceeds the slippage then the swap transaction will fail.
@@ -555,3 +795,12 @@ components:
       in: query
       schema:
         type: boolean
+  
+  # RFQ Parameters
+    TakerParameter:
+      name: taker
+      description: Optional taker address. Required for RFQ quotes to reply with a signable signature.
+      in: query
+      schema:
+        type: string
+  

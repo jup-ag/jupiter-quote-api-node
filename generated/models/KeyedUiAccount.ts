@@ -13,71 +13,67 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { QuoteResponseValue } from './QuoteResponseValue';
+import type { UiAccount } from './UiAccount';
 import {
-    QuoteResponseValueFromJSON,
-    QuoteResponseValueFromJSONTyped,
-    QuoteResponseValueToJSON,
-} from './QuoteResponseValue';
+    UiAccountFromJSON,
+    UiAccountFromJSONTyped,
+    UiAccountToJSON,
+} from './UiAccount';
 
 /**
  * 
  * @export
- * @interface QuoteResponse
+ * @interface KeyedUiAccount
  */
-export interface QuoteResponse {
+export interface KeyedUiAccount {
     /**
      * 
      * @type {string}
-     * @memberof QuoteResponse
+     * @memberof KeyedUiAccount
      */
-    kind: QuoteResponseKindEnum;
+    pubkey: string;
     /**
      * 
-     * @type {QuoteResponseValue}
-     * @memberof QuoteResponse
+     * @type {UiAccount}
+     * @memberof KeyedUiAccount
      */
-    value: QuoteResponseValue;
+    uiAccount: UiAccount;
+    /**
+     * 
+     * @type {object}
+     * @memberof KeyedUiAccount
+     */
+    params?: object;
 }
 
-
 /**
- * @export
+ * Check if a given object implements the KeyedUiAccount interface.
  */
-export const QuoteResponseKindEnum = {
-    Aggregator: 'Aggregator',
-    Rfq: 'Rfq'
-} as const;
-export type QuoteResponseKindEnum = typeof QuoteResponseKindEnum[keyof typeof QuoteResponseKindEnum];
-
-
-/**
- * Check if a given object implements the QuoteResponse interface.
- */
-export function instanceOfQuoteResponse(value: object): boolean {
+export function instanceOfKeyedUiAccount(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "kind" in value;
-    isInstance = isInstance && "value" in value;
+    isInstance = isInstance && "pubkey" in value;
+    isInstance = isInstance && "uiAccount" in value;
 
     return isInstance;
 }
 
-export function QuoteResponseFromJSON(json: any): QuoteResponse {
-    return QuoteResponseFromJSONTyped(json, false);
+export function KeyedUiAccountFromJSON(json: any): KeyedUiAccount {
+    return KeyedUiAccountFromJSONTyped(json, false);
 }
 
-export function QuoteResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): QuoteResponse {
+export function KeyedUiAccountFromJSONTyped(json: any, ignoreDiscriminator: boolean): KeyedUiAccount {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'kind': json['kind'],
-        'value': QuoteResponseValueFromJSON(json['value']),
+        'pubkey': json['pubkey'],
+        'uiAccount': UiAccountFromJSON(json['uiAccount']),
+        'params': !exists(json, 'params') ? undefined : json['params'],
     };
 }
 
-export function QuoteResponseToJSON(value?: QuoteResponse | null): any {
+export function KeyedUiAccountToJSON(value?: KeyedUiAccount | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -86,8 +82,9 @@ export function QuoteResponseToJSON(value?: QuoteResponse | null): any {
     }
     return {
         
-        'kind': value.kind,
-        'value': QuoteResponseValueToJSON(value.value),
+        'pubkey': value.pubkey,
+        'uiAccount': UiAccountToJSON(value.uiAccount),
+        'params': value.params,
     };
 }
 
