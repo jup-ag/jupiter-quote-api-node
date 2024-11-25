@@ -10,34 +10,20 @@ import bs58 from "bs58";
 import { transactionSenderAndConfirmationWaiter } from "./utils/transactionSender";
 import { getSignature } from "./utils/getSignature";
 
-// Make sure that you are using your own RPC endpoint.
+// If you have problem landing transactions, read this too: https://station.jup.ag/docs/apis/landing-transactions
+
+// Make sure that you are using your own RPC endpoint. This RPC doesn't work.
+// Helius and Triton have staked SOL and they can usually land transactions better.
 const connection = new Connection(
   "https://neat-hidden-sanctuary.solana-mainnet.discover.quiknode.pro/2af5315d336f9ae920028bbb90a73b724dc1bbed/"
 );
 const jupiterQuoteApi = createJupiterApiClient();
 
 async function getQuote() {
-  // basic params
-  // const params: QuoteGetRequest = {
-  //   inputMint: "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
-  //   outputMint: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
-  //   amount: 35281,
-  //   slippageBps: 50,
-  //   onlyDirectRoutes: false,
-  //   asLegacyTransaction: false,
-  // }
-
-  // auto slippage w/ minimizeSlippage params
   const params: QuoteGetRequest = {
     inputMint: "So11111111111111111111111111111111111111112",
-    outputMint: "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", // $WIF
+    outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
     amount: 100000000, // 0.1 SOL
-    autoSlippage: true,
-    autoSlippageCollisionUsdValue: 1_000,
-    maxAutoSlippageBps: 1000, // 10%
-    minimizeSlippage: true,
-    onlyDirectRoutes: false,
-    asLegacyTransaction: false,
   };
 
   // get quote
@@ -56,7 +42,16 @@ async function getSwapObj(wallet: Wallet, quote: QuoteResponse) {
       quoteResponse: quote,
       userPublicKey: wallet.publicKey.toBase58(),
       dynamicComputeUnitLimit: true,
-      prioritizationFeeLamports: "auto",
+      dynamicSlippage: {
+        // This will set an optimized slippage to ensure high success rate
+        maxBps: 300, // Make sure to set a reasonable cap here to prevent MEV
+      },
+      prioritizationFeeLamports: {
+        priorityLevelWithMaxLamports: {
+          maxLamports: 10000000,
+          priorityLevel: "veryHigh", // If you want to land transaction fast, set this to use `veryHigh`. You will pay on average higher priority fee.
+        },
+      },
     },
   });
   return swapObj;

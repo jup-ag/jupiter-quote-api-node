@@ -7,7 +7,7 @@
   "typings": "dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
-    "dev-swap": "FLOW=swap ts-node ./example/index.ts",
+    "dev-swap": "FLOW=quoteAndSwap ts-node ./example/index.ts",
     "dev-quote": "FLOW=quote ts-node ./example/index.ts",
     "test": "vitest",
     "build": "npm run openapi-gen && tsup src/index.ts --dts --format esm,cjs",
