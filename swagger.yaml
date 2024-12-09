@@ -558,7 +558,7 @@ components:
         type: boolean
     TokenCategoryBasedIntermediateTokensParameter:
       name: tokenCategoryBasedIntermediateTokens
-      description: Default is false. Enabling it would allows us to use a new set of token list with different categories as intermediate tokens to fetch the best route.
+      description: Default is false. Uses categorized top token lists as intermediate tokens to optimize routing paths, replacing the old static top token list. This helps achieve better pricing while maintaining route reliability.
       in: query
       schema:
         type: boolean
