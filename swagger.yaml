@@ -42,6 +42,7 @@ paths:
         - $ref: "#/components/parameters/MaxAccountsParameter"
         - $ref: "#/components/parameters/MinimizeSlippage"
         - $ref: "#/components/parameters/PreferLiquidDexes"
+        - $ref: "#/components/parameters/TokenCategoryBasedIntermediateTokensParameter"
       responses:
         "200":
           description: Successful response
@@ -552,6 +553,12 @@ components:
     PreferLiquidDexes:
       name: preferLiquidDexes
       description: Default is false. Enabling it would only consider markets with high liquidity to reduce slippage.
+      in: query
+      schema:
+        type: boolean
+    TokenCategoryBasedIntermediateTokensParameter:
+      name: tokenCategoryBasedIntermediateTokens
+      description: Default is false. Enabling it would allows us to use a new set of token list with different categories as intermediate tokens to fetch the best route.
       in: query
       schema:
         type: boolean
