@@ -57,6 +57,7 @@ export interface QuoteGetRequest {
     maxAccounts?: number;
     minimizeSlippage?: boolean;
     preferLiquidDexes?: boolean;
+    tokenCategoryBasedIntermediateTokens?: boolean;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -223,6 +224,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.preferLiquidDexes !== undefined) {
             queryParameters['preferLiquidDexes'] = requestParameters.preferLiquidDexes;
+        }
+
+        if (requestParameters.tokenCategoryBasedIntermediateTokens !== undefined) {
+            queryParameters['tokenCategoryBasedIntermediateTokens'] = requestParameters.tokenCategoryBasedIntermediateTokens;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
