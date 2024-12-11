@@ -28,6 +28,7 @@ paths:
         - $ref: "#/components/parameters/OutputMintParameter"
         - $ref: "#/components/parameters/AmountParameter"
         - $ref: "#/components/parameters/SlippageParameter"
+        - $ref: "#/components/parameters/DynamicSlippageParameter"
         - $ref: "#/components/parameters/AutoSlippageParameter"
         - $ref: "#/components/parameters/AutoSlippageCollisionValueParameter"
         - $ref: "#/components/parameters/ComputeAutoSlippageParameter"
@@ -461,6 +462,12 @@ components:
       required: true
       schema:
         type: integer
+    DynamicSlippageParameter:
+      name: dynamicSlippage
+      description: Set to true to indicate the usage of dynamic slippage.
+      in: query
+      schema:
+        type: boolean
     SlippageParameter:
       name: slippageBps
       description: The slippage in basis points, 1 basis point is 0.01%. If the output token amount exceeds the slippage then the swap transaction will fail.

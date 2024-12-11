@@ -43,6 +43,7 @@ export interface QuoteGetRequest {
     outputMint: string;
     amount: number;
     slippageBps?: number;
+    dynamicSlippage?: boolean;
     autoSlippage?: boolean;
     autoSlippageCollisionUsdValue?: number;
     computeAutoSlippage?: boolean;
@@ -168,6 +169,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.slippageBps !== undefined) {
             queryParameters['slippageBps'] = requestParameters.slippageBps;
+        }
+
+        if (requestParameters.dynamicSlippage !== undefined) {
+            queryParameters['dynamicSlippage'] = requestParameters.dynamicSlippage;
         }
 
         if (requestParameters.autoSlippage !== undefined) {
