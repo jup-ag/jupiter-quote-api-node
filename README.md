@@ -43,7 +43,7 @@ jupiterQuoteApi.quoteGet({
     outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     amount: "100000000",
     // platformFeeBps: 10,
-    // asLegacyTransaction: true, // legacy transaction, default is versoined transaction
+    // asLegacyTransaction: true, // legacy transaction, default is versioned transaction
 })
 ```
 
