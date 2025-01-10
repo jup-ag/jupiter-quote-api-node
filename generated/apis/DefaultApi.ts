@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit We update our rate limit from time to time depending on the load of our servers. We recommend running your own instance of the API if you want to have high rate limit, here to learn how to run the [self-hosted API](https://station.jup.ag/docs/apis/self-hosted).  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -20,7 +20,7 @@ import type {
   SwapInstructionsResponse,
   SwapRequest,
   SwapResponse,
-} from '../models';
+} from '../models/index';
 import {
     IndexedRouteMapResponseFromJSON,
     IndexedRouteMapResponseToJSON,
@@ -32,7 +32,7 @@ import {
     SwapRequestToJSON,
     SwapResponseFromJSON,
     SwapResponseToJSON,
-} from '../models';
+} from '../models/index';
 
 export interface IndexedRouteMapGetRequest {
     onlyDirectRoutes?: boolean;
@@ -43,11 +43,22 @@ export interface QuoteGetRequest {
     outputMint: string;
     amount: number;
     slippageBps?: number;
+    dynamicSlippage?: boolean;
+    autoSlippage?: boolean;
+    autoSlippageCollisionUsdValue?: number;
+    computeAutoSlippage?: boolean;
+    maxAutoSlippageBps?: number;
+    swapMode?: QuoteGetSwapModeEnum;
+    dexes?: Array<string>;
     excludeDexes?: Array<string>;
+    restrictIntermediateTokens?: boolean;
     onlyDirectRoutes?: boolean;
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
     maxAccounts?: number;
+    minimizeSlippage?: boolean;
+    preferLiquidDexes?: boolean;
+    tokenCategoryBasedIntermediateTokens?: boolean;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -64,8 +75,9 @@ export interface SwapPostRequest {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
-     * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
+     * DEPRECATED, please use /tokens for tradable mints. Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      * GET /indexed-route-map
+     * @deprecated
      */
     async indexedRouteMapGetRaw(requestParameters: IndexedRouteMapGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IndexedRouteMapResponse>> {
         const queryParameters: any = {};
@@ -87,8 +99,9 @@ export class DefaultApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
+     * DEPRECATED, please use /tokens for tradable mints. Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
      * GET /indexed-route-map
+     * @deprecated
      */
     async indexedRouteMapGet(requestParameters: IndexedRouteMapGetRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IndexedRouteMapResponse> {
         const response = await this.indexedRouteMapGetRaw(requestParameters, initOverrides);
@@ -99,7 +112,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
      * GET /program-id-to-label
      */
-    async programIdToLabelGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+    async programIdToLabelGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: string; }>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -118,7 +131,7 @@ export class DefaultApi extends runtime.BaseAPI {
      * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
      * GET /program-id-to-label
      */
-    async programIdToLabelGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+    async programIdToLabelGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: string; }> {
         const response = await this.programIdToLabelGetRaw(initOverrides);
         return await response.value();
     }
@@ -158,8 +171,40 @@ export class DefaultApi extends runtime.BaseAPI {
             queryParameters['slippageBps'] = requestParameters.slippageBps;
         }
 
+        if (requestParameters.dynamicSlippage !== undefined) {
+            queryParameters['dynamicSlippage'] = requestParameters.dynamicSlippage;
+        }
+
+        if (requestParameters.autoSlippage !== undefined) {
+            queryParameters['autoSlippage'] = requestParameters.autoSlippage;
+        }
+
+        if (requestParameters.autoSlippageCollisionUsdValue !== undefined) {
+            queryParameters['autoSlippageCollisionUsdValue'] = requestParameters.autoSlippageCollisionUsdValue;
+        }
+
+        if (requestParameters.computeAutoSlippage !== undefined) {
+            queryParameters['computeAutoSlippage'] = requestParameters.computeAutoSlippage;
+        }
+
+        if (requestParameters.maxAutoSlippageBps !== undefined) {
+            queryParameters['maxAutoSlippageBps'] = requestParameters.maxAutoSlippageBps;
+        }
+
+        if (requestParameters.swapMode !== undefined) {
+            queryParameters['swapMode'] = requestParameters.swapMode;
+        }
+
+        if (requestParameters.dexes) {
+            queryParameters['dexes'] = requestParameters.dexes;
+        }
+
         if (requestParameters.excludeDexes) {
             queryParameters['excludeDexes'] = requestParameters.excludeDexes;
+        }
+
+        if (requestParameters.restrictIntermediateTokens !== undefined) {
+            queryParameters['restrictIntermediateTokens'] = requestParameters.restrictIntermediateTokens;
         }
 
         if (requestParameters.onlyDirectRoutes !== undefined) {
@@ -176,6 +221,18 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.maxAccounts !== undefined) {
             queryParameters['maxAccounts'] = requestParameters.maxAccounts;
+        }
+
+        if (requestParameters.minimizeSlippage !== undefined) {
+            queryParameters['minimizeSlippage'] = requestParameters.minimizeSlippage;
+        }
+
+        if (requestParameters.preferLiquidDexes !== undefined) {
+            queryParameters['preferLiquidDexes'] = requestParameters.preferLiquidDexes;
+        }
+
+        if (requestParameters.tokenCategoryBasedIntermediateTokens !== undefined) {
+            queryParameters['tokenCategoryBasedIntermediateTokens'] = requestParameters.tokenCategoryBasedIntermediateTokens;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -269,4 +326,41 @@ export class DefaultApi extends runtime.BaseAPI {
         return await response.value();
     }
 
+    /**
+     * Returns a list of all the tradable mints
+     * GET /tokens
+     */
+    async tokensGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/tokens`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Returns a list of all the tradable mints
+     * GET /tokens
+     */
+    async tokensGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.tokensGetRaw(initOverrides);
+        return await response.value();
+    }
+
 }
+
+/**
+ * @export
+ */
+export const QuoteGetSwapModeEnum = {
+    ExactIn: 'ExactIn',
+    ExactOut: 'ExactOut'
+} as const;
+export type QuoteGetSwapModeEnum = typeof QuoteGetSwapModeEnum[keyof typeof QuoteGetSwapModeEnum];

@@ -1,65 +1,143 @@
-import { createJupiterApiClient, IndexedRouteMapResponse } from "../src/index";
+import {
+  QuoteGetRequest,
+  QuoteResponse,
+  SwapResponse,
+  createJupiterApiClient,
+} from "../src/index";
+import { Connection, Keypair, VersionedTransaction } from "@solana/web3.js";
+import { Wallet } from "@project-serum/anchor";
+import bs58 from "bs58";
+import { transactionSenderAndConfirmationWaiter } from "./utils/transactionSender";
+import { getSignature } from "./utils/getSignature";
 
-type RouteMap = Record<string, string[]>;
+// If you have problem landing transactions, read this too: https://station.jup.ag/docs/apis/landing-transactions
 
-function inflateIndexedRouteMap(
-  result: IndexedRouteMapResponse
-): Record<string, string[]> {
-  const { mintKeys, indexedRouteMap } = result;
+// Make sure that you are using your own RPC endpoint. This RPC doesn't work.
+// Helius and Triton have staked SOL and they can usually land transactions better.
+const connection = new Connection(
+  "https://neat-hidden-sanctuary.solana-mainnet.discover.quiknode.pro/2af5315d336f9ae920028bbb90a73b724dc1bbed/"
+);
+const jupiterQuoteApi = createJupiterApiClient();
 
-  return Object.entries(indexedRouteMap).reduce<RouteMap>(
-    (acc, [inputMintIndexString, outputMintIndices]) => {
-      const inputMintIndex = Number(inputMintIndexString);
-      const inputMint = mintKeys[inputMintIndex];
-      if (!inputMint)
-        throw new Error(`Could no find mint key for index ${inputMintIndex}`);
-
-      acc[inputMint] = outputMintIndices.map((index) => {
-        const outputMint = mintKeys[index];
-        if (!outputMint)
-          throw new Error(`Could no find mint key for index ${index}`);
-
-        return outputMint;
-      });
-
-      return acc;
-    },
-    {}
-  );
-}
-
-export async function main() {
-  const jupiterQuoteApi = createJupiterApiClient();
+async function getQuote() {
+  const params: QuoteGetRequest = {
+    inputMint: "So11111111111111111111111111111111111111112",
+    outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+    amount: 100000000, // 0.1 SOL
+  };
 
   // get quote
-  const quote = await jupiterQuoteApi.quoteGet({
-    inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-    outputMint: "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
-    amount: 35281,
-    slippageBps: 100,
-    onlyDirectRoutes: false,
-    asLegacyTransaction: false,
-  });
+  const quote = await jupiterQuoteApi.quoteGet(params);
 
   if (!quote) {
-    console.error("unable to quote");
+    throw new Error("unable to quote");
+  }
+  return quote;
+}
+
+async function getSwapObj(wallet: Wallet, quote: QuoteResponse) {
+  // Get serialized transaction
+  const swapObj = await jupiterQuoteApi.swapPost({
+    swapRequest: {
+      quoteResponse: quote,
+      userPublicKey: wallet.publicKey.toBase58(),
+      dynamicComputeUnitLimit: true,
+      dynamicSlippage: {
+        // This will set an optimized slippage to ensure high success rate
+        maxBps: 300, // Make sure to set a reasonable cap here to prevent MEV
+      },
+      prioritizationFeeLamports: {
+        priorityLevelWithMaxLamports: {
+          maxLamports: 10000000,
+          priorityLevel: "veryHigh", // If you want to land transaction fast, set this to use `veryHigh`. You will pay on average higher priority fee.
+        },
+      },
+    },
+  });
+  return swapObj;
+}
+
+async function flowQuote() {
+  const quote = await getQuote();
+  console.dir(quote, { depth: null });
+}
+
+async function flowQuoteAndSwap() {
+  const wallet = new Wallet(
+    Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ""))
+  );
+  console.log("Wallet:", wallet.publicKey.toBase58());
+
+  const quote = await getQuote();
+  console.dir(quote, { depth: null });
+  const swapObj = await getSwapObj(wallet, quote);
+  console.dir(swapObj, { depth: null });
+
+  // Serialize the transaction
+  const swapTransactionBuf = Buffer.from(swapObj.swapTransaction, "base64");
+  var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+
+  // Sign the transaction
+  transaction.sign([wallet.payer]);
+  const signature = getSignature(transaction);
+
+  // We first simulate whether the transaction would be successful
+  const { value: simulatedTransactionResponse } =
+    await connection.simulateTransaction(transaction, {
+      replaceRecentBlockhash: true,
+      commitment: "processed",
+    });
+  const { err, logs } = simulatedTransactionResponse;
+
+  if (err) {
+    // Simulation error, we can check the logs for more details
+    // If you are getting an invalid account error, make sure that you have the input mint account to actually swap from.
+    console.error("Simulation Error:");
+    console.error({ err, logs });
     return;
   }
 
-  // get serialized transaction
-  const swapResult = await jupiterQuoteApi.swapInstructionsPost({
-    swapRequest: {
-      quoteResponse: quote,
-      userPublicKey: "HAPdsaZFfQDG4bD8vzBbPCUawUWKSJxvhQ7TGg1BeAxZ",
+  const serializedTransaction = Buffer.from(transaction.serialize());
+  const blockhash = transaction.message.recentBlockhash;
+
+  const transactionResponse = await transactionSenderAndConfirmationWaiter({
+    connection,
+    serializedTransaction,
+    blockhashWithExpiryBlockHeight: {
+      blockhash,
+      lastValidBlockHeight: swapObj.lastValidBlockHeight,
     },
   });
 
-  console.dir(swapResult, { depth: null });
+  // If we are not getting a response back, the transaction has not confirmed.
+  if (!transactionResponse) {
+    console.error("Transaction not confirmed");
+    return;
+  }
 
-  // get route map
-  const result = await jupiterQuoteApi.indexedRouteMapGet();
-  const routeMap = inflateIndexedRouteMap(result);
-  console.log(Object.keys(routeMap).length);
+  if (transactionResponse.meta?.err) {
+    console.error(transactionResponse.meta?.err);
+  }
+
+  console.log(`https://solscan.io/tx/${signature}`);
+}
+
+export async function main() {
+  switch (process.env.FLOW) {
+    case "quote": {
+      await flowQuote();
+      break;
+    }
+
+    case "quoteAndSwap": {
+      await flowQuoteAndSwap();
+      break;
+    }
+
+    default: {
+      console.error("Please set the FLOW environment");
+    }
+  }
 }
 
 main();

@@ -1,26 +1,34 @@
 {
   "name": "@jup-ag/api",
-  "version": "6.0.4",
+  "version": "6.0.32",
   "description": "## Generate typescript types from swagger schema",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
   "sideEffects": false,
   "scripts": {
-    "start": "ts-node ./example/index.ts",
+    "dev-swap": "FLOW=quoteAndSwap ts-node ./example/index.ts",
+    "dev-quote": "FLOW=quote ts-node ./example/index.ts",
     "test": "vitest",
     "build": "npm run openapi-gen && tsup src/index.ts --dts --format esm,cjs",
-    "openapi-gen": "openapi-generator-cli generate -i swagger.yaml -o generated -g typescript-fetch --skip-validate-spec --additional-properties=supportsES6=true,typescriptThreePlus=true"
+    "openapi-gen": "openapi-generator-cli generate -i swagger.yaml -o generated -g typescript-fetch --skip-validate-spec --additional-properties=supportsES6=true,typescriptThreePlus=true",
+    "openapi-gen-rust": "openapi-generator-cli generate -i swagger.yaml -o generated -g rust"
   },
   "author": "",
   "license": "MIT",
+  "dependencies": {},
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.7.0",
+    "@project-serum/anchor": "^0.26.0",
+    "@solana/web3.js": "^1.87.6",
+    "bs58": "^5.0.0",
+    "promise-retry": "2.0.1",
+    "@openapitools/openapi-generator-cli": "^2.9.0",
     "cross-fetch": "^3.1.5",
     "ts-node": "^10.5.0",
     "tsup": "^7.1.0",
     "typescript": "^5.1.6",
-    "vitest": "^0.34.1"
+    "vitest": "^0.34.1",
+    "@types/promise-retry": "^1.1.3"
   },
   "files": [
     "dist"

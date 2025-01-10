@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit We update our rate limit from time to time depending on the load of our servers. We recommend running your own instance of the API if you want to have high rate limit, here to learn how to run the [self-hosted API](https://station.jup.ag/docs/apis/self-hosted).  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -19,6 +19,24 @@ import {
     QuoteResponseFromJSONTyped,
     QuoteResponseToJSON,
 } from './QuoteResponse';
+import type { SwapRequestComputeUnitPriceMicroLamports } from './SwapRequestComputeUnitPriceMicroLamports';
+import {
+    SwapRequestComputeUnitPriceMicroLamportsFromJSON,
+    SwapRequestComputeUnitPriceMicroLamportsFromJSONTyped,
+    SwapRequestComputeUnitPriceMicroLamportsToJSON,
+} from './SwapRequestComputeUnitPriceMicroLamports';
+import type { SwapRequestDynamicSlippage } from './SwapRequestDynamicSlippage';
+import {
+    SwapRequestDynamicSlippageFromJSON,
+    SwapRequestDynamicSlippageFromJSONTyped,
+    SwapRequestDynamicSlippageToJSON,
+} from './SwapRequestDynamicSlippage';
+import type { SwapRequestPrioritizationFeeLamports } from './SwapRequestPrioritizationFeeLamports';
+import {
+    SwapRequestPrioritizationFeeLamportsFromJSON,
+    SwapRequestPrioritizationFeeLamportsFromJSONTyped,
+    SwapRequestPrioritizationFeeLamportsToJSON,
+} from './SwapRequestPrioritizationFeeLamports';
 
 /**
  * 
@@ -33,7 +51,7 @@ export interface SwapRequest {
      */
     userPublicKey: string;
     /**
-     * Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.
+     * Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
      * @type {boolean}
      * @memberof SwapRequest
      */
@@ -45,17 +63,23 @@ export interface SwapRequest {
      */
     useSharedAccounts?: boolean;
     /**
-     * Fee token account for the output token, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a `platformFeeBps` in `/quote` and make sure that the feeAccount has been created).
+     * Fee token account, same as the output token for ExactIn and as the input token for ExactOut, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a feeBps and make sure that the feeAccount has been created).
      * @type {string}
      * @memberof SwapRequest
      */
     feeAccount?: string;
     /**
-     * The compute unit price to prioritize the transaction, the additional fee will be `computeUnitSet (1400000) * computeUnitPriceMicroLamports`.
-     * @type {number}
+     * 
+     * @type {SwapRequestComputeUnitPriceMicroLamports}
      * @memberof SwapRequest
      */
-    computeUnitPriceMicroLamports?: number;
+    computeUnitPriceMicroLamports?: SwapRequestComputeUnitPriceMicroLamports;
+    /**
+     * 
+     * @type {SwapRequestPrioritizationFeeLamports}
+     * @memberof SwapRequest
+     */
+    prioritizationFeeLamports?: SwapRequestPrioritizationFeeLamports;
     /**
      * Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
      * @type {boolean}
@@ -75,11 +99,53 @@ export interface SwapRequest {
      */
     destinationTokenAccount?: string;
     /**
+     * When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit. This will increase latency slightly since there will be one extra RPC call to simulate this. Default is `false`.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    dynamicComputeUnitLimit?: boolean;
+    /**
+     * When enabled, it will not do any rpc calls check on user's accounts. Enable it only when you already setup all the accounts needed for the trasaction, like wrapping or unwrapping sol, destination account is already created.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    skipUserAccountsRpcCalls?: boolean;
+    /**
+     * The program authority id [0;7], load balanced across the available set by default
+     * @type {number}
+     * @memberof SwapRequest
+     */
+    programAuthorityId?: number;
+    /**
+     * Default is false. Enabling it would reduce use an optimized way to open WSOL that reduce compute unit.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    allowOptimizedWrappedSolTokenAccount?: boolean;
+    /**
      * 
      * @type {QuoteResponse}
      * @memberof SwapRequest
      */
     quoteResponse: QuoteResponse;
+    /**
+     * 
+     * @type {SwapRequestDynamicSlippage}
+     * @memberof SwapRequest
+     */
+    dynamicSlippage?: SwapRequestDynamicSlippage;
+    /**
+     * Optional. When passed in, Swap object will be returned with your desired slots to epxiry.
+     * @type {number}
+     * @memberof SwapRequest
+     */
+    blockhashSlotsToExpiry?: number;
+    /**
+     * Optional. Default to false. Request Swap object to be returned with the correct blockhash prior to Agave 2.0.
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    correctLastValidBlockHeight?: boolean;
 }
 
 /**
@@ -107,11 +173,19 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
         'useSharedAccounts': !exists(json, 'useSharedAccounts') ? undefined : json['useSharedAccounts'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
-        'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : json['computeUnitPriceMicroLamports'],
+        'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : SwapRequestComputeUnitPriceMicroLamportsFromJSON(json['computeUnitPriceMicroLamports']),
+        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : SwapRequestPrioritizationFeeLamportsFromJSON(json['prioritizationFeeLamports']),
         'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
         'useTokenLedger': !exists(json, 'useTokenLedger') ? undefined : json['useTokenLedger'],
         'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
+        'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
+        'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
+        'programAuthorityId': !exists(json, 'programAuthorityId') ? undefined : json['programAuthorityId'],
+        'allowOptimizedWrappedSolTokenAccount': !exists(json, 'allowOptimizedWrappedSolTokenAccount') ? undefined : json['allowOptimizedWrappedSolTokenAccount'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
+        'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : SwapRequestDynamicSlippageFromJSON(json['dynamicSlippage']),
+        'blockhashSlotsToExpiry': !exists(json, 'blockhashSlotsToExpiry') ? undefined : json['blockhashSlotsToExpiry'],
+        'correctLastValidBlockHeight': !exists(json, 'correctLastValidBlockHeight') ? undefined : json['correctLastValidBlockHeight'],
     };
 }
 
@@ -128,11 +202,19 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'wrapAndUnwrapSol': value.wrapAndUnwrapSol,
         'useSharedAccounts': value.useSharedAccounts,
         'feeAccount': value.feeAccount,
-        'computeUnitPriceMicroLamports': value.computeUnitPriceMicroLamports,
+        'computeUnitPriceMicroLamports': SwapRequestComputeUnitPriceMicroLamportsToJSON(value.computeUnitPriceMicroLamports),
+        'prioritizationFeeLamports': SwapRequestPrioritizationFeeLamportsToJSON(value.prioritizationFeeLamports),
         'asLegacyTransaction': value.asLegacyTransaction,
         'useTokenLedger': value.useTokenLedger,
         'destinationTokenAccount': value.destinationTokenAccount,
+        'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
+        'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,
+        'programAuthorityId': value.programAuthorityId,
+        'allowOptimizedWrappedSolTokenAccount': value.allowOptimizedWrappedSolTokenAccount,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
+        'dynamicSlippage': SwapRequestDynamicSlippageToJSON(value.dynamicSlippage),
+        'blockhashSlotsToExpiry': value.blockhashSlotsToExpiry,
+        'correctLastValidBlockHeight': value.correctLastValidBlockHeight,
     };
 }
 

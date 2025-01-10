@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: "3.0.2"
 info:
   title: Jupiter API v6
   version: 6.0.0
@@ -6,14 +6,14 @@ info:
     The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.
 
     ### Rate Limit
-    The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.
+    We update our rate limit from time to time depending on the load of our servers. We recommend running your own instance of the API if you want to have high rate limit, here to learn how to run the [self-hosted API](https://station.jup.ag/docs/apis/self-hosted).
 
     ### API Wrapper
     - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)
 
     ### Data types
     - Public keys are base58 encoded strings
-    - raw data such as Vec<u8> are base64 encoded strings
+    - raw data such as Vec<u8\> are base64 encoded strings
 
 servers:
   - url: https://quote-api.jup.ag/v6
@@ -24,22 +24,33 @@ paths:
       summary: GET /quote
       description: Sends a GET request to the Jupiter API to get the best priced quote.
       parameters:
-        - $ref: '#/components/parameters/InputMintParameter'
-        - $ref: '#/components/parameters/OutputMintParameter'
-        - $ref: '#/components/parameters/AmountParameter'
-        - $ref: '#/components/parameters/SlippageParameter'
-        - $ref: '#/components/parameters/ExcludeDexesParameter'
-        - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
-        - $ref: '#/components/parameters/AsLegacyTransactionParameter'
-        - $ref: '#/components/parameters/PlatformFeeBpsParameter'
-        - $ref: '#/components/parameters/MaxAccountsParameter'
+        - $ref: "#/components/parameters/InputMintParameter"
+        - $ref: "#/components/parameters/OutputMintParameter"
+        - $ref: "#/components/parameters/AmountParameter"
+        - $ref: "#/components/parameters/SlippageParameter"
+        - $ref: "#/components/parameters/DynamicSlippageParameter"
+        - $ref: "#/components/parameters/AutoSlippageParameter"
+        - $ref: "#/components/parameters/AutoSlippageCollisionValueParameter"
+        - $ref: "#/components/parameters/ComputeAutoSlippageParameter"
+        - $ref: "#/components/parameters/MaxAutoSlippageBpsParameter"
+        - $ref: "#/components/parameters/SwapModeParameter"
+        - $ref: "#/components/parameters/DexesParameter"
+        - $ref: "#/components/parameters/ExcludeDexesParameter"
+        - $ref: "#/components/parameters/RestrictIntermediateTokensParameter"
+        - $ref: "#/components/parameters/OnlyDirectRoutesParameter"
+        - $ref: "#/components/parameters/AsLegacyTransactionParameter"
+        - $ref: "#/components/parameters/PlatformFeeBpsParameter"
+        - $ref: "#/components/parameters/MaxAccountsParameter"
+        - $ref: "#/components/parameters/MinimizeSlippage"
+        - $ref: "#/components/parameters/PreferLiquidDexes"
+        - $ref: "#/components/parameters/TokenCategoryBasedIntermediateTokensParameter"
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/QuoteResponse'
+                $ref: "#/components/schemas/QuoteResponse"
   /swap:
     post:
       summary: POST /swap
@@ -49,14 +60,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SwapRequest'
+              $ref: "#/components/schemas/SwapRequest"
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SwapResponse'
+                $ref: "#/components/schemas/SwapResponse"
   /swap-instructions:
     post:
       summary: POST /swap-instructions
@@ -66,20 +77,47 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SwapRequest'
+              $ref: "#/components/schemas/SwapRequest"
       responses:
-        '200':
+        "200":
           description: Successful response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SwapInstructionsResponse'
+                $ref: "#/components/schemas/SwapInstructionsResponse"
   /program-id-to-label:
     get:
       summary: GET /program-id-to-label
       description: Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
       responses:
-        '200':
+        "200":
+          description: Default response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+  /indexed-route-map:
+    get:
+      summary: GET /indexed-route-map
+      description: DEPRECATED, please use /tokens for tradable mints. Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
+      deprecated: true
+      parameters:
+        - $ref: "#/components/parameters/OnlyDirectRoutesParameter"
+      responses:
+        "200":
+          description: Default response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IndexedRouteMapResponse"
+  /tokens:
+    get:
+      summary: GET /tokens
+      description: Returns a list of all the tradable mints
+      responses:
+        "200":
           description: Default response
           content:
             application/json:
@@ -87,19 +125,10 @@ paths:
                 type: array
                 items:
                   type: string
-  /indexed-route-map:
-    get:
-      summary: GET /indexed-route-map
-      description: Returns a hash map, input mint as key and an array of valid output mint as values, token mints are indexed to reduce the file size
-      parameters:
-        - $ref: '#/components/parameters/OnlyDirectRoutesParameter'
-      responses:
-        '200':
-          description: Default response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/IndexedRouteMapResponse'
+                example:
+                  - "So11111111111111111111111111111111111111112"
+                  - "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                  - "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
 
 components:
   schemas:
@@ -111,7 +140,7 @@ components:
         accounts:
           type: array
           items:
-            $ref: '#/components/schemas/AccountMeta'
+            $ref: "#/components/schemas/AccountMeta"
         data:
           type: string
       required:
@@ -133,6 +162,18 @@ components:
         - isSigner
         - isWritable
 
+    PriorityFeeWithMaxLamports:
+      priorityLevelWithMaxLamports:
+      type: object
+      properties:
+        global:
+          type: boolean
+        maxLamports:
+          type: integer
+        priorityLevel:
+          type: string
+          enum: ["medium", "high", "veryHigh"]
+
     QuoteResponse:
       type: object
       properties:
@@ -147,19 +188,22 @@ components:
         otherAmountThreshold:
           type: string
         swapMode:
-          $ref: '#/components/schemas/SwapMode'
+          $ref: "#/components/schemas/SwapMode"
           required: true
         slippageBps:
           type: integer
           format: int32
+        computedAutoSlippage:
+          type: integer
+          format: int32
         platformFee:
-          $ref: '#/components/schemas/PlatformFee'
+          $ref: "#/components/schemas/PlatformFee"
         priceImpactPct:
           type: string
         routePlan:
           type: array
           items:
-            $ref: '#/components/schemas/RoutePlanStep'
+            $ref: "#/components/schemas/RoutePlanStep"
         contextSlot:
           type: number
         timeTaken:
@@ -197,7 +241,7 @@ components:
       type: object
       properties:
         swapInfo:
-          $ref: '#/components/schemas/SwapInfo'
+          $ref: "#/components/schemas/SwapInfo"
         percent:
           type: integer
           format: int32
@@ -241,26 +285,69 @@ components:
           description: The user public key.
           type: string
         wrapAndUnwrapSol:
-          description: Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.
+          description: Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
           type: boolean
+          default: true
         useSharedAccounts:
           description: Default is true. This enables the usage of shared program accountns. That means no intermediate token accounts or open orders accounts need to be created for the users. But it also means that the likelihood of hot accounts is higher.
           type: boolean
+          default: true
         feeAccount:
-          description: Fee token account for the output token, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a `platformFeeBps` in `/quote` and make sure that the feeAccount has been created).
+          description: Fee token account, same as the output token for ExactIn and as the input token for ExactOut, it is derived using the seeds = ["referral_ata", referral_account, mint] and the `REFER4ZgmyYx9c6He5XfaTMiGfdLwRnkV4RPp9t9iF3` referral contract (only pass in if you set a feeBps and make sure that the feeAccount has been created).
           type: string
         computeUnitPriceMicroLamports:
-          description: The compute unit price to prioritize the transaction, the additional fee will be `computeUnitSet (1400000) * computeUnitPriceMicroLamports`.
-          type: integer
+          description: The compute unit price to prioritize the transaction, the additional fee will be `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
+          anyOf:
+            - type: integer
+            - type: string
+              enum: ["auto"]
+        prioritizationFeeLamports:
+          description: \* PriorityFeeWithMaxLamports is impossible to be typed. Prioritization fee lamports paid for the transaction in addition to the signatures fee. Mutually exclusive with compute_unit_price_micro_lamports. If `auto` is used, Jupiter will automatically set a priority fee and it will be capped at 5,000,000 lamports / 0.005 SOL.
+          anyOf:
+            - type: integer
+            - type: string
+              enum: ["auto"]
+            # It's impossible to type this, with Swagger 2.0, anyOf, oneOf typing is not supported
+            # - type: object
+            #   $ref: "#/components/schemas/PriorityFeeWithMaxLamports"
+
         asLegacyTransaction:
           description: Default is false. Request a legacy transaction rather than the default versioned transaction, needs to be paired with a quote using asLegacyTransaction otherwise the transaction might be too large.
           type: boolean
+          default: false
         useTokenLedger:
           description: Default is false. This is useful when the instruction before the swap has a transfer that increases the input token amount. Then, the swap will just use the difference between the token ledger token amount and post token amount.
           type: boolean
+          default: false
         destinationTokenAccount:
           description: Public key of the token account that will be used to receive the token out of the swap. If not provided, the user's ATA will be used. If provided, we assume that the token account is already initialized.
           type: string
+        dynamicComputeUnitLimit:
+          description: When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit. This will increase latency slightly since there will be one extra RPC call to simulate this. Default is `false`.
+          type: boolean
+        skipUserAccountsRpcCalls:
+          description: When enabled, it will not do any rpc calls check on user's accounts. Enable it only when you already setup all the accounts needed for the trasaction, like wrapping or unwrapping sol, destination account is already created.
+          type: boolean
+        programAuthorityId:
+          description: The program authority id [0;7], load balanced across the available set by default
+          type: integer
+        allowOptimizedWrappedSolTokenAccount:
+          description: Default is false. Enabling it would reduce use an optimized way to open WSOL that reduce compute unit.
+          type: boolean
+          default: false
+        dynamicSlippage:
+          type: object
+          properties:
+            minBps:
+              type: integer
+            maxBps:
+              type: integer
+        blockhashSlotsToExpiry:
+          description: Optional. When passed in, Swap object will be returned with your desired slots to epxiry.
+          type: number
+        correctLastValidBlockHeight:
+          description: Optional. Default to false. Request Swap object to be returned with the correct blockhash prior to Agave 2.0.
+          type: boolean
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
       required:
@@ -272,31 +359,52 @@ components:
       properties:
         swapTransaction:
           type: string
+        lastValidBlockHeight:
+          type: number
+        prioritizationFeeLamports:
+          type: number
+        dynamicSlippageReport:
+          type: object
+          properties:
+            amplificationRatio:
+              type: string
+            otherAmount:
+              type: integer
+            simulatedIncurredSlippageBps:
+              type: integer
+            slippageBps:
+              type: integer
+            categoryName:
+              type: string
+              enum: ["stable", "lst", "bluechip", "verified"]
+            heuristicMaxSlippageBps:
+              type: integer
       required:
         - swapTransaction
+        - lastValidBlockHeight
 
     SwapInstructionsResponse:
       type: object
       properties:
         tokenLedgerInstruction:
           description: If you are using `useTokenLedger = true`.
-          $ref: '#/components/schemas/Instruction'
+          $ref: "#/components/schemas/Instruction"
         computeBudgetInstructions:
           description: The necessary instructions to setup the compute budget.
           type: array
           items:
-            $ref: '#/components/schemas/Instruction'
+            $ref: "#/components/schemas/Instruction"
         setupInstructions:
           description: Setup missing ATA for the users.
           type: array
           items:
-            $ref: '#/components/schemas/Instruction'
+            $ref: "#/components/schemas/Instruction"
         swapInstruction:
           description: The actual swap instruction.
-          $ref: '#/components/schemas/Instruction'
+          $ref: "#/components/schemas/Instruction"
         cleanupInstruction:
-          description: Unwrap the SOL if `wrapUnwrapSOL = true`.
-          $ref: '#/components/schemas/Instruction'
+          description: Unwrap the SOL if `wrapAndUnwrapSol = true`.
+          $ref: "#/components/schemas/Instruction"
         addressLookupTableAddresses:
           description: The lookup table addresses that you can use if you are using versioned transaction.
           type: array
@@ -327,11 +435,11 @@ components:
             items:
               type: number
           example:
-            '1':
+            "1":
               - 2
               - 3
               - 4
-            '2':
+            "2":
               - 1
               - 3
               - 4
@@ -358,14 +466,52 @@ components:
       required: true
       schema:
         type: integer
+    DynamicSlippageParameter:
+      name: dynamicSlippage
+      description: Set to true to indicate the usage of dynamic slippage.
+      in: query
+      schema:
+        type: boolean
     SlippageParameter:
       name: slippageBps
-      description: The slippage % in BPS. If the output token amount exceeds the slippage then the swap transaction will fail.
+      description: The slippage in basis points, 1 basis point is 0.01%. If the output token amount exceeds the slippage then the swap transaction will fail.
       in: query
       schema:
         type: integer
+    AutoSlippageParameter:
+      name: autoSlippage
+      description: Automatically calculate the slippage based on pairs.
+      in: query
+      schema:
+        type: boolean
+    AutoSlippageCollisionValueParameter:
+      name: autoSlippageCollisionUsdValue
+      description: Automatic slippage collision value.
+      in: query
+      schema:
+        type: integer
+    MaxAutoSlippageBpsParameter:
+      name: maxAutoSlippageBps
+      description: Max slippage in basis points for auto slippage calculation. Default is 400.
+      in: query
+      schema:
+        type: integer
+    ComputeAutoSlippageParameter:
+      name: computeAutoSlippage
+      description: Compute auto slippage value without using it.
+      in: query
+      schema:
+        type: boolean
+    SwapModeParameter:
+      name: swapMode
+      description: (ExactIn or ExactOut) Defaults to ExactIn. ExactOut is for supporting use cases where you need an exact token amount, like payments. In this case the slippage is on the input token.
+      in: query
+      schema:
+        type: string
+        enum: ["ExactIn", "ExactOut"]
     DexesParameter:
       name: dexes
+      description: Default is that all DEXes are included. You can pass in the DEXes that you want to include only and separate them by `,`. You can check out the full list [here](https://quote-api.jup.ag/v6/program-id-to-label).
       in: query
       schema:
         type: array
@@ -373,12 +519,18 @@ components:
           type: string
     ExcludeDexesParameter:
       name: excludeDexes
-      description: Default is that all DEXes are included. You can pass in the DEXes that you want to exclude and separate them by `,`. For example, `Aldrin,Saber`.
+      description: Default is that all DEXes are included. You can pass in the DEXes that you want to exclude and separate them by `,`. You can check out the full list [here](https://quote-api.jup.ag/v6/program-id-to-label).
       in: query
       schema:
         type: array
         items:
           type: string
+    RestrictIntermediateTokensParameter:
+      name: restrictIntermediateTokens
+      description: Restrict intermediate tokens to a top token set that has stable liquidity. This will help to ease potential high slippage error rate when swapping with minimal impact on pricing.
+      in: query
+      schema:
+        type: boolean
     OnlyDirectRoutesParameter:
       name: onlyDirectRoutes
       description: Default is false. Direct Routes limits Jupiter routing to single hop routes only.
@@ -403,3 +555,21 @@ components:
       in: query
       schema:
         type: integer
+    MinimizeSlippage:
+      name: minimizeSlippage
+      description: Default is false. Miminize slippage attempts to find routes with lower slippage.
+      in: query
+      schema:
+        type: boolean
+    PreferLiquidDexes:
+      name: preferLiquidDexes
+      description: Default is false. Enabling it would only consider markets with high liquidity to reduce slippage.
+      in: query
+      schema:
+        type: boolean
+    TokenCategoryBasedIntermediateTokensParameter:
+      name: tokenCategoryBasedIntermediateTokens
+      description: Default is false. Uses categorized top token lists as intermediate tokens to optimize routing paths, replacing the old static top token list. This helps achieve better pricing while maintaining route reliability.
+      in: query
+      schema:
+        type: boolean

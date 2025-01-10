@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Jupiter API v6
- * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit The rate limit is 50 requests / 10 seconds. If you need a higher rate limit, feel free to contact us on [#developer-support](https://discord.com/channels/897540204506775583/910250162402779146) on Discord.  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8> are base64 encoded strings 
+ * The core of [jup.ag](https://jup.ag). Easily get a quote and swap through Jupiter API.  ### Rate Limit We update our rate limit from time to time depending on the load of our servers. We recommend running your own instance of the API if you want to have high rate limit, here to learn how to run the [self-hosted API](https://station.jup.ag/docs/apis/self-hosted).  ### API Wrapper - Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data types - Public keys are base58 encoded strings - raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 6.0.0
  * 
@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { SwapResponseDynamicSlippageReport } from './SwapResponseDynamicSlippageReport';
+import {
+    SwapResponseDynamicSlippageReportFromJSON,
+    SwapResponseDynamicSlippageReportFromJSONTyped,
+    SwapResponseDynamicSlippageReportToJSON,
+} from './SwapResponseDynamicSlippageReport';
+
 /**
  * 
  * @export
@@ -25,6 +32,24 @@ export interface SwapResponse {
      * @memberof SwapResponse
      */
     swapTransaction: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof SwapResponse
+     */
+    lastValidBlockHeight: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SwapResponse
+     */
+    prioritizationFeeLamports?: number;
+    /**
+     * 
+     * @type {SwapResponseDynamicSlippageReport}
+     * @memberof SwapResponse
+     */
+    dynamicSlippageReport?: SwapResponseDynamicSlippageReport;
 }
 
 /**
@@ -33,6 +58,7 @@ export interface SwapResponse {
 export function instanceOfSwapResponse(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "swapTransaction" in value;
+    isInstance = isInstance && "lastValidBlockHeight" in value;
 
     return isInstance;
 }
@@ -48,6 +74,9 @@ export function SwapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
     return {
         
         'swapTransaction': json['swapTransaction'],
+        'lastValidBlockHeight': json['lastValidBlockHeight'],
+        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
+        'dynamicSlippageReport': !exists(json, 'dynamicSlippageReport') ? undefined : SwapResponseDynamicSlippageReportFromJSON(json['dynamicSlippageReport']),
     };
 }
 
@@ -61,6 +90,9 @@ export function SwapResponseToJSON(value?: SwapResponse | null): any {
     return {
         
         'swapTransaction': value.swapTransaction,
+        'lastValidBlockHeight': value.lastValidBlockHeight,
+        'prioritizationFeeLamports': value.prioritizationFeeLamports,
+        'dynamicSlippageReport': SwapResponseDynamicSlippageReportToJSON(value.dynamicSlippageReport),
     };
 }
 

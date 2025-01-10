@@ -16,50 +16,48 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface IndexedRouteMapResponse
+ * @interface SwapRequestDynamicSlippage
  */
-export interface IndexedRouteMapResponse {
+export interface SwapRequestDynamicSlippage {
     /**
-     * All the mints that are indexed to match in indexedRouteMap
-     * @type {Array<string>}
-     * @memberof IndexedRouteMapResponse
+     * 
+     * @type {number}
+     * @memberof SwapRequestDynamicSlippage
      */
-    mintKeys: Array<string>;
+    minBps?: number;
     /**
-     * All the possible route and their corresponding output mints
-     * @type {{ [key: string]: Array<number>; }}
-     * @memberof IndexedRouteMapResponse
+     * 
+     * @type {number}
+     * @memberof SwapRequestDynamicSlippage
      */
-    indexedRouteMap: { [key: string]: Array<number>; };
+    maxBps?: number;
 }
 
 /**
- * Check if a given object implements the IndexedRouteMapResponse interface.
+ * Check if a given object implements the SwapRequestDynamicSlippage interface.
  */
-export function instanceOfIndexedRouteMapResponse(value: object): boolean {
+export function instanceOfSwapRequestDynamicSlippage(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "mintKeys" in value;
-    isInstance = isInstance && "indexedRouteMap" in value;
 
     return isInstance;
 }
 
-export function IndexedRouteMapResponseFromJSON(json: any): IndexedRouteMapResponse {
-    return IndexedRouteMapResponseFromJSONTyped(json, false);
+export function SwapRequestDynamicSlippageFromJSON(json: any): SwapRequestDynamicSlippage {
+    return SwapRequestDynamicSlippageFromJSONTyped(json, false);
 }
 
-export function IndexedRouteMapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): IndexedRouteMapResponse {
+export function SwapRequestDynamicSlippageFromJSONTyped(json: any, ignoreDiscriminator: boolean): SwapRequestDynamicSlippage {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'mintKeys': json['mintKeys'],
-        'indexedRouteMap': json['indexedRouteMap'],
+        'minBps': !exists(json, 'minBps') ? undefined : json['minBps'],
+        'maxBps': !exists(json, 'maxBps') ? undefined : json['maxBps'],
     };
 }
 
-export function IndexedRouteMapResponseToJSON(value?: IndexedRouteMapResponse | null): any {
+export function SwapRequestDynamicSlippageToJSON(value?: SwapRequestDynamicSlippage | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -68,8 +66,8 @@ export function IndexedRouteMapResponseToJSON(value?: IndexedRouteMapResponse | 
     }
     return {
         
-        'mintKeys': value.mintKeys,
-        'indexedRouteMap': value.indexedRouteMap,
+        'minBps': value.minBps,
+        'maxBps': value.maxBps,
     };
 }
 
