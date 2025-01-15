@@ -284,6 +284,9 @@ components:
         userPublicKey:
           description: The user public key.
           type: string
+        payer:
+          description: Allow a custom payer to pay for the transaction.
+          type: string
         wrapAndUnwrapSol:
           description: Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
           type: boolean
