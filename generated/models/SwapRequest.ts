@@ -51,6 +51,12 @@ export interface SwapRequest {
      */
     userPublicKey: string;
     /**
+     * Allow a custom payer to pay for the transaction.
+     * @type {string}
+     * @memberof SwapRequest
+     */
+    payer?: string;
+    /**
      * Default is true. If true, will automatically wrap/unwrap SOL. If false, it will use wSOL token account.  Will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close.
      * @type {boolean}
      * @memberof SwapRequest
@@ -124,12 +130,6 @@ export interface SwapRequest {
     allowOptimizedWrappedSolTokenAccount?: boolean;
     /**
      * 
-     * @type {QuoteResponse}
-     * @memberof SwapRequest
-     */
-    quoteResponse: QuoteResponse;
-    /**
-     * 
      * @type {SwapRequestDynamicSlippage}
      * @memberof SwapRequest
      */
@@ -146,6 +146,12 @@ export interface SwapRequest {
      * @memberof SwapRequest
      */
     correctLastValidBlockHeight?: boolean;
+    /**
+     * 
+     * @type {QuoteResponse}
+     * @memberof SwapRequest
+     */
+    quoteResponse: QuoteResponse;
 }
 
 /**
@@ -170,6 +176,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
     return {
         
         'userPublicKey': json['userPublicKey'],
+        'payer': !exists(json, 'payer') ? undefined : json['payer'],
         'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
         'useSharedAccounts': !exists(json, 'useSharedAccounts') ? undefined : json['useSharedAccounts'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
@@ -182,10 +189,10 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
         'programAuthorityId': !exists(json, 'programAuthorityId') ? undefined : json['programAuthorityId'],
         'allowOptimizedWrappedSolTokenAccount': !exists(json, 'allowOptimizedWrappedSolTokenAccount') ? undefined : json['allowOptimizedWrappedSolTokenAccount'],
-        'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
         'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : SwapRequestDynamicSlippageFromJSON(json['dynamicSlippage']),
         'blockhashSlotsToExpiry': !exists(json, 'blockhashSlotsToExpiry') ? undefined : json['blockhashSlotsToExpiry'],
         'correctLastValidBlockHeight': !exists(json, 'correctLastValidBlockHeight') ? undefined : json['correctLastValidBlockHeight'],
+        'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
     };
 }
 
@@ -199,6 +206,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
     return {
         
         'userPublicKey': value.userPublicKey,
+        'payer': value.payer,
         'wrapAndUnwrapSol': value.wrapAndUnwrapSol,
         'useSharedAccounts': value.useSharedAccounts,
         'feeAccount': value.feeAccount,
@@ -211,10 +219,10 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,
         'programAuthorityId': value.programAuthorityId,
         'allowOptimizedWrappedSolTokenAccount': value.allowOptimizedWrappedSolTokenAccount,
-        'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
         'dynamicSlippage': SwapRequestDynamicSlippageToJSON(value.dynamicSlippage),
         'blockhashSlotsToExpiry': value.blockhashSlotsToExpiry,
         'correctLastValidBlockHeight': value.correctLastValidBlockHeight,
+        'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
     };
 }
 
