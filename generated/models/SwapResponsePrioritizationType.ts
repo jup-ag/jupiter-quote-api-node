@@ -27,7 +27,7 @@ import {
 } from './SwapResponsePrioritizationTypeJito';
 
 /**
- * 
+ * The type of prioritization used for the swap, either Jito or ComputeBudget.
  * @export
  * @interface SwapResponsePrioritizationType
  */
