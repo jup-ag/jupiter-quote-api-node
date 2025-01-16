@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/DefaultApi.ts
 apis/index.ts
 index.ts
@@ -18,5 +17,8 @@ models/SwapRequestDynamicSlippage.ts
 models/SwapRequestPrioritizationFeeLamports.ts
 models/SwapResponse.ts
 models/SwapResponseDynamicSlippageReport.ts
+models/SwapResponsePrioritizationType.ts
+models/SwapResponsePrioritizationTypeComputeBudget.ts
+models/SwapResponsePrioritizationTypeJito.ts
 models/index.ts
 runtime.ts

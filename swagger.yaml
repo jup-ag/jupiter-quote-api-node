@@ -366,6 +366,22 @@ components:
           type: number
         prioritizationFeeLamports:
           type: number
+        prioritizationType:
+          type: object
+          description: The type of prioritization used for the swap, either Jito or ComputeBudget.
+          properties:
+            jito:
+              type: object
+              properties:
+                lamports:
+                  type: integer
+            computeBudget:
+              type: object
+              properties:
+                estimatedMicroLamports:
+                  type: integer
+                microLamports:
+                  type: integer
         dynamicSlippageReport:
           type: object
           properties:
@@ -385,7 +401,8 @@ components:
       required:
         - swapTransaction
         - lastValidBlockHeight
-
+        - prioritizationFeeLamports
+        
     SwapInstructionsResponse:
       type: object
       properties:

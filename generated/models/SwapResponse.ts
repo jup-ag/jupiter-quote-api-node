@@ -19,6 +19,12 @@ import {
     SwapResponseDynamicSlippageReportFromJSONTyped,
     SwapResponseDynamicSlippageReportToJSON,
 } from './SwapResponseDynamicSlippageReport';
+import type { SwapResponsePrioritizationType } from './SwapResponsePrioritizationType';
+import {
+    SwapResponsePrioritizationTypeFromJSON,
+    SwapResponsePrioritizationTypeFromJSONTyped,
+    SwapResponsePrioritizationTypeToJSON,
+} from './SwapResponsePrioritizationType';
 
 /**
  * 
@@ -43,7 +49,13 @@ export interface SwapResponse {
      * @type {number}
      * @memberof SwapResponse
      */
-    prioritizationFeeLamports?: number;
+    prioritizationFeeLamports: number;
+    /**
+     * 
+     * @type {SwapResponsePrioritizationType}
+     * @memberof SwapResponse
+     */
+    prioritizationType?: SwapResponsePrioritizationType;
     /**
      * 
      * @type {SwapResponseDynamicSlippageReport}
@@ -59,6 +71,7 @@ export function instanceOfSwapResponse(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "swapTransaction" in value;
     isInstance = isInstance && "lastValidBlockHeight" in value;
+    isInstance = isInstance && "prioritizationFeeLamports" in value;
 
     return isInstance;
 }
@@ -75,7 +88,8 @@ export function SwapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         
         'swapTransaction': json['swapTransaction'],
         'lastValidBlockHeight': json['lastValidBlockHeight'],
-        'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
+        'prioritizationFeeLamports': json['prioritizationFeeLamports'],
+        'prioritizationType': !exists(json, 'prioritizationType') ? undefined : SwapResponsePrioritizationTypeFromJSON(json['prioritizationType']),
         'dynamicSlippageReport': !exists(json, 'dynamicSlippageReport') ? undefined : SwapResponseDynamicSlippageReportFromJSON(json['dynamicSlippageReport']),
     };
 }
@@ -92,6 +106,7 @@ export function SwapResponseToJSON(value?: SwapResponse | null): any {
         'swapTransaction': value.swapTransaction,
         'lastValidBlockHeight': value.lastValidBlockHeight,
         'prioritizationFeeLamports': value.prioritizationFeeLamports,
+        'prioritizationType': SwapResponsePrioritizationTypeToJSON(value.prioritizationType),
         'dynamicSlippageReport': SwapResponseDynamicSlippageReportToJSON(value.dynamicSlippageReport),
     };
 }
