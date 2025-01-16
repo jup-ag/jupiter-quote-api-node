@@ -16,3 +16,6 @@ export * from './SwapRequestDynamicSlippage';
 export * from './SwapRequestPrioritizationFeeLamports';
 export * from './SwapResponse';
 export * from './SwapResponseDynamicSlippageReport';
+export * from './SwapResponsePrioritizationType';
+export * from './SwapResponsePrioritizationTypeComputeBudget';
+export * from './SwapResponsePrioritizationTypeJito';
