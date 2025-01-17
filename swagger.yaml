@@ -208,6 +208,8 @@ components:
           type: number
         timeTaken:
           type: number
+        swapUsdValue:
+          type: number
       required:
         - inputMint
         - outputMint
@@ -402,7 +404,7 @@ components:
         - swapTransaction
         - lastValidBlockHeight
         - prioritizationFeeLamports
-        
+
     SwapInstructionsResponse:
       type: object
       properties:
