@@ -118,10 +118,10 @@ export interface QuoteResponse {
     timeTaken?: number;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof QuoteResponse
      */
-    swapUsdValue?: number;
+    swapUsdValue?: string;
 }
 
 /**

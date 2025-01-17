@@ -209,7 +209,7 @@ components:
         timeTaken:
           type: number
         swapUsdValue:
-          type: number
+          type: string
       required:
         - inputMint
         - outputMint
