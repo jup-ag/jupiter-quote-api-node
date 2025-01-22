@@ -35,9 +35,9 @@ async function getQuote() {
   return quote;
 }
 
-async function getSwapObj(wallet: Wallet, quote: QuoteResponse) {
+async function getSwapResponse(wallet: Wallet, quote: QuoteResponse) {
   // Get serialized transaction
-  const swapObj = await jupiterQuoteApi.swapPost({
+  const swapResponse = await jupiterQuoteApi.swapPost({
     swapRequest: {
       quoteResponse: quote,
       userPublicKey: wallet.publicKey.toBase58(),
@@ -52,9 +52,10 @@ async function getSwapObj(wallet: Wallet, quote: QuoteResponse) {
           priorityLevel: "veryHigh", // If you want to land transaction fast, set this to use `veryHigh`. You will pay on average higher priority fee.
         },
       },
+      correctLastValidBlockHeight: true,
     },
   });
-  return swapObj;
+  return swapResponse;
 }
 
 async function flowQuote() {
@@ -70,11 +71,14 @@ async function flowQuoteAndSwap() {
 
   const quote = await getQuote();
   console.dir(quote, { depth: null });
-  const swapObj = await getSwapObj(wallet, quote);
-  console.dir(swapObj, { depth: null });
+  const swapResponse = await getSwapResponse(wallet, quote);
+  console.dir(swapResponse, { depth: null });
 
   // Serialize the transaction
-  const swapTransactionBuf = Buffer.from(swapObj.swapTransaction, "base64");
+  const swapTransactionBuf = Buffer.from(
+    swapResponse.swapTransaction,
+    "base64"
+  );
   var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
 
   // Sign the transaction
@@ -105,7 +109,7 @@ async function flowQuoteAndSwap() {
     serializedTransaction,
     blockhashWithExpiryBlockHeight: {
       blockhash,
-      lastValidBlockHeight: swapObj.lastValidBlockHeight,
+      lastValidBlockHeight: swapResponse.lastValidBlockHeight,
     },
   });
 

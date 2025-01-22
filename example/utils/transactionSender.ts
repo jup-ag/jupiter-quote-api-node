@@ -48,7 +48,7 @@ export async function transactionSenderAndConfirmationWaiter({
   try {
     abortableResender();
     const lastValidBlockHeight =
-      blockhashWithExpiryBlockHeight.lastValidBlockHeight - 150;
+      blockhashWithExpiryBlockHeight.lastValidBlockHeight;
 
     // this would throw TransactionExpiredBlockheightExceededError
     await Promise.race([
