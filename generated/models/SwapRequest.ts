@@ -147,6 +147,12 @@ export interface SwapRequest {
      */
     correctLastValidBlockHeight?: boolean;
     /**
+     * Optional. Default to false. Add consensus account to (hopefully) prevent MEV attacks
+     * @type {boolean}
+     * @memberof SwapRequest
+     */
+    addConsensusAccount?: boolean;
+    /**
      * 
      * @type {QuoteResponse}
      * @memberof SwapRequest
@@ -192,6 +198,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : SwapRequestDynamicSlippageFromJSON(json['dynamicSlippage']),
         'blockhashSlotsToExpiry': !exists(json, 'blockhashSlotsToExpiry') ? undefined : json['blockhashSlotsToExpiry'],
         'correctLastValidBlockHeight': !exists(json, 'correctLastValidBlockHeight') ? undefined : json['correctLastValidBlockHeight'],
+        'addConsensusAccount': !exists(json, 'addConsensusAccount') ? undefined : json['addConsensusAccount'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
     };
 }
@@ -222,6 +229,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'dynamicSlippage': SwapRequestDynamicSlippageToJSON(value.dynamicSlippage),
         'blockhashSlotsToExpiry': value.blockhashSlotsToExpiry,
         'correctLastValidBlockHeight': value.correctLastValidBlockHeight,
+        'addConsensusAccount': value.addConsensusAccount,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
     };
 }
