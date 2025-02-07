@@ -59,6 +59,7 @@ export interface QuoteGetRequest {
     minimizeSlippage?: boolean;
     preferLiquidDexes?: boolean;
     tokenCategoryBasedIntermediateTokens?: boolean;
+    preferSimpleRouting?: boolean;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -233,6 +234,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.tokenCategoryBasedIntermediateTokens !== undefined) {
             queryParameters['tokenCategoryBasedIntermediateTokens'] = requestParameters.tokenCategoryBasedIntermediateTokens;
+        }
+
+        if (requestParameters.preferSimpleRouting !== undefined) {
+            queryParameters['preferSimpleRouting'] = requestParameters.preferSimpleRouting;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

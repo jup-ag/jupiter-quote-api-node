@@ -44,6 +44,7 @@ paths:
         - $ref: "#/components/parameters/MinimizeSlippage"
         - $ref: "#/components/parameters/PreferLiquidDexes"
         - $ref: "#/components/parameters/TokenCategoryBasedIntermediateTokensParameter"
+        - $ref: "#/components/parameters/PreferSimpleRoutingParameter"
       responses:
         "200":
           description: Successful response
@@ -210,6 +211,8 @@ components:
           type: number
         swapUsdValue:
           type: string
+        simplerRouteUsed:
+          type: boolean  
       required:
         - inputMint
         - outputMint
@@ -598,3 +601,9 @@ components:
       in: query
       schema:
         type: boolean
+    PreferSimpleRoutingParameter:
+      name: preferSimpleRouting
+      description: Default is false. Prefers simpler routing with less splits if the quoted amount is within an acceptable range.
+      in: query
+      schema:
+        type: boolean    
