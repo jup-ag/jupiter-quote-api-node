@@ -122,6 +122,12 @@ export interface QuoteResponse {
      * @memberof QuoteResponse
      */
     swapUsdValue?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof QuoteResponse
+     */
+    simplerRouteUsed?: boolean;
 }
 
 /**
@@ -166,6 +172,7 @@ export function QuoteResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
         'contextSlot': !exists(json, 'contextSlot') ? undefined : json['contextSlot'],
         'timeTaken': !exists(json, 'timeTaken') ? undefined : json['timeTaken'],
         'swapUsdValue': !exists(json, 'swapUsdValue') ? undefined : json['swapUsdValue'],
+        'simplerRouteUsed': !exists(json, 'simplerRouteUsed') ? undefined : json['simplerRouteUsed'],
     };
 }
 
@@ -192,6 +199,7 @@ export function QuoteResponseToJSON(value?: QuoteResponse | null): any {
         'contextSlot': value.contextSlot,
         'timeTaken': value.timeTaken,
         'swapUsdValue': value.swapUsdValue,
+        'simplerRouteUsed': value.simplerRouteUsed,
     };
 }
 
