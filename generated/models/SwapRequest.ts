@@ -25,12 +25,6 @@ import {
     SwapRequestComputeUnitPriceMicroLamportsFromJSONTyped,
     SwapRequestComputeUnitPriceMicroLamportsToJSON,
 } from './SwapRequestComputeUnitPriceMicroLamports';
-import type { SwapRequestDynamicSlippage } from './SwapRequestDynamicSlippage';
-import {
-    SwapRequestDynamicSlippageFromJSON,
-    SwapRequestDynamicSlippageFromJSONTyped,
-    SwapRequestDynamicSlippageToJSON,
-} from './SwapRequestDynamicSlippage';
 import type { SwapRequestPrioritizationFeeLamports } from './SwapRequestPrioritizationFeeLamports';
 import {
     SwapRequestPrioritizationFeeLamportsFromJSON,
@@ -130,10 +124,10 @@ export interface SwapRequest {
     allowOptimizedWrappedSolTokenAccount?: boolean;
     /**
      * 
-     * @type {SwapRequestDynamicSlippage}
+     * @type {boolean}
      * @memberof SwapRequest
      */
-    dynamicSlippage?: SwapRequestDynamicSlippage;
+    dynamicSlippage?: boolean;
     /**
      * Optional. When passed in, Swap object will be returned with your desired slots to epxiry.
      * @type {number}
@@ -195,7 +189,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
         'programAuthorityId': !exists(json, 'programAuthorityId') ? undefined : json['programAuthorityId'],
         'allowOptimizedWrappedSolTokenAccount': !exists(json, 'allowOptimizedWrappedSolTokenAccount') ? undefined : json['allowOptimizedWrappedSolTokenAccount'],
-        'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : SwapRequestDynamicSlippageFromJSON(json['dynamicSlippage']),
+        'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : json['dynamicSlippage'],
         'blockhashSlotsToExpiry': !exists(json, 'blockhashSlotsToExpiry') ? undefined : json['blockhashSlotsToExpiry'],
         'correctLastValidBlockHeight': !exists(json, 'correctLastValidBlockHeight') ? undefined : json['correctLastValidBlockHeight'],
         'addConsensusAccount': !exists(json, 'addConsensusAccount') ? undefined : json['addConsensusAccount'],
@@ -226,7 +220,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,
         'programAuthorityId': value.programAuthorityId,
         'allowOptimizedWrappedSolTokenAccount': value.allowOptimizedWrappedSolTokenAccount,
-        'dynamicSlippage': SwapRequestDynamicSlippageToJSON(value.dynamicSlippage),
+        'dynamicSlippage': value.dynamicSlippage,
         'blockhashSlotsToExpiry': value.blockhashSlotsToExpiry,
         'correctLastValidBlockHeight': value.correctLastValidBlockHeight,
         'addConsensusAccount': value.addConsensusAccount,

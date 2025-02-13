@@ -15,7 +15,7 @@ import { getSignature } from "./utils/getSignature";
 // Make sure that you are using your own RPC endpoint. This RPC doesn't work.
 // Helius and Triton have staked SOL and they can usually land transactions better.
 const connection = new Connection(
-  "https://neat-hidden-sanctuary.solana-mainnet.discover.quiknode.pro/2af5315d336f9ae920028bbb90a73b724dc1bbed/"
+  "https://api.mainnet-beta.solana.com" // We only support mainnet.
 );
 const jupiterQuoteApi = createJupiterApiClient();
 
@@ -24,6 +24,7 @@ async function getQuote() {
     inputMint: "So11111111111111111111111111111111111111112",
     outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
     amount: 100000000, // 0.1 SOL
+    slippageBps: 100, // 1%
   };
 
   // get quote
@@ -42,10 +43,7 @@ async function getSwapResponse(wallet: Wallet, quote: QuoteResponse) {
       quoteResponse: quote,
       userPublicKey: wallet.publicKey.toBase58(),
       dynamicComputeUnitLimit: true,
-      dynamicSlippage: {
-        // This will set an optimized slippage to ensure high success rate
-        maxBps: 300, // Make sure to set a reasonable cap here to prevent MEV
-      },
+      dynamicSlippage: true,
       prioritizationFeeLamports: {
         priorityLevelWithMaxLamports: {
           maxLamports: 10000000,
