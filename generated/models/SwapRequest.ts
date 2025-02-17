@@ -91,12 +91,6 @@ export interface SwapRequest {
      * @type {boolean}
      * @memberof SwapRequest
      */
-    useTokenLedger?: boolean;
-    /**
-     * Public key of the token account that will be used to receive the token out of the swap. If not provided, the user's ATA will be used. If provided, we assume that the token account is already initialized.
-     * @type {string}
-     * @memberof SwapRequest
-     */
     destinationTokenAccount?: string;
     /**
      * When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit. This will increase latency slightly since there will be one extra RPC call to simulate this. Default is `false`.
@@ -183,7 +177,6 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : SwapRequestComputeUnitPriceMicroLamportsFromJSON(json['computeUnitPriceMicroLamports']),
         'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : SwapRequestPrioritizationFeeLamportsFromJSON(json['prioritizationFeeLamports']),
         'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
-        'useTokenLedger': !exists(json, 'useTokenLedger') ? undefined : json['useTokenLedger'],
         'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
         'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
         'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
@@ -214,7 +207,6 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'computeUnitPriceMicroLamports': SwapRequestComputeUnitPriceMicroLamportsToJSON(value.computeUnitPriceMicroLamports),
         'prioritizationFeeLamports': SwapRequestPrioritizationFeeLamportsToJSON(value.prioritizationFeeLamports),
         'asLegacyTransaction': value.asLegacyTransaction,
-        'useTokenLedger': value.useTokenLedger,
         'destinationTokenAccount': value.destinationTokenAccount,
         'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
         'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,

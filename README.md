@@ -5,8 +5,7 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [Examples](#examples)
-  - [Using Custom URLs](#using-custom-urls)
-  - [Paid Hosted APIs](#paid-hosted-apis)
+  - [Paid Hosted APIs](#paid-hosted-apis) (Deprecated and will not be supported, reach out in Discord for more information)
 
 ## Installation
 
@@ -23,6 +22,8 @@ npm install @jup-ag/api
 - pnpm dev-swap
   - get a quote, perform swap
   - please setup `process.env.PRIVATE_KEY`
+
+Refer to Station developer documentation for more inforamtion and tips: https://station.jup.ag/docs/
 
 ## Usage
 
@@ -42,28 +43,10 @@ jupiterQuoteApi.quoteGet({
     inputMint: "So11111111111111111111111111111111111111112",
     outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     amount: "100000000",
-    // platformFeeBps: 10,
-    // asLegacyTransaction: true, // legacy transaction, default is versioned transaction
+    slippageBps: 100,
 })
 ```
 
 ## Examples
 
-Checkout the example in the repo. [link](/example/index.ts)
-
-### Using Custom URLs
-
-You can set custom URLs via the configuration for any self-hosted Jupiter APIs, like the [V6 Swap API](https://station.jup.ag/docs/apis/self-hosted) or the [paid hosted APIs](#paid-hosted-apis)
-
-```typescript
-import { createJupiterApiClient } from '@jup-ag/api';
-
-const config = {
-    basePath: 'https://hosted.api'
-};
-const jupiterQuoteApi = createJupiterApiClient(config);
-```
-
-### Paid Hosted APIs
-
-You can also check out some of the [paid hosted APIs](https://station.jup.ag/docs/apis/self-hosted#paid-hosted-apis).
+Checkout the [example in the repo](/example/index.ts).

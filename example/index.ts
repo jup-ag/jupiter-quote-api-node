@@ -9,10 +9,13 @@ import { Wallet } from "@project-serum/anchor";
 import bs58 from "bs58";
 import { transactionSenderAndConfirmationWaiter } from "./utils/transactionSender";
 import { getSignature } from "./utils/getSignature";
+import dotenv from "dotenv";
 
-// If you have problem landing transactions, read this too: https://station.jup.ag/docs/apis/landing-transactions
+dotenv.config();
 
-// Make sure that you are using your own RPC endpoint. This RPC doesn't work.
+// If you have problem landing transactions, read this: https://station.jup.ag/docs/swap-api/send-swap-transaction#how-jupiter-estimates-priority-fee
+
+// Make sure that you are using your own RPC endpoint.
 // Helius and Triton have staked SOL and they can usually land transactions better.
 const connection = new Connection(
   "https://api.mainnet-beta.solana.com" // We only support mainnet.
@@ -73,11 +76,10 @@ async function flowQuoteAndSwap() {
   console.dir(swapResponse, { depth: null });
 
   // Serialize the transaction
-  const swapTransactionBuf = Buffer.from(
-    swapResponse.swapTransaction,
-    "base64"
+  const swapTransactionBuf = Uint8Array.from(
+    Buffer.from(swapResponse.swapTransaction, "base64")
   );
-  var transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+  const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
 
   // Sign the transaction
   transaction.sign([wallet.payer]);
