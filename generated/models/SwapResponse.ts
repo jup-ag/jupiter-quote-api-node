@@ -13,12 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { SwapResponseDynamicSlippageReport } from './SwapResponseDynamicSlippageReport';
-import {
-    SwapResponseDynamicSlippageReportFromJSON,
-    SwapResponseDynamicSlippageReportFromJSONTyped,
-    SwapResponseDynamicSlippageReportToJSON,
-} from './SwapResponseDynamicSlippageReport';
 import type { SwapResponsePrioritizationType } from './SwapResponsePrioritizationType';
 import {
     SwapResponsePrioritizationTypeFromJSON,
@@ -56,12 +50,6 @@ export interface SwapResponse {
      * @memberof SwapResponse
      */
     prioritizationType?: SwapResponsePrioritizationType;
-    /**
-     * 
-     * @type {SwapResponseDynamicSlippageReport}
-     * @memberof SwapResponse
-     */
-    dynamicSlippageReport?: SwapResponseDynamicSlippageReport;
 }
 
 /**
@@ -90,7 +78,6 @@ export function SwapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'lastValidBlockHeight': json['lastValidBlockHeight'],
         'prioritizationFeeLamports': json['prioritizationFeeLamports'],
         'prioritizationType': !exists(json, 'prioritizationType') ? undefined : SwapResponsePrioritizationTypeFromJSON(json['prioritizationType']),
-        'dynamicSlippageReport': !exists(json, 'dynamicSlippageReport') ? undefined : SwapResponseDynamicSlippageReportFromJSON(json['dynamicSlippageReport']),
     };
 }
 
@@ -107,7 +94,6 @@ export function SwapResponseToJSON(value?: SwapResponse | null): any {
         'lastValidBlockHeight': value.lastValidBlockHeight,
         'prioritizationFeeLamports': value.prioritizationFeeLamports,
         'prioritizationType': SwapResponsePrioritizationTypeToJSON(value.prioritizationType),
-        'dynamicSlippageReport': SwapResponseDynamicSlippageReportToJSON(value.dynamicSlippageReport),
     };
 }
 
