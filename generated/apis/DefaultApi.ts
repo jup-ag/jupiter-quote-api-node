@@ -43,11 +43,6 @@ export interface QuoteGetRequest {
     outputMint: string;
     amount: number;
     slippageBps?: number;
-    dynamicSlippage?: boolean;
-    autoSlippage?: boolean;
-    autoSlippageCollisionUsdValue?: number;
-    computeAutoSlippage?: boolean;
-    maxAutoSlippageBps?: number;
     swapMode?: QuoteGetSwapModeEnum;
     dexes?: Array<string>;
     excludeDexes?: Array<string>;
@@ -56,10 +51,6 @@ export interface QuoteGetRequest {
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
     maxAccounts?: number;
-    minimizeSlippage?: boolean;
-    preferLiquidDexes?: boolean;
-    tokenCategoryBasedIntermediateTokens?: boolean;
-    preferSimpleRouting?: boolean;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -172,35 +163,15 @@ export class DefaultApi extends runtime.BaseAPI {
             queryParameters['slippageBps'] = requestParameters.slippageBps;
         }
 
-        if (requestParameters.dynamicSlippage !== undefined) {
-            queryParameters['dynamicSlippage'] = requestParameters.dynamicSlippage;
-        }
-
-        if (requestParameters.autoSlippage !== undefined) {
-            queryParameters['autoSlippage'] = requestParameters.autoSlippage;
-        }
-
-        if (requestParameters.autoSlippageCollisionUsdValue !== undefined) {
-            queryParameters['autoSlippageCollisionUsdValue'] = requestParameters.autoSlippageCollisionUsdValue;
-        }
-
-        if (requestParameters.computeAutoSlippage !== undefined) {
-            queryParameters['computeAutoSlippage'] = requestParameters.computeAutoSlippage;
-        }
-
-        if (requestParameters.maxAutoSlippageBps !== undefined) {
-            queryParameters['maxAutoSlippageBps'] = requestParameters.maxAutoSlippageBps;
-        }
-
         if (requestParameters.swapMode !== undefined) {
             queryParameters['swapMode'] = requestParameters.swapMode;
         }
 
-        if (requestParameters.dexes) {
+        if (requestParameters.dexes !== undefined) {
             queryParameters['dexes'] = requestParameters.dexes;
         }
 
-        if (requestParameters.excludeDexes) {
+        if (requestParameters.excludeDexes !== undefined) {
             queryParameters['excludeDexes'] = requestParameters.excludeDexes;
         }
 
@@ -222,23 +193,8 @@ export class DefaultApi extends runtime.BaseAPI {
 
         if (requestParameters.maxAccounts !== undefined) {
             queryParameters['maxAccounts'] = requestParameters.maxAccounts;
-        }
+        }   
 
-        if (requestParameters.minimizeSlippage !== undefined) {
-            queryParameters['minimizeSlippage'] = requestParameters.minimizeSlippage;
-        }
-
-        if (requestParameters.preferLiquidDexes !== undefined) {
-            queryParameters['preferLiquidDexes'] = requestParameters.preferLiquidDexes;
-        }
-
-        if (requestParameters.tokenCategoryBasedIntermediateTokens !== undefined) {
-            queryParameters['tokenCategoryBasedIntermediateTokens'] = requestParameters.tokenCategoryBasedIntermediateTokens;
-        }
-
-        if (requestParameters.preferSimpleRouting !== undefined) {
-            queryParameters['preferSimpleRouting'] = requestParameters.preferSimpleRouting;
-        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
