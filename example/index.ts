@@ -53,7 +53,6 @@ async function getSwapResponse(wallet: Wallet, quote: QuoteResponse) {
           priorityLevel: "veryHigh", // If you want to land transaction fast, set this to use `veryHigh`. You will pay on average higher priority fee.
         },
       },
-      correctLastValidBlockHeight: true,
     },
   });
   return swapResponse;
