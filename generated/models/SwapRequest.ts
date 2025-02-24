@@ -69,6 +69,12 @@ export interface SwapRequest {
      */
     feeAccount?: string;
     /**
+     * Tracking account public key. Specify any public key to track transactions. Useful for integrators to associate all swap transactions with this account for analytical purposes.
+     * @type {string}
+     * @memberof SwapRequest
+     */
+    trackingAccount?: string;
+    /**
      * 
      * @type {SwapRequestComputeUnitPriceMicroLamports}
      * @memberof SwapRequest
