@@ -58,6 +58,22 @@ async function getSwapResponse(wallet: Wallet, quote: QuoteResponse) {
   return swapResponse;
 }
 
+async function getSwapInstructionsResponse(wallet: Wallet, quote: QuoteResponse) {
+  // Get serialized transaction
+  const swapResponse = await jupiterQuoteApi.swapInstructionsPost({
+    swapRequest: {
+      quoteResponse: quote,
+      userPublicKey: wallet.publicKey.toBase58(),
+      dynamicComputeUnitLimit: true,
+      dynamicSlippage: true,
+      prioritizationFeeLamports: {
+        jitoTipLamports: 10000000,
+      },
+    },
+  });
+  return swapResponse;
+}
+
 async function flowQuote() {
   const quote = await getQuote();
   console.dir(quote, { depth: null });
@@ -125,6 +141,19 @@ async function flowQuoteAndSwap() {
   console.log(`https://solscan.io/tx/${signature}`);
 }
 
+async function flowQuoteAndSwapInstructions() {
+  const wallet = new Wallet(
+    Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY || ""))
+  );
+  console.log("Wallet:", wallet.publicKey.toBase58());
+
+  const quote = await getQuote();
+  console.dir(quote, { depth: null });
+  const swapResponse = await getSwapInstructionsResponse(wallet, quote);
+  console.dir(swapResponse, { depth: null });
+
+}
+
 export async function main() {
   switch (process.env.FLOW) {
     case "quote": {
@@ -134,6 +163,11 @@ export async function main() {
 
     case "quoteAndSwap": {
       await flowQuoteAndSwap();
+      break;
+    }
+
+    case "quoteAndSwapInstructions": {
+      await flowQuoteAndSwapInstructions();
       break;
     }
 

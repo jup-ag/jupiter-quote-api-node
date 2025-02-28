@@ -2,6 +2,7 @@ apis/SwapApi.ts
 apis/index.ts
 index.ts
 models/AccountMeta.ts
+models/BlockhashWithMetadata.ts
 models/IndexedRouteMapResponse.ts
 models/Instruction.ts
 models/PlatformFee.ts
@@ -9,6 +10,7 @@ models/QuoteResponse.ts
 models/RoutePlanStep.ts
 models/SwapInfo.ts
 models/SwapInstructionsResponse.ts
+models/SwapInstructionsResponsePrioritizationType.ts
 models/SwapMode.ts
 models/SwapRequest.ts
 models/SwapRequestPrioritizationFeeLamports.ts
