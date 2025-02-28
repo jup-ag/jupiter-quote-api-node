@@ -401,12 +401,33 @@ components:
           type: array
           items:
             type: string
+        otherInstructions:
+          description: The other instructions to be used in the swap transaction.
+          type: array
+          items:
+            $ref: '#/components/schemas/Instruction'
+        computeUnitLimit:
+          type: integer
+        prioritizationType:
+          type: object
+          description: The type of prioritization used for the swap, either Jito or ComputeBudget.
+          properties:
+            jito:
+              type: object
+        prioritizationFeeLamports:
+          type: integer
+        blockhashWithMetadata:
+          $ref: '#/components/schemas/BlockhashWithMetadata'
       required:
         - computeBudgetInstructions
         - otherInstructions
         - setupInstructions
         - swapInstruction
         - addressLookupTableAddresses
+        - computeUnitLimit
+        - prioritizationType
+        - prioritizationFeeLamports
+        - blockhashWithMetadata
 
     IndexedRouteMapResponse:
       type: object
@@ -435,6 +456,24 @@ components:
               - 1
               - 3
               - 4
+
+    BlockhashWithMetadata:
+      type: object
+      required:
+        - blockhash
+        - lastValidBlockHeight
+        - fetchedAt
+      properties:
+        blockhash:
+          type: string
+          description: The blockhash as a base58 encoded string
+        lastValidBlockHeight:
+          type: integer
+          format: uint64
+          description: The last block height at which this blockhash will be valid
+        fetchedAt:
+          type: number
+          description: The timestamp when this blockhash was fetched
 
   parameters:
     InputMintParameter:
