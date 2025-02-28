@@ -13,3 +13,6 @@ export * from './SwapRequest';
 export * from './SwapRequestPrioritizationFeeLamports';
 export * from './SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamports';
 export * from './SwapResponse';
+export * from './SwapResponsePrioritizationType';
+export * from './SwapResponsePrioritizationTypeComputeBudget';
+export * from './SwapResponsePrioritizationTypeJito';

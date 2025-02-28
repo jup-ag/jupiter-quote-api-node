@@ -353,9 +353,25 @@ components:
         swapTransaction:
           type: string
         lastValidBlockHeight:
-          type: integer
+          type: number
         prioritizationFeeLamports:
-          type: integer
+          type: number
+        prioritizationType:
+          type: object
+          description: The type of prioritization used for the swap, either Jito or ComputeBudget.
+          properties:
+            jito:
+              type: object
+              properties:
+                lamports:
+                  type: integer
+            computeBudget:
+              type: object
+              properties:
+                estimatedMicroLamports:
+                  type: integer
+                microLamports:
+                  type: integer
 
       required:
         - swapTransaction
@@ -364,9 +380,6 @@ components:
     SwapInstructionsResponse:
       type: object
       properties:
-        otherInstructions:
-          description: "If you set `{\"prioritizationFeeLamports\": {\"jitoTipLamports\": 5000}}`, you will see a custom tip instruction to Jito here."
-          $ref: '#/components/schemas/Instruction'
         computeBudgetInstructions:
           description: The necessary instructions to setup the compute budget.
           type: array

@@ -27,12 +27,6 @@ import {
  */
 export interface SwapInstructionsResponse {
     /**
-     * 
-     * @type {Instruction}
-     * @memberof SwapInstructionsResponse
-     */
-    otherInstructions: Instruction;
-    /**
      * The necessary instructions to setup the compute budget.
      * @type {Array<Instruction>}
      * @memberof SwapInstructionsResponse
@@ -69,7 +63,6 @@ export interface SwapInstructionsResponse {
  */
 export function instanceOfSwapInstructionsResponse(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "otherInstructions" in value;
     isInstance = isInstance && "computeBudgetInstructions" in value;
     isInstance = isInstance && "setupInstructions" in value;
     isInstance = isInstance && "swapInstruction" in value;
@@ -88,7 +81,6 @@ export function SwapInstructionsResponseFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'otherInstructions': InstructionFromJSON(json['otherInstructions']),
         'computeBudgetInstructions': ((json['computeBudgetInstructions'] as Array<any>).map(InstructionFromJSON)),
         'setupInstructions': ((json['setupInstructions'] as Array<any>).map(InstructionFromJSON)),
         'swapInstruction': InstructionFromJSON(json['swapInstruction']),
@@ -106,7 +98,6 @@ export function SwapInstructionsResponseToJSON(value?: SwapInstructionsResponse 
     }
     return {
         
-        'otherInstructions': InstructionToJSON(value.otherInstructions),
         'computeBudgetInstructions': ((value.computeBudgetInstructions as Array<any>).map(InstructionToJSON)),
         'setupInstructions': ((value.setupInstructions as Array<any>).map(InstructionToJSON)),
         'swapInstruction': InstructionToJSON(value.swapInstruction),

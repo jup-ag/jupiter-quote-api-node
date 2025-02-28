@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/SwapApi.ts
 apis/index.ts
 index.ts
@@ -15,5 +14,8 @@ models/SwapRequest.ts
 models/SwapRequestPrioritizationFeeLamports.ts
 models/SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamports.ts
 models/SwapResponse.ts
+models/SwapResponsePrioritizationType.ts
+models/SwapResponsePrioritizationTypeComputeBudget.ts
+models/SwapResponsePrioritizationTypeJito.ts
 models/index.ts
 runtime.ts
