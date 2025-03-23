@@ -48,7 +48,7 @@ export interface SwapRequest {
      */
     wrapAndUnwrapSol?: boolean;
     /**
-     * - The default is determined dynamically by the routing engine, allowing us to optiimze for compute units, etc
+     * - The default is determined dynamically by the routing engine, allowing us to optimize for compute units, etc
      * - This enables the usage of shared program accounts, this is essential as complex routing will require multiple intermediate token accounts which the user might not have
      * - If true, you do not need to handle the creation of intermediate token accounts for the user
      * - Do note, shared accounts route will fail on some new AMMs (low liquidity token)
@@ -135,13 +135,13 @@ export interface SwapRequest {
      */
     computeUnitPriceMicroLamports?: number;
     /**
-     * - To customize the blockhash expiry
-     * type: integer
+     * - Pass in the number of slots we want the transaction to be valid for
+     * - Example: If you pass in 10 slots, the transaction will be valid for ~400ms * 10 = approximately 4 seconds before it expires
      * 
-     * @type {any}
+     * @type {number}
      * @memberof SwapRequest
      */
-    blockhashSlotsToExpiry?: any | null;
+    blockhashSlotsToExpiry?: number;
     /**
      * 
      * @type {QuoteResponse}

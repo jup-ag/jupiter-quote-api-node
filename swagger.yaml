@@ -272,7 +272,7 @@ components:
           default: true
         useSharedAccounts:
           description: |
-            - The default is determined dynamically by the routing engine, allowing us to optiimze for compute units, etc
+            - The default is determined dynamically by the routing engine, allowing us to optimize for compute units, etc
             - This enables the usage of shared program accounts, this is essential as complex routing will require multiple intermediate token accounts which the user might not have
             - If true, you do not need to handle the creation of intermediate token accounts for the user
             - Do note, shared accounts route will fail on some new AMMs (low liquidity token)
@@ -357,8 +357,9 @@ components:
           type: integer
         blockhashSlotsToExpiry:
           description: |
-            - To customize the blockhash expiry
-            type: integer
+            - Pass in the number of slots we want the transaction to be valid for
+            - Example: If you pass in 10 slots, the transaction will be valid for ~400ms * 10 = approximately 4 seconds before it expires
+          type: integer
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
 
@@ -476,7 +477,9 @@ components:
       name: swapMode
       description: |
         - ExactOut is for supporting use cases where you need an exact output amount, like https://station.jup.ag/docs/swap-api/payments-through-swap
-        - In this case the slippage is on the input token.
+        - In the case of `ExactIn`, the slippage is on the output token
+        - In the case of `ExactOut`, the slippage is on the input token
+        - Not all AMMs support `ExactOut`
       in: query
       schema:
         type: string
