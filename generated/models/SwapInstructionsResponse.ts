@@ -13,24 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { BlockhashWithMetadata } from './BlockhashWithMetadata';
-import {
-    BlockhashWithMetadataFromJSON,
-    BlockhashWithMetadataFromJSONTyped,
-    BlockhashWithMetadataToJSON,
-} from './BlockhashWithMetadata';
 import type { Instruction } from './Instruction';
 import {
     InstructionFromJSON,
     InstructionFromJSONTyped,
     InstructionToJSON,
 } from './Instruction';
-import type { SwapInstructionsResponsePrioritizationType } from './SwapInstructionsResponsePrioritizationType';
-import {
-    SwapInstructionsResponsePrioritizationTypeFromJSON,
-    SwapInstructionsResponsePrioritizationTypeFromJSONTyped,
-    SwapInstructionsResponsePrioritizationTypeToJSON,
-} from './SwapInstructionsResponsePrioritizationType';
 
 /**
  * 
@@ -39,13 +27,22 @@ import {
  */
 export interface SwapInstructionsResponse {
     /**
-     * The necessary instructions to setup the compute budget.
+     * - If you set `{\"prioritizationFeeLamports\": {\"jitoTipLamports\": 5000}}`, you will see a custom tip instruction to Jito here.
+     * 
+     * @type {Array<Instruction>}
+     * @memberof SwapInstructionsResponse
+     */
+    otherInstructions?: Array<Instruction>;
+    /**
+     * - To setup the compute budget for the transaction.
+     * 
      * @type {Array<Instruction>}
      * @memberof SwapInstructionsResponse
      */
     computeBudgetInstructions: Array<Instruction>;
     /**
-     * Setup missing ATA for the users.
+     * - To setup required token accounts for the users.
+     * 
      * @type {Array<Instruction>}
      * @memberof SwapInstructionsResponse
      */
@@ -63,41 +60,12 @@ export interface SwapInstructionsResponse {
      */
     cleanupInstruction?: Instruction;
     /**
-     * The lookup table addresses that you can use if you are using versioned transaction.
+     * - The lookup table addresses if you are using versioned transaction.
+     * 
      * @type {Array<string>}
      * @memberof SwapInstructionsResponse
      */
     addressLookupTableAddresses: Array<string>;
-    /**
-     * The other instructions to be used in the swap transaction.
-     * @type {Array<Instruction>}
-     * @memberof SwapInstructionsResponse
-     */
-    otherInstructions: Array<Instruction>;
-    /**
-     * 
-     * @type {number}
-     * @memberof SwapInstructionsResponse
-     */
-    computeUnitLimit: number;
-    /**
-     * 
-     * @type {SwapInstructionsResponsePrioritizationType}
-     * @memberof SwapInstructionsResponse
-     */
-    prioritizationType: SwapInstructionsResponsePrioritizationType;
-    /**
-     * 
-     * @type {number}
-     * @memberof SwapInstructionsResponse
-     */
-    prioritizationFeeLamports: number;
-    /**
-     * 
-     * @type {BlockhashWithMetadata}
-     * @memberof SwapInstructionsResponse
-     */
-    blockhashWithMetadata: BlockhashWithMetadata;
 }
 
 /**
@@ -109,11 +77,6 @@ export function instanceOfSwapInstructionsResponse(value: object): boolean {
     isInstance = isInstance && "setupInstructions" in value;
     isInstance = isInstance && "swapInstruction" in value;
     isInstance = isInstance && "addressLookupTableAddresses" in value;
-    isInstance = isInstance && "otherInstructions" in value;
-    isInstance = isInstance && "computeUnitLimit" in value;
-    isInstance = isInstance && "prioritizationType" in value;
-    isInstance = isInstance && "prioritizationFeeLamports" in value;
-    isInstance = isInstance && "blockhashWithMetadata" in value;
 
     return isInstance;
 }
@@ -128,16 +91,12 @@ export function SwapInstructionsResponseFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
+        'otherInstructions': !exists(json, 'otherInstructions') ? undefined : ((json['otherInstructions'] as Array<any>).map(InstructionFromJSON)),
         'computeBudgetInstructions': ((json['computeBudgetInstructions'] as Array<any>).map(InstructionFromJSON)),
         'setupInstructions': ((json['setupInstructions'] as Array<any>).map(InstructionFromJSON)),
         'swapInstruction': InstructionFromJSON(json['swapInstruction']),
         'cleanupInstruction': !exists(json, 'cleanupInstruction') ? undefined : InstructionFromJSON(json['cleanupInstruction']),
         'addressLookupTableAddresses': json['addressLookupTableAddresses'],
-        'otherInstructions': ((json['otherInstructions'] as Array<any>).map(InstructionFromJSON)),
-        'computeUnitLimit': json['computeUnitLimit'],
-        'prioritizationType': SwapInstructionsResponsePrioritizationTypeFromJSON(json['prioritizationType']),
-        'prioritizationFeeLamports': json['prioritizationFeeLamports'],
-        'blockhashWithMetadata': BlockhashWithMetadataFromJSON(json['blockhashWithMetadata']),
     };
 }
 
@@ -150,16 +109,12 @@ export function SwapInstructionsResponseToJSON(value?: SwapInstructionsResponse 
     }
     return {
         
+        'otherInstructions': value.otherInstructions === undefined ? undefined : ((value.otherInstructions as Array<any>).map(InstructionToJSON)),
         'computeBudgetInstructions': ((value.computeBudgetInstructions as Array<any>).map(InstructionToJSON)),
         'setupInstructions': ((value.setupInstructions as Array<any>).map(InstructionToJSON)),
         'swapInstruction': InstructionToJSON(value.swapInstruction),
         'cleanupInstruction': InstructionToJSON(value.cleanupInstruction),
         'addressLookupTableAddresses': value.addressLookupTableAddresses,
-        'otherInstructions': ((value.otherInstructions as Array<any>).map(InstructionToJSON)),
-        'computeUnitLimit': value.computeUnitLimit,
-        'prioritizationType': SwapInstructionsResponsePrioritizationTypeToJSON(value.prioritizationType),
-        'prioritizationFeeLamports': value.prioritizationFeeLamports,
-        'blockhashWithMetadata': BlockhashWithMetadataToJSON(value.blockhashWithMetadata),
     };
 }
 

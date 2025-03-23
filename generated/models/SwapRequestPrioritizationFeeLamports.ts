@@ -22,8 +22,9 @@ import {
 
 /**
  * - To specify a level or amount of additional fees to prioritize the transaction
- * - It can be used for EITHER priority fee OR Jito tip
+ * - It can be used for EITHER priority fee OR Jito tip (not both at the same time)
  * - If you want to include both, you will need to use `/swap-instructions` to add both at the same time
+ * 
  * @export
  * @interface SwapRequestPrioritizationFeeLamports
  */
@@ -36,9 +37,10 @@ export interface SwapRequestPrioritizationFeeLamports {
     priorityLevelWithMaxLamports?: SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamports;
     /**
      * - Exact amount of tip to use in a tip instruction
-     * - Estimate how much to set using Jito tip percentiles endpoint
+     * - Refer to Jito docs on how to estimate the tip amount based on percentiles
      * - It has to be used together with a connection to a Jito RPC
      * - [See their docs](https://docs.jito.wtf/)
+     * 
      * @type {number}
      * @memberof SwapRequestPrioritizationFeeLamports
      */

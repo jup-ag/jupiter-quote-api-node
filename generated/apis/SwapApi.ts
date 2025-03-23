@@ -17,7 +17,6 @@ import * as runtime from '../runtime';
 import type {
   QuoteResponse,
   SwapInstructionsResponse,
-  SwapMode,
   SwapRequest,
   SwapResponse,
 } from '../models/index';
@@ -26,8 +25,6 @@ import {
     QuoteResponseToJSON,
     SwapInstructionsResponseFromJSON,
     SwapInstructionsResponseToJSON,
-    SwapModeFromJSON,
-    SwapModeToJSON,
     SwapRequestFromJSON,
     SwapRequestToJSON,
     SwapResponseFromJSON,
@@ -39,7 +36,7 @@ export interface QuoteGetRequest {
     outputMint: string;
     amount: number;
     slippageBps?: number;
-    swapMode?: SwapMode;
+    swapMode?: QuoteGetSwapModeEnum;
     dexes?: Array<string>;
     excludeDexes?: Array<string>;
     restrictIntermediateTokens?: boolean;
@@ -47,6 +44,7 @@ export interface QuoteGetRequest {
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
     maxAccounts?: number;
+    dynamicSlippage?: boolean;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -63,8 +61,7 @@ export interface SwapPostRequest {
 export class SwapApi extends runtime.BaseAPI {
 
     /**
-     * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
-     * program-id-to-label
+     * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. This can be used in conjunction with the `excludeDexes` or `dexes` parameter. 
      */
     async programIdToLabelGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: string; }>> {
         const queryParameters: any = {};
@@ -72,7 +69,7 @@ export class SwapApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/program-id-to-label`,
+            path: `/swap/v1/program-id-to-label`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -82,8 +79,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. With that, we can use the `excludeDexes` or `dexes` parameter.
-     * program-id-to-label
+     * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. This can be used in conjunction with the `excludeDexes` or `dexes` parameter. 
      */
     async programIdToLabelGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: string; }> {
         const response = await this.programIdToLabelGetRaw(initOverrides);
@@ -91,7 +87,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Retrieve a quote to be used in `POST /swap`.  Refer to https://station.jup.ag/docs/swap-api/get-quote for more information.
+     * Request for a quote to be used in `POST /swap`  :::note Refer to https://station.jup.ag/docs/swap-api/get-quote for more information ::: 
      * quote
      */
     async quoteGetRaw(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<QuoteResponse>> {
@@ -157,10 +153,14 @@ export class SwapApi extends runtime.BaseAPI {
             queryParameters['maxAccounts'] = requestParameters.maxAccounts;
         }
 
+        if (requestParameters.dynamicSlippage !== undefined) {
+            queryParameters['dynamicSlippage'] = requestParameters.dynamicSlippage;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/quote`,
+            path: `/swap/v1/quote`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -170,7 +170,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Retrieve a quote to be used in `POST /swap`.  Refer to https://station.jup.ag/docs/swap-api/get-quote for more information.
+     * Request for a quote to be used in `POST /swap`  :::note Refer to https://station.jup.ag/docs/swap-api/get-quote for more information ::: 
      * quote
      */
     async quoteGet(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QuoteResponse> {
@@ -179,7 +179,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns instructions that you can use from the quote you get from `/quote`.  Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions for more information.
+     * Request for swap instructions that you can use from the quote you get from `/quote`  :::note Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions for more information ::: 
      * swap-instructions
      */
     async swapInstructionsPostRaw(requestParameters: SwapInstructionsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SwapInstructionsResponse>> {
@@ -194,7 +194,7 @@ export class SwapApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/swap-instructions`,
+            path: `/swap/v1/swap-instructions`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -205,7 +205,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns instructions that you can use from the quote you get from `/quote`.  Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions for more information.
+     * Request for swap instructions that you can use from the quote you get from `/quote`  :::note Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions for more information ::: 
      * swap-instructions
      */
     async swapInstructionsPost(requestParameters: SwapInstructionsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SwapInstructionsResponse> {
@@ -214,8 +214,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a transaction that you can use from the quote you get from `/quote`.  Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction for more information.
-     * swap
+     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response  :::note Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction for more information ::: 
      */
     async swapPostRaw(requestParameters: SwapPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SwapResponse>> {
         if (requestParameters.swapRequest === null || requestParameters.swapRequest === undefined) {
@@ -229,7 +228,7 @@ export class SwapApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/swap`,
+            path: `/swap/v1/swap`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -240,8 +239,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Returns a transaction that you can use from the quote you get from `/quote`.  Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction for more information.
-     * swap
+     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response  :::note Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction for more information ::: 
      */
     async swapPost(requestParameters: SwapPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SwapResponse> {
         const response = await this.swapPostRaw(requestParameters, initOverrides);
@@ -249,3 +247,12 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
 }
+
+/**
+ * @export
+ */
+export const QuoteGetSwapModeEnum = {
+    ExactIn: 'ExactIn',
+    ExactOut: 'ExactOut'
+} as const;
+export type QuoteGetSwapModeEnum = typeof QuoteGetSwapModeEnum[keyof typeof QuoteGetSwapModeEnum];

@@ -13,13 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { SwapResponsePrioritizationType } from './SwapResponsePrioritizationType';
-import {
-    SwapResponsePrioritizationTypeFromJSON,
-    SwapResponsePrioritizationTypeFromJSONTyped,
-    SwapResponsePrioritizationTypeToJSON,
-} from './SwapResponsePrioritizationType';
-
 /**
  * 
  * @export
@@ -44,12 +37,6 @@ export interface SwapResponse {
      * @memberof SwapResponse
      */
     prioritizationFeeLamports?: number;
-    /**
-     * 
-     * @type {SwapResponsePrioritizationType}
-     * @memberof SwapResponse
-     */
-    prioritizationType?: SwapResponsePrioritizationType;
 }
 
 /**
@@ -76,7 +63,6 @@ export function SwapResponseFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'swapTransaction': json['swapTransaction'],
         'lastValidBlockHeight': json['lastValidBlockHeight'],
         'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : json['prioritizationFeeLamports'],
-        'prioritizationType': !exists(json, 'prioritizationType') ? undefined : SwapResponsePrioritizationTypeFromJSON(json['prioritizationType']),
     };
 }
 
@@ -92,7 +78,6 @@ export function SwapResponseToJSON(value?: SwapResponse | null): any {
         'swapTransaction': value.swapTransaction,
         'lastValidBlockHeight': value.lastValidBlockHeight,
         'prioritizationFeeLamports': value.prioritizationFeeLamports,
-        'prioritizationType': SwapResponsePrioritizationTypeToJSON(value.prioritizationType),
     };
 }
 

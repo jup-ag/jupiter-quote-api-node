@@ -20,18 +20,31 @@ import { exists, mapValues } from '../runtime';
  */
 export interface SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamports {
     /**
-     * Either `medium`, `high` or `veryHigh`
+     * 
      * @type {string}
      * @memberof SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamports
      */
-    priorityLevel?: string;
+    priorityLevel?: SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamportsPriorityLevelEnum;
     /**
-     * Maximum lamports to cap the priority fee estimation, to prevent overpaying
+     * - Maximum lamports to cap the priority fee estimation, to prevent overpaying
+     * 
      * @type {number}
      * @memberof SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamports
      */
     maxLamports?: number;
 }
+
+
+/**
+ * @export
+ */
+export const SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamportsPriorityLevelEnum = {
+    Medium: 'medium',
+    High: 'high',
+    VeryHigh: 'veryHigh'
+} as const;
+export type SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamportsPriorityLevelEnum = typeof SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamportsPriorityLevelEnum[keyof typeof SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamportsPriorityLevelEnum];
+
 
 /**
  * Check if a given object implements the SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamports interface.
