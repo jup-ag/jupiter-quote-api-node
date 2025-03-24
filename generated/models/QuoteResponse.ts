@@ -57,15 +57,17 @@ export interface QuoteResponse {
      */
     outputMint: string;
     /**
-     * - Calculated output amount from routing algorithm
-     * - Exlcuding network fees, slippage or platform fees
+     * - Calculated output amount from routing engine
+     * - Exlcuding slippage or platform fees
+     * 
      * @type {string}
      * @memberof QuoteResponse
      */
     outAmount: string;
     /**
      * - Calculated minimum output amount after accounting for `slippageBps` and `platformFeeBps`
-     * - Not used by build transaction
+     * - Not used by `/swap` endpoint to build transaction
+     * 
      * @type {string}
      * @memberof QuoteResponse
      */
@@ -107,7 +109,7 @@ export interface QuoteResponse {
      */
     contextSlot?: number;
     /**
-     * Time taken to determine quote
+     * 
      * @type {number}
      * @memberof QuoteResponse
      */

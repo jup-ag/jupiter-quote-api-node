@@ -27,19 +27,22 @@ import {
  */
 export interface SwapInstructionsResponse {
     /**
+     * - If you set `{\"prioritizationFeeLamports\": {\"jitoTipLamports\": 5000}}`, you will see a custom tip instruction to Jito here.
      * 
-     * @type {Instruction}
+     * @type {Array<Instruction>}
      * @memberof SwapInstructionsResponse
      */
-    otherInstructions: Instruction;
+    otherInstructions?: Array<Instruction>;
     /**
-     * The necessary instructions to setup the compute budget.
+     * - To setup the compute budget for the transaction.
+     * 
      * @type {Array<Instruction>}
      * @memberof SwapInstructionsResponse
      */
     computeBudgetInstructions: Array<Instruction>;
     /**
-     * Setup missing ATA for the users.
+     * - To setup required token accounts for the users.
+     * 
      * @type {Array<Instruction>}
      * @memberof SwapInstructionsResponse
      */
@@ -57,7 +60,8 @@ export interface SwapInstructionsResponse {
      */
     cleanupInstruction?: Instruction;
     /**
-     * The lookup table addresses that you can use if you are using versioned transaction.
+     * - The lookup table addresses if you are using versioned transaction.
+     * 
      * @type {Array<string>}
      * @memberof SwapInstructionsResponse
      */
@@ -69,7 +73,6 @@ export interface SwapInstructionsResponse {
  */
 export function instanceOfSwapInstructionsResponse(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "otherInstructions" in value;
     isInstance = isInstance && "computeBudgetInstructions" in value;
     isInstance = isInstance && "setupInstructions" in value;
     isInstance = isInstance && "swapInstruction" in value;
@@ -88,7 +91,7 @@ export function SwapInstructionsResponseFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'otherInstructions': InstructionFromJSON(json['otherInstructions']),
+        'otherInstructions': !exists(json, 'otherInstructions') ? undefined : ((json['otherInstructions'] as Array<any>).map(InstructionFromJSON)),
         'computeBudgetInstructions': ((json['computeBudgetInstructions'] as Array<any>).map(InstructionFromJSON)),
         'setupInstructions': ((json['setupInstructions'] as Array<any>).map(InstructionFromJSON)),
         'swapInstruction': InstructionFromJSON(json['swapInstruction']),
@@ -106,7 +109,7 @@ export function SwapInstructionsResponseToJSON(value?: SwapInstructionsResponse 
     }
     return {
         
-        'otherInstructions': InstructionToJSON(value.otherInstructions),
+        'otherInstructions': value.otherInstructions === undefined ? undefined : ((value.otherInstructions as Array<any>).map(InstructionToJSON)),
         'computeBudgetInstructions': ((value.computeBudgetInstructions as Array<any>).map(InstructionToJSON)),
         'setupInstructions': ((value.setupInstructions as Array<any>).map(InstructionToJSON)),
         'swapInstruction': InstructionToJSON(value.swapInstruction),

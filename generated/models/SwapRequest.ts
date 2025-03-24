@@ -33,32 +33,36 @@ import {
  */
 export interface SwapRequest {
     /**
-     * The user public key
+     * 
      * @type {string}
      * @memberof SwapRequest
      */
     userPublicKey: string;
     /**
-     * Default: true
      * - To automatically wrap/unwrap SOL in the transaction
      * - If false, it will use wSOL token account
      * - Parameter will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close
+     * 
      * @type {boolean}
      * @memberof SwapRequest
      */
     wrapAndUnwrapSol?: boolean;
     /**
-     * Default: true
+     * - The default is determined dynamically by the routing engine, allowing us to optimize for compute units, etc
      * - This enables the usage of shared program accounts, this is essential as complex routing will require multiple intermediate token accounts which the user might not have
-     * - If true, you do not need to handle the creation of intermediate token accounts for the user.
+     * - If true, you do not need to handle the creation of intermediate token accounts for the user
+     * - Do note, shared accounts route will fail on some new AMMs (low liquidity token)
+     * 
      * @type {boolean}
      * @memberof SwapRequest
      */
     useSharedAccounts?: boolean;
     /**
-     * - An Associated Token Address (ATA) of specific mints depending on `SwapMode` to collect fees
-     * - You no longer need the Referral Program
+     * - An token account that will be used to collect fees
+     * - The mint of the token account **can only be either the input or output mint of the swap**
+     * - You no longer are required to use the Referral Program
      * - See [Add Fees](/docs/swap-api/add-fees-to-swap) guide for more details
+     * 
      * @type {string}
      * @memberof SwapRequest
      */
@@ -67,6 +71,7 @@ export interface SwapRequest {
      * - Specify any public key that belongs to you to track the transactions
      * - Useful for integrators to get all the swap transactions from this public key
      * - Query the data using a block explorer like Solscan/SolanaFM or query like Dune/Flipside
+     * 
      * @type {string}
      * @memberof SwapRequest
      */
@@ -78,54 +83,65 @@ export interface SwapRequest {
      */
     prioritizationFeeLamports?: SwapRequestPrioritizationFeeLamports;
     /**
-     * Default: false
-     * - Request a legacy transaction rather than the default versioned transaction
-     * - Used together with `asLegacyTransaction` in /quote, otherwise the transaction might be too large
+     * - Builds a legacy transaction rather than the default versioned transaction
+     * - Used together with `asLegacyTransaction` in `/quote`, otherwise the transaction might be too large
+     * 
      * @type {boolean}
      * @memberof SwapRequest
      */
     asLegacyTransaction?: boolean;
     /**
      * - Public key of a token account that will be used to receive the token out of the swap
-     * - If not provided, the signer's ATA will be used
+     * - If not provided, the signer's token account will be used
      * - If provided, we assume that the token account is already initialized
+     * 
      * @type {string}
      * @memberof SwapRequest
      */
     destinationTokenAccount?: string;
     /**
-     * Default: false
      * - When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit
-     * - This will increase latency slightly since there will be one extra RPC call to simulate this
-     * - This can be useful to estimate compute unit correctly and reduce priority fees needed or have higher chance to be included in a block
+     * - This incurs one extra RPC call to simulate this
+     * - We recommend to enable this to estimate compute unit correctly and reduce priority fees needed or have higher chance to be included in a block
+     * 
      * @type {boolean}
      * @memberof SwapRequest
      */
     dynamicComputeUnitLimit?: boolean;
     /**
-     * Default: false
-     * - When enabled, it will not do any additional RPC calls to check on user's accounts
+     * - When enabled, it will not do any additional RPC calls to check on required accounts
      * - Enable it only when you already setup all the accounts needed for the trasaction, like wrapping or unwrapping sol, or destination account is already created
+     * 
      * @type {boolean}
      * @memberof SwapRequest
      */
     skipUserAccountsRpcCalls?: boolean;
     /**
-     * Default: false
-     * - When enabled, it estimate slippage and apply it in the swap transaction directly, overwriting the `slippageBps` parameter in the quote response.
+     * - When enabled, it estimates slippage and apply it in the swap transaction directly, overwriting the `slippageBps` parameter in the quote response.
+     * - Used together with `dynamicSlippage` in `/quote`, otherwise the slippage used will be the one in the `/quote`'s `slippageBps`
      * - [See notes for more information](/docs/swap-api/send-swap-transaction#how-jupiter-estimates-slippage)
+     * 
      * @type {boolean}
      * @memberof SwapRequest
      */
     dynamicSlippage?: boolean;
     /**
-     * - To specify a compute unit price to calculate priority fee
+     * - To use an exact compute unit price to calculate priority fee
      * - `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`
-     * - **We recommend using `prioritizationFeeLamports` and `dynamicComputeUnitLimit` instead of passing in a compute unit price**
+     * - We recommend using `prioritizationFeeLamports` and `dynamicComputeUnitLimit` instead of passing in your own compute unit price
+     * 
      * @type {number}
      * @memberof SwapRequest
      */
     computeUnitPriceMicroLamports?: number;
+    /**
+     * - Pass in the number of slots we want the transaction to be valid for
+     * - Example: If you pass in 10 slots, the transaction will be valid for ~400ms * 10 = approximately 4 seconds before it expires
+     * 
+     * @type {number}
+     * @memberof SwapRequest
+     */
+    blockhashSlotsToExpiry?: number;
     /**
      * 
      * @type {QuoteResponse}
@@ -167,6 +183,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
         'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : json['dynamicSlippage'],
         'computeUnitPriceMicroLamports': !exists(json, 'computeUnitPriceMicroLamports') ? undefined : json['computeUnitPriceMicroLamports'],
+        'blockhashSlotsToExpiry': !exists(json, 'blockhashSlotsToExpiry') ? undefined : json['blockhashSlotsToExpiry'],
         'quoteResponse': QuoteResponseFromJSON(json['quoteResponse']),
     };
 }
@@ -192,6 +209,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,
         'dynamicSlippage': value.dynamicSlippage,
         'computeUnitPriceMicroLamports': value.computeUnitPriceMicroLamports,
+        'blockhashSlotsToExpiry': value.blockhashSlotsToExpiry,
         'quoteResponse': QuoteResponseToJSON(value.quoteResponse),
     };
 }
