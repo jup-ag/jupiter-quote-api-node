@@ -21,7 +21,7 @@ npm install @jup-ag/api
   - just get a quote, without needing wallet
 - pnpm dev-swap
   - get a quote, perform swap
-  - please setup `process.env.PRIVATE_KEY`
+  - please setup `process.env.PRIVATE_KEY` and `process.env.API_KEY`
 
 Refer to Station developer documentation for more inforamtion and tips: https://station.jup.ag/docs/
 
