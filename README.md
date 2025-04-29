@@ -23,7 +23,9 @@ npm install @jup-ag/api
   - get a quote, perform swap
   - please setup `process.env.PRIVATE_KEY` and `process.env.API_KEY` if you have a Pro plan.
 
-Refer to Station developer documentation for more inforamtion and tips: https://station.jup.ag/docs/
+Refer to Station developer documentation for more information and tips:
+- Swap API: https://dev.jup.ag/docs/swap-api
+- API Key setup: https://dev.jup.ag/docs/api-setup
 
 ## Usage
 
