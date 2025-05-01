@@ -21,6 +21,7 @@ npm install @jup-ag/api
   - Get request a quote based on mints and amount
 - pnpm dev-swap
   - Post request with the quote response to receive the swap transaction to sign and send to the network
+  - Ensure you have setup `process.env.PRIVATE_KEY` to sign
  
 - Please set up `process.env.API_KEY` if you have a Pro plan via https://portal.jup.ag/
 
