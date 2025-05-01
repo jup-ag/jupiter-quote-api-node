@@ -18,12 +18,13 @@ npm install @jup-ag/api
 ## Developing
 
 - pnpm dev-quote
-  - just get a quote, without needing wallet
+  - Get request a quote based on mints and amount
 - pnpm dev-swap
-  - get a quote, perform swap
-  - please setup `process.env.PRIVATE_KEY` and `process.env.API_KEY` if you have a Pro plan.
+  - Post request with the quote response to receive the swap transaction to sign and send to the network
+ 
+- Please set up `process.env.API_KEY` if you have a Pro plan via https://portal.jup.ag/
 
-Refer to Station developer documentation for more information and tips:
+Refer to our developer documentation for more information and tips:
 - Swap API: https://dev.jup.ag/docs/swap-api
 - API Key setup: https://dev.jup.ag/docs/api-setup
 
