@@ -20,7 +20,7 @@ dotenv.config();
 const connection = new Connection(
   "https://api.mainnet-beta.solana.com" // We only support mainnet.
 );
-const jupiterQuoteApi = createJupiterApiClient();
+const jupiterQuoteApi = createJupiterApiClient({ apiKey: process.env.API_KEY });
 
 async function getQuote() {
   const params: QuoteGetRequest = {
