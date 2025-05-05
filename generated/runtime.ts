@@ -22,21 +22,34 @@ export interface ConfigurationParameters {
     queryParamsStringify?: (params: HTTPQuery) => string; // stringify function for query strings
     username?: string; // parameter for basic security
     password?: string; // parameter for basic security
-    apiKey?: string | Promise<string> | ((name: string) => string | Promise<string>); // parameter for apiKey security
+    apiKey?: string; // parameter for apiKey security
     accessToken?: string | Promise<string> | ((name?: string, scopes?: string[]) => string | Promise<string>); // parameter for oauth2 security
     headers?: HTTPHeaders; //header params we want to use on every request
     credentials?: RequestCredentials; //value for the credentials param we want to use on each request
 }
 
 export class Configuration {
-    constructor(private configuration: ConfigurationParameters = {}) {}
+    constructor(private configuration: ConfigurationParameters = {}) {
+        if (configuration.apiKey) {
+            if (!this.configuration.headers) {
+                this.configuration.headers = {};
+            }
+            this.configuration.headers["x-api-key"] = configuration.apiKey;
+        }
+    }
 
     set config(configuration: Configuration) {
         this.configuration = configuration;
     }
 
     get basePath(): string {
-        return this.configuration.basePath != null ? this.configuration.basePath : BASE_PATH;
+        if (this.configuration.basePath != null) {
+            return this.configuration.basePath;
+        }
+        if (!this.configuration.apiKey) {
+            return LITE_BASE_PATH;
+        }
+        return BASE_PATH;
     }
 
     get fetchApi(): FetchAPI | undefined {
@@ -59,10 +72,10 @@ export class Configuration {
         return this.configuration.password;
     }
 
-    get apiKey(): ((name: string) => string | Promise<string>) | undefined {
+    get apiKey(): string | undefined {
         const apiKey = this.configuration.apiKey;
         if (apiKey) {
-            return typeof apiKey === 'function' ? apiKey : () => apiKey;
+            return apiKey;
         }
         return undefined;
     }

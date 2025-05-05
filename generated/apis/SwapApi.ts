@@ -70,7 +70,7 @@ export class SwapApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/program-id-to-label`,
+            path: `/swap/v1/program-id-to-label`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -162,7 +162,7 @@ export class SwapApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/quote`,
+            path: `/swap/v1/quote`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -196,7 +196,7 @@ export class SwapApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/swap-instructions`,
+            path: `/swap/v1/swap-instructions`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -231,7 +231,7 @@ export class SwapApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/swap`,
+            path: `/swap/v1/swap`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
