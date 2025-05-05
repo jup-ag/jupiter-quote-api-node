@@ -16,7 +16,10 @@ info:
     - Raw data such as Vec<u8\> are base64 encoded strings
 
 servers:
+  - url: https://lite-api.jup.ag/swap/v1
+    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/swap/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
   /quote:
