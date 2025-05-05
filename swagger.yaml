@@ -22,7 +22,7 @@ servers:
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
-  /swap/v1/quote:
+  /quote:
     get:
       operationId: QuoteGet
       tags:
@@ -55,7 +55,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuoteResponse'
-  /swap/v1/swap:
+  /swap:
     post:
       operationId: SwapPost
       tags:
@@ -80,7 +80,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwapResponse'
-  /swap/v1/swap-instructions:
+  /swap-instructions:
     post:
       operationId: SwapInstructionsPost
       tags:
@@ -105,7 +105,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwapInstructionsResponse'
-  /swap/v1/program-id-to-label:
+  /program-id-to-label:
     get:
       operationId: ProgramIdToLabelGet
       tags:
