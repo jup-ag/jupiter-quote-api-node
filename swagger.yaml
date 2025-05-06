@@ -6,7 +6,7 @@ info:
     The heart and soul of Jupiter lies in the Quote and Swap API.
 
     ### API Rate Limit
-    Since 1 December 2024, we have updated our API structure. Please refer to [Station](https://station.jup.ag/docs/) for further details on usage and rate limits.
+    Since 1 December 2024, we have updated our API structure. Please refer to [Developer Docs](https://dev.jup.ag/docs/) for further details on usage and rate limits.
 
     ### API Usage
     - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)
@@ -16,10 +16,13 @@ info:
     - Raw data such as Vec<u8\> are base64 encoded strings
 
 servers:
-  - url: https://api.jup.ag
+  - url: https://lite-api.jup.ag/swap/v1
+    description: Free tier API endpoint with rate limits
+  - url: https://api.jup.ag/swap/v1
+    description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
-  /swap/v1/quote:
+  /quote:
     get:
       operationId: QuoteGet
       tags:
@@ -29,7 +32,7 @@ paths:
         Request for a quote to be used in `POST /swap`
         
         :::note
-        Refer to https://station.jup.ag/docs/swap-api/get-quote for more information
+        Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/get-quote) for more information
         :::
       parameters:
         - $ref: '#/components/parameters/InputMintParameter'
@@ -52,16 +55,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuoteResponse'
-  /swap/v1/swap:
+  /swap:
     post:
       operationId: SwapPost
       tags:
         - Swap
+      summary: swap
       description: |
         Request for a base64-encoded unsigned swap transaction based on the `/quote` response
         
         :::note
-        Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction for more information
+        Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction) for more information
         :::
       requestBody:
         required: true
@@ -76,7 +80,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwapResponse'
-  /swap/v1/swap-instructions:
+  /swap-instructions:
     post:
       operationId: SwapInstructionsPost
       tags:
@@ -86,7 +90,7 @@ paths:
         Request for swap instructions that you can use from the quote you get from `/quote`
         
         :::note
-        Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions for more information
+        Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions) for more information
         :::
       requestBody:
         required: true
@@ -101,11 +105,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SwapInstructionsResponse'
-  /swap/v1/program-id-to-label:
+  /program-id-to-label:
     get:
       operationId: ProgramIdToLabelGet
       tags:
         - Swap
+      summary: program-id-to-label
       description: |
         Returns a hash, which key is the program id and value is the label.
         This is used to help map error from transaction by identifying the fault program id.
@@ -476,7 +481,7 @@ components:
     SwapModeParameter:
       name: swapMode
       description: |
-        - ExactOut is for supporting use cases where you need an exact output amount, like https://station.jup.ag/docs/swap-api/payments-through-swap
+        - ExactOut is for supporting use cases where you need an exact output amount, like using [Swap API as a payment service](/docs/swap-api/payments-through-swap)
         - In the case of `ExactIn`, the slippage is on the output token
         - In the case of `ExactOut`, the slippage is on the input token
         - Not all AMMs support `ExactOut`
@@ -493,7 +498,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `dexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **only use** that DEX
-        - [Full list of DEXes here](https://api.jup.ag/swap/v1/program-id-to-label)
+        - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label)
       in: query
       schema:
         type: array
@@ -505,7 +510,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **not use** that DEX
-        - [Full list of DEXes here](https://api.jup.ag/swap/v1/program-id-to-label)
+        - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label)
       in: query
       schema:
         type: array

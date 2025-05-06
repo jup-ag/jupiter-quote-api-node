@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Swap API
- * The heart and soul of Jupiter lies in the Quote and Swap API.  ### API Rate Limit Since 1 December 2024, we have updated our API structure. Please refer to [Station](https://station.jup.ag/docs/) for further details on usage and rate limits.  ### API Usage - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
+ * The heart and soul of Jupiter lies in the Quote and Swap API.  ### API Rate Limit Since 1 December 2024, we have updated our API structure. Please refer to [Developer Docs](https://dev.jup.ag/docs/) for further details on usage and rate limits.  ### API Usage - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -62,6 +62,7 @@ export class SwapApi extends runtime.BaseAPI {
 
     /**
      * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. This can be used in conjunction with the `excludeDexes` or `dexes` parameter. 
+     * program-id-to-label
      */
     async programIdToLabelGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: string; }>> {
         const queryParameters: any = {};
@@ -69,7 +70,7 @@ export class SwapApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/swap/v1/program-id-to-label`,
+            path: `/program-id-to-label`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -80,6 +81,7 @@ export class SwapApi extends runtime.BaseAPI {
 
     /**
      * Returns a hash, which key is the program id and value is the label. This is used to help map error from transaction by identifying the fault program id. This can be used in conjunction with the `excludeDexes` or `dexes` parameter. 
+     * program-id-to-label
      */
     async programIdToLabelGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: string; }> {
         const response = await this.programIdToLabelGetRaw(initOverrides);
@@ -87,7 +89,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for a quote to be used in `POST /swap`  :::note Refer to https://station.jup.ag/docs/swap-api/get-quote for more information ::: 
+     * Request for a quote to be used in `POST /swap`  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/get-quote) for more information ::: 
      * quote
      */
     async quoteGetRaw(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<QuoteResponse>> {
@@ -160,7 +162,7 @@ export class SwapApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/swap/v1/quote`,
+            path: `/quote`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -170,7 +172,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for a quote to be used in `POST /swap`  :::note Refer to https://station.jup.ag/docs/swap-api/get-quote for more information ::: 
+     * Request for a quote to be used in `POST /swap`  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/get-quote) for more information ::: 
      * quote
      */
     async quoteGet(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QuoteResponse> {
@@ -179,7 +181,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for swap instructions that you can use from the quote you get from `/quote`  :::note Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions for more information ::: 
+     * Request for swap instructions that you can use from the quote you get from `/quote`  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions) for more information ::: 
      * swap-instructions
      */
     async swapInstructionsPostRaw(requestParameters: SwapInstructionsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SwapInstructionsResponse>> {
@@ -194,7 +196,7 @@ export class SwapApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/swap/v1/swap-instructions`,
+            path: `/swap-instructions`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -205,7 +207,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for swap instructions that you can use from the quote you get from `/quote`  :::note Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions for more information ::: 
+     * Request for swap instructions that you can use from the quote you get from `/quote`  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions) for more information ::: 
      * swap-instructions
      */
     async swapInstructionsPost(requestParameters: SwapInstructionsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SwapInstructionsResponse> {
@@ -214,7 +216,8 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response  :::note Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction for more information ::: 
+     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction) for more information ::: 
+     * swap
      */
     async swapPostRaw(requestParameters: SwapPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SwapResponse>> {
         if (requestParameters.swapRequest === null || requestParameters.swapRequest === undefined) {
@@ -228,7 +231,7 @@ export class SwapApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/swap/v1/swap`,
+            path: `/swap`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -239,7 +242,8 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response  :::note Refer to https://station.jup.ag/docs/swap-api/build-swap-transaction for more information ::: 
+     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction) for more information ::: 
+     * swap
      */
     async swapPost(requestParameters: SwapPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SwapResponse> {
         const response = await this.swapPostRaw(requestParameters, initOverrides);
