@@ -13,7 +13,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// If you have problem landing transactions, read this: https://station.jup.ag/docs/swap-api/send-swap-transaction#how-jupiter-estimates-priority-fee
+// If you have problem landing transactions, read this: https://dev.jup.ag/docs/swap-api/send-swap-transaction#how-jupiter-estimates-priority-fee
 
 // Make sure that you are using your own RPC endpoint.
 // Helius and Triton have staked SOL and they can usually land transactions better.

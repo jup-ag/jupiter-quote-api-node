@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Swap API
- * The heart and soul of Jupiter lies in the Quote and Swap API.  ### API Rate Limit Since 1 December 2024, we have updated our API structure. Please refer to [Station](https://station.jup.ag/docs/) for further details on usage and rate limits.  ### API Usage - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
+ * The heart and soul of Jupiter lies in the Quote and Swap API.  ### API Rate Limit Since 1 December 2024, we have updated our API structure. Please refer to [Developer Docs](https://dev.jup.ag/docs/) for further details on usage and rate limits.  ### API Usage - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 1.0.0
  * 
