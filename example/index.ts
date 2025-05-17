@@ -13,18 +13,30 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-// If you have problem landing transactions, read this: https://station.jup.ag/docs/swap-api/send-swap-transaction#how-jupiter-estimates-priority-fee
+// If you have problem landing transactions, read this: https://dev.jup.ag/docs/swap-api/send-swap-transaction#how-jupiter-estimates-priority-fee
 
 // Make sure that you are using your own RPC endpoint.
 // Helius and Triton have staked SOL and they can usually land transactions better.
 const connection = new Connection(
   "https://api.mainnet-beta.solana.com" // We only support mainnet.
 );
-const jupiterQuoteApi = createJupiterApiClient({ apiKey: process.env.API_KEY });
+
+// Get API key from environment variables
+const apiKey = process.env.API_KEY;
+
+// Create Jupiter API client with API key if available
+const jupiterQuoteApi = createJupiterApiClient(
+  apiKey ? { apiKey } : undefined
+);
+
+// Log which API endpoint is being used
+console.log("Using API endpoint:", apiKey
+  ? "https://api.jup.ag/swap/v1 (with API key)" 
+  : "https://lite-api.jup.ag/swap/v1 (free tier)");
 
 async function getQuote() {
   const params: QuoteGetRequest = {
-    inputMint: "So11111111111111111111111111111111111111112",
+    inputMint: "So11111111111111111111111111111111111111112", // SOL
     outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
     amount: 100000000, // 0.1 SOL
     slippageBps: 100, // 1%

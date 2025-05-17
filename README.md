@@ -3,9 +3,10 @@
 ## Table of Contents
 
 - [Installation](#installation)
+- [Developing](#developing)
 - [Usage](#usage)
 - [Examples](#examples)
-  - [Paid Hosted APIs](#paid-hosted-apis) (Deprecated and will not be supported, reach out in Discord for more information)
+  - Paid Hosted APIs (Deprecated and will not be supported, reach out in Discord for more information)
 
 ## Installation
 
@@ -36,8 +37,7 @@ To start using the API client, you need to require it in your Node.js project:
 ```typescript
 import { createJupiterApiClient } from '@jup-ag/api';
 
-const jupiterQuoteApi = createJupiterApiClient(config); // config is optional
-
+const jupiterQuoteApi = createJupiterApiClient(config); // config is optional such as api key
 ```
 
 Now, you can call methods provided by the API client to interact with Jupiter's API. For example:
