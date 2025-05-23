@@ -30,7 +30,7 @@ paths:
       summary: quote
       description: |
         Request for a quote to be used in `POST /swap`
-        
+
         :::note
         Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/get-quote) for more information
         :::
@@ -50,7 +50,7 @@ paths:
         - $ref: '#/components/parameters/DynamicSlippage'
       responses:
         '200':
-          description: "Successful response to be used in `/swap`"
+          description: 'Successful response to be used in `/swap`'
           content:
             application/json:
               schema:
@@ -63,7 +63,7 @@ paths:
       summary: swap
       description: |
         Request for a base64-encoded unsigned swap transaction based on the `/quote` response
-        
+
         :::note
         Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction) for more information
         :::
@@ -88,7 +88,7 @@ paths:
       summary: swap-instructions
       description: |
         Request for swap instructions that you can use from the quote you get from `/quote`
-        
+
         :::note
         Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions) for more information
         :::
@@ -315,8 +315,10 @@ components:
                   description: |
                     - Maximum lamports to cap the priority fee estimation, to prevent overpaying
                   type: integer
+                  format: uint64
             jitoTipLamports:
               type: integer
+              format: uint64
               description: |
                 - Exact amount of tip to use in a tip instruction
                 - Refer to Jito docs on how to estimate the tip amount based on percentiles
@@ -360,11 +362,13 @@ components:
             - `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`
             - We recommend using `prioritizationFeeLamports` and `dynamicComputeUnitLimit` instead of passing in your own compute unit price
           type: integer
+          format: uint64
         blockhashSlotsToExpiry:
           description: |
             - Pass in the number of slots we want the transaction to be valid for
             - Example: If you pass in 10 slots, the transaction will be valid for ~400ms * 10 = approximately 4 seconds before it expires
           type: integer
+          format: uint64
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
 
@@ -375,8 +379,10 @@ components:
           type: string
         lastValidBlockHeight:
           type: integer
+          format: uint64
         prioritizationFeeLamports:
           type: integer
+          format: uint64
       required:
         - swapTransaction
         - lastValidBlockHeight
@@ -473,11 +479,13 @@ components:
       required: true
       schema:
         type: integer
+        format: uint64
     SlippageParameter:
       name: slippageBps
       in: query
       schema:
         type: integer
+        format: int32
     SwapModeParameter:
       name: swapMode
       description: |
@@ -550,6 +558,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int
         default: 64
     PlatformFeeBpsParameter:
       name: platformFeeBps
@@ -559,6 +568,7 @@ components:
       in: query
       schema:
         type: integer
+        format: int32
     DynamicSlippage:
       name: dynamicSlippage
       description: |
