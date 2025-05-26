@@ -368,7 +368,7 @@ components:
             - Pass in the number of slots we want the transaction to be valid for
             - Example: If you pass in 10 slots, the transaction will be valid for ~400ms * 10 = approximately 4 seconds before it expires
           type: integer
-          format: uint64
+          format: uint8
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
 
@@ -485,7 +485,7 @@ components:
       in: query
       schema:
         type: integer
-        format: int32
+        format: uint16
     SwapModeParameter:
       name: swapMode
       description: |
@@ -568,7 +568,7 @@ components:
       in: query
       schema:
         type: integer
-        format: int32
+        format: uint8
     DynamicSlippage:
       name: dynamicSlippage
       description: |
