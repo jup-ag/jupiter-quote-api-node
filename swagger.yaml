@@ -267,6 +267,10 @@ components:
         - quoteResponse
       properties:
         userPublicKey:
+          description: The user public key.
+          type: string
+        payer:
+          description: Allow a custom payer to pay for the transaction.
           type: string
         wrapAndUnwrapSol:
           description: |
