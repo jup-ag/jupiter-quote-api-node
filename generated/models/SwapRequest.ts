@@ -33,11 +33,17 @@ import {
  */
 export interface SwapRequest {
     /**
-     * 
+     * The user public key.
      * @type {string}
      * @memberof SwapRequest
      */
     userPublicKey: string;
+    /**
+     * Allow a custom payer to pay for the transaction.
+     * @type {string}
+     * @memberof SwapRequest
+     */
+    payer?: string;
     /**
      * - To automatically wrap/unwrap SOL in the transaction
      * - If false, it will use wSOL token account
@@ -172,6 +178,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
     return {
         
         'userPublicKey': json['userPublicKey'],
+        'payer': !exists(json, 'payer') ? undefined : json['payer'],
         'wrapAndUnwrapSol': !exists(json, 'wrapAndUnwrapSol') ? undefined : json['wrapAndUnwrapSol'],
         'useSharedAccounts': !exists(json, 'useSharedAccounts') ? undefined : json['useSharedAccounts'],
         'feeAccount': !exists(json, 'feeAccount') ? undefined : json['feeAccount'],
@@ -198,6 +205,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
     return {
         
         'userPublicKey': value.userPublicKey,
+        'payer': value.payer,
         'wrapAndUnwrapSol': value.wrapAndUnwrapSol,
         'useSharedAccounts': value.useSharedAccounts,
         'feeAccount': value.feeAccount,
