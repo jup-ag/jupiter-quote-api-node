@@ -39,7 +39,9 @@ export interface SwapRequest {
      */
     userPublicKey: string;
     /**
-     * Allow a custom payer to pay for the transaction.
+     * - Allow a custom payer to pay for the transaction fees and rent of token accounts
+     * - Note that users can close their ATAs elsewhere and have you reopen them again, your fees should account for this
+     * 
      * @type {string}
      * @memberof SwapRequest
      */
