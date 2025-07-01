@@ -1,6 +1,11 @@
 {
   "name": "@jup-ag/api",
   "version": "6.0.44",
+  "homepage": "https://github.com/jup-ag/jupiter-quote-api-node",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jup-ag/jupiter-quote-api-node.git"
+  },
   "description": "## Generate typescript types from swagger schema",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
