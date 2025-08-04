@@ -204,6 +204,9 @@ components:
           type: number
         timeTaken:
           type: number
+        swapUsdValue:
+          type: string
+          description: USD value of the swap amount
 
     SwapMode:
       type: string
@@ -366,6 +369,7 @@ components:
             - `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`
             - We recommend using `prioritizationFeeLamports` and `dynamicComputeUnitLimit` instead of passing in your own compute unit price
           type: integer
+          format: int64
         blockhashSlotsToExpiry:
           description: |
             - Pass in the number of slots we want the transaction to be valid for
@@ -381,8 +385,10 @@ components:
           type: string
         lastValidBlockHeight:
           type: integer
+          format: int64
         prioritizationFeeLamports:
           type: integer
+          format: int64
       required:
         - swapTransaction
         - lastValidBlockHeight
