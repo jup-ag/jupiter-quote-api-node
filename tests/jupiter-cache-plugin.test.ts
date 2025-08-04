@@ -31,10 +31,14 @@ describe('Jupiter Cache Plugin', () => {
       const conservativeClient = withCache(baseClient, { mode: 'conservative' });
       const balancedClient = withCache(baseClient, { mode: 'balanced' });
       const aggressiveClient = withCache(baseClient, { mode: 'aggressive' });
+      const adaptiveClient = withCache(baseClient, { mode: 'adaptive' });
+      const predictiveClient = withCache(baseClient, { mode: 'predictive' });
       
       expect(conservativeClient).toBeDefined();
       expect(balancedClient).toBeDefined();
       expect(aggressiveClient).toBeDefined();
+      expect(adaptiveClient).toBeDefined();
+      expect(predictiveClient).toBeDefined();
     });
   });
 
@@ -81,7 +85,7 @@ describe('Jupiter Cache Plugin', () => {
     it('should override preset with custom options', () => {
       const customOptions = {
         maxSize: 99,
-        defaultTTL: 123
+        defaultTTL: 45 // Valid value within basic range
       };
       
       const client = withCache(baseClient, { 
@@ -279,6 +283,56 @@ describe('Jupiter Cache Plugin', () => {
         // Should throw the same error as original client
         expect(error).toBeDefined();
       }
+    });
+  });
+
+  // PHASE 2 & 3: Advanced Features Tests
+  describe('Advanced Cache Features', () => {
+    it('should support adaptive intelligence mode', () => {
+      const adaptiveClient = withCache(baseClient, { mode: 'adaptive' });
+      const config = (adaptiveClient as any).configuration;
+      
+      expect(config).toBeDefined();
+      expect(config.middleware).toBeDefined();
+      expect(config.middleware.length).toBeGreaterThan(0);
+      
+      // Adaptive mode should have adaptive TTL enabled
+      const middleware = config.middleware[0];
+      expect(middleware.options?.enableAdaptiveTTL).toBe(true);
+    });
+
+    it('should support predictive optimization mode', () => {
+      const predictiveClient = withCache(baseClient, { mode: 'predictive' });
+      const config = (predictiveClient as any).configuration;
+      
+      expect(config).toBeDefined();
+      expect(config.middleware).toBeDefined();
+      expect(config.middleware.length).toBeGreaterThan(0);
+      
+      // Predictive mode should have both adaptive TTL and predictive features enabled
+      const middleware = config.middleware[0];
+      expect(middleware.options?.enableAdaptiveTTL).toBe(true);
+      expect(middleware.options?.enablePredictive).toBe(true);
+    });
+
+    it('should have correct configuration for adaptive mode', () => {
+      const adaptiveClient = withCache(baseClient, { mode: 'adaptive' });
+      const middleware = (adaptiveClient as any).configuration.middleware[0];
+      
+      expect(middleware.options?.maxSize).toBe(800);
+      expect(middleware.options?.defaultTTL).toBe(30);
+      expect(middleware.options?.maxTTL).toBe(180);
+      expect(middleware.options?.minTTL).toBe(5);
+    });
+
+    it('should have correct configuration for predictive mode', () => {
+      const predictiveClient = withCache(baseClient, { mode: 'predictive' });
+      const middleware = (predictiveClient as any).configuration.middleware[0];
+      
+      expect(middleware.options?.maxSize).toBe(1200);
+      expect(middleware.options?.defaultTTL).toBe(45);
+      expect(middleware.options?.maxTTL).toBe(240);
+      expect(middleware.options?.minTTL).toBe(3);
     });
   });
 });
