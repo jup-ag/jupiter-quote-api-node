@@ -114,6 +114,12 @@ export interface QuoteResponse {
      * @memberof QuoteResponse
      */
     timeTaken?: number;
+    /**
+     * USD value of the swap amount
+     * @type {string}
+     * @memberof QuoteResponse
+     */
+    swapUsdValue?: string;
 }
 
 /**
@@ -156,6 +162,7 @@ export function QuoteResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
         'routePlan': ((json['routePlan'] as Array<any>).map(RoutePlanStepFromJSON)),
         'contextSlot': !exists(json, 'contextSlot') ? undefined : json['contextSlot'],
         'timeTaken': !exists(json, 'timeTaken') ? undefined : json['timeTaken'],
+        'swapUsdValue': !exists(json, 'swapUsdValue') ? undefined : json['swapUsdValue'],
     };
 }
 
@@ -180,6 +187,7 @@ export function QuoteResponseToJSON(value?: QuoteResponse | null): any {
         'routePlan': ((value.routePlan as Array<any>).map(RoutePlanStepToJSON)),
         'contextSlot': value.contextSlot,
         'timeTaken': value.timeTaken,
+        'swapUsdValue': value.swapUsdValue,
     };
 }
 
