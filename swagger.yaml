@@ -22,6 +22,7 @@ servers:
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
+  # SwapAPI
   /quote:
     get:
       operationId: QuoteGet
@@ -124,6 +125,212 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
+  
+  # TokenAPI
+  /search:
+    get:
+      tags:
+        - Token
+      operationId: searchTokens
+      summary: search
+      description: |
+        Request a search by token's symbol, name or mint address
+          
+        :::note
+        - Refer to [Token API doc](/docs/token-api/v2) for more information
+        :::
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: true
+          description: |
+            - Search for a token and its information by its symbol, name or mint address
+            - Comma-separate to ONLY search for multiple mint addresses
+            - Limit to 100 mint addresses in query
+            - Default to 20 mints in response when searching via symbol or name
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MintInformation"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+  /tag:
+    get:
+      tags:
+        - Token
+      operationId: getTokensByTag
+      summary: tag
+      description: |
+        Request an array of mints and their information by a tag
+        - Note that this will return the entire array of existing mints that belongs to the tag.
+
+        :::note
+        - Refer to [Token API doc](/docs/token-api/v2) for more information
+        :::
+      parameters:
+        - in: query
+          name: query
+          schema:
+            type: string
+            enum:
+              - lst
+              - verified
+          required: true
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MintInformation"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+  /{category}/{interval}:
+    get:
+      tags:
+        - Token
+      operationId: getCategoryByInterval
+      summary: category
+      description: |
+        Returns an array of mints and their information for the given category and interval
+
+        :::note
+        - Refer to [Token API doc](/docs/token-api/v2) for more information
+        :::
+      parameters:
+        - in: path
+          name: category
+          required: true
+          schema:
+            type: string
+            enum: [toporganicscore, toptraded, toptrending]
+          description: |
+            - Top tokens in different trading categories
+            - The result filters out generic top tokens like SOL, USDC, etc
+            - Default to 50 mints in response
+        - in: path
+          name: interval
+          required: true
+          schema:
+            type: string
+            enum: [5m, 1h, 6h, 24h]
+          description: |
+            - Query by time interval for more accuracy
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          required: false
+          description: |
+            - Maximum number of results to return (default 50, max 100)
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MintInformation"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /recent:
+    get:
+      tags:
+        - Token
+      operationId: getRecentTokens
+      summary: recent
+      description: |
+        Returns an array of mints that recently had their **first created pool**
+        - Default to 30 mints in response
+
+        :::note
+        - Refer to [Token API doc](/docs/token-api/v2) for more information
+        :::
+
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MintInformation"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 
 components:
   schemas:
@@ -455,6 +662,187 @@ components:
               - 1
               - 3
               - 4
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+    
+    MintInformation:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The token's mint address
+        name:
+          type: string
+        symbol:
+          type: string
+        icon:
+          type: string
+          nullable: true
+        decimals:
+          type: number
+        twitter:
+          type: string
+          nullable: true
+        telegram:
+          type: string
+          nullable: true
+        website:
+          type: string
+          nullable: true
+        dev:
+          type: string
+          nullable: true
+          description: The token's developer address
+        circSupply:
+          type: number
+          nullable: true
+        totalSupply:
+          type: number
+          nullable: true
+        tokenProgram:
+          type: string
+          description: The token program address
+        launchpad:
+          type: string
+          nullable: true
+        partnerConfig:
+          type: string
+          nullable: true
+        graduatedPool:
+          type: string
+          nullable: true
+        graduatedAt:
+          type: string
+          nullable: true
+        holderCount:
+          type: integer
+          nullable: true
+        fdv:
+          type: number
+          nullable: true
+        mcap:
+          type: number
+          nullable: true
+        usdPrice:
+          type: number
+          nullable: true
+        priceBlockId:
+          type: integer
+          nullable: true
+        liquidity:
+          type: number
+          nullable: true
+        stats5m:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+        stats1h:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+        stats6h:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+        stats24h:
+          $ref: "#/components/schemas/SwapStats"
+          nullable: true
+        firstPool:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            createdAt:
+              type: string
+        audit:
+          type: object
+          nullable: true
+          properties:
+            isSus:
+              type: boolean
+              nullable: true
+            mintAuthorityDisabled:
+              type: boolean
+              nullable: true
+            freezeAuthorityDisabled:
+              type: boolean
+              nullable: true
+            topHoldersPercentage:
+              type: number
+              nullable: true
+            devBalancePercentage:
+              type: number
+              nullable: true
+            devMigrations:
+              type: number
+              nullable: true
+        organicScore:
+          type: number
+        organicScoreLabel:
+          type: string
+          enum: [high, medium, low]
+        isVerified:
+          type: boolean
+          nullable: true
+        cexes:
+          type: array
+          items:
+            type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+          nullable: true
+        updatedAt:
+          type: string
+          format: date-time
+    
+    SwapStats:
+      type: object
+      properties:
+        priceChange:
+          type: number
+          nullable: true
+        holderChange:
+          type: number
+          nullable: true
+        liquidityChange:
+          type: number
+          nullable: true
+        volumeChange:
+          type: number
+          nullable: true
+        buyVolume:
+          type: number
+          nullable: true
+        sellVolume:
+          type: number
+          nullable: true
+        buyOrganicVolume:
+          type: number
+          nullable: true
+        sellOrganicVolume:
+          type: number
+          nullable: true
+        numBuys:
+          type: integer
+          nullable: true
+        numSells:
+          type: integer
+          nullable: true
+        numTraders:
+          type: integer
+          nullable: true
+        numOrganicBuyers:
+          type: integer
+          nullable: true
+        numNetBuyers:
+          type: integer
+          nullable: true
 
   parameters:
     InputMintParameter:
