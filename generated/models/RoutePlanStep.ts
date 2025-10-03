@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Swap API
- * The heart and soul of Jupiter lies in the Quote and Swap API.  ### API Rate Limit Since 1 December 2024, we have updated our API structure. Please refer to [Developer Docs](https://dev.jup.ag/docs/) for further details on usage and rate limits.  ### API Usage - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
+ * API reference for Jupiter\'s Swap API, including Quote, Swap and Swap Instructions endpoints.  ### Rate Limits Since 1 December 2024, we have updated our API structure. Please refer to https://dev.jup.ag/ for further details on usage and rate limits.  ### Usage - API Wrapper Typescript https://github.com/jup-ag/jupiter-quote-api-node  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -37,7 +37,13 @@ export interface RoutePlanStep {
      * @type {number}
      * @memberof RoutePlanStep
      */
-    percent: number;
+    percent?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RoutePlanStep
+     */
+    bps?: number;
 }
 
 /**
@@ -46,7 +52,6 @@ export interface RoutePlanStep {
 export function instanceOfRoutePlanStep(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "swapInfo" in value;
-    isInstance = isInstance && "percent" in value;
 
     return isInstance;
 }
@@ -62,7 +67,8 @@ export function RoutePlanStepFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'swapInfo': SwapInfoFromJSON(json['swapInfo']),
-        'percent': json['percent'],
+        'percent': !exists(json, 'percent') ? undefined : json['percent'],
+        'bps': !exists(json, 'bps') ? undefined : json['bps'],
     };
 }
 
@@ -77,6 +83,7 @@ export function RoutePlanStepToJSON(value?: RoutePlanStep | null): any {
         
         'swapInfo': SwapInfoToJSON(value.swapInfo),
         'percent': value.percent,
+        'bps': value.bps,
     };
 }
 

@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Swap API
- * The heart and soul of Jupiter lies in the Quote and Swap API.  ### API Rate Limit Since 1 December 2024, we have updated our API structure. Please refer to [Developer Docs](https://dev.jup.ag/docs/) for further details on usage and rate limits.  ### API Usage - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
+ * API reference for Jupiter\'s Swap API, including Quote, Swap and Swap Instructions endpoints.  ### Rate Limits Since 1 December 2024, we have updated our API structure. Please refer to https://dev.jup.ag/ for further details on usage and rate limits.  ### Usage - API Wrapper Typescript https://github.com/jup-ag/jupiter-quote-api-node  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -13,7 +13,7 @@
  */
 
 
-export const BASE_PATH = "https://lite-api.jup.ag/swap/v1".replace(/\/+$/, "");
+export const BASE_PATH = "https://api.jup.ag/swap/v1".replace(/\/+$/, "");
 
 export interface ConfigurationParameters {
     basePath?: string; // override base path

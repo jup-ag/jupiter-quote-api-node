@@ -16,48 +16,46 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface PlatformFee
+ * @interface JitoTipLamports
  */
-export interface PlatformFee {
+export interface JitoTipLamports {
     /**
-     * 
-     * @type {string}
-     * @memberof PlatformFee
-     */
-    amount?: string;
-    /**
+     * - Exact amount of tip to use in a tip instruction
+     * - Refer to Jito docs on how to estimate the tip amount based on percentiles
+     * - It has to be used together with a connection to a Jito RPC
+     * - See their docs at https://docs.jito.wtf/
      * 
      * @type {number}
-     * @memberof PlatformFee
+     * @memberof JitoTipLamports
      */
-    feeBps?: number;
+    jitoTipLamports: number;
 }
 
 /**
- * Check if a given object implements the PlatformFee interface.
+ * Check if a given object implements the JitoTipLamports interface.
  */
-export function instanceOfPlatformFee(value: object): boolean {
+export function instanceOfJitoTipLamports(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "jitoTipLamports" in value;
 
     return isInstance;
 }
 
-export function PlatformFeeFromJSON(json: any): PlatformFee {
-    return PlatformFeeFromJSONTyped(json, false);
+export function JitoTipLamportsFromJSON(json: any): JitoTipLamports {
+    return JitoTipLamportsFromJSONTyped(json, false);
 }
 
-export function PlatformFeeFromJSONTyped(json: any, ignoreDiscriminator: boolean): PlatformFee {
+export function JitoTipLamportsFromJSONTyped(json: any, ignoreDiscriminator: boolean): JitoTipLamports {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'amount': !exists(json, 'amount') ? undefined : json['amount'],
-        'feeBps': !exists(json, 'feeBps') ? undefined : json['feeBps'],
+        'jitoTipLamports': json['jitoTipLamports'],
     };
 }
 
-export function PlatformFeeToJSON(value?: PlatformFee | null): any {
+export function JitoTipLamportsToJSON(value?: JitoTipLamports | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -66,8 +64,7 @@ export function PlatformFeeToJSON(value?: PlatformFee | null): any {
     }
     return {
         
-        'amount': value.amount,
-        'feeBps': value.feeBps,
+        'jitoTipLamports': value.jitoTipLamports,
     };
 }
 
