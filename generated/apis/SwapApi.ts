@@ -45,6 +45,7 @@ export interface QuoteGetRequest {
     platformFeeBps?: number;
     maxAccounts?: number;
     instructionVersion?: QuoteGetInstructionVersionEnum;
+    dynamicSlippage?: boolean;
 }
 
 export interface SwapInstructionsPostRequest {
@@ -157,6 +158,10 @@ export class SwapApi extends runtime.BaseAPI {
 
         if (requestParameters.instructionVersion !== undefined) {
             queryParameters['instructionVersion'] = requestParameters.instructionVersion;
+        }
+
+        if (requestParameters.dynamicSlippage !== undefined) {
+            queryParameters['dynamicSlippage'] = requestParameters.dynamicSlippage;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
