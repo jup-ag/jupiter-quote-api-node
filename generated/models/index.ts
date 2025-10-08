@@ -1,9 +1,26 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './AccountMeta';
-export * from './IndexedRouteMapResponse';
+export * from './ErrorResponse';
+export * from './GetOrder200Response';
+export * from './GetOrder200ResponsePlatformFee';
+export * from './GetOrder200ResponseRoutePlanInner';
+export * from './GetOrder200ResponseRoutePlanInnerSwapInfo';
+export * from './GetOrder400Response';
+export * from './GetRouters200ResponseInner';
+export * from './GetShield200Response';
+export * from './GetShield200ResponseWarningsValueInner';
+export * from './HoldingsResponse';
 export * from './Instruction';
+export * from './MintInformation';
+export * from './MintInformationAudit';
+export * from './MintInformationFirstPool';
+export * from './NativeHoldingsResponse';
 export * from './PlatformFee';
+export * from './PostExecute200Response';
+export * from './PostExecute200ResponseSwapEventsInner';
+export * from './PostExecute400Response';
+export * from './PostExecuteRequest';
 export * from './QuoteResponse';
 export * from './RoutePlanStep';
 export * from './SwapInfo';
@@ -13,3 +30,5 @@ export * from './SwapRequest';
 export * from './SwapRequestPrioritizationFeeLamports';
 export * from './SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamports';
 export * from './SwapResponse';
+export * from './SwapStats';
+export * from './TokenAccount';
