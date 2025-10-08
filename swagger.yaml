@@ -22,6 +22,616 @@ servers:
     description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
+  # UltraAPI
+  /order:
+    get:
+      tags:
+        - Ultra
+      operationId: getOrder
+      summary: order
+      description: |
+        Request for a base64-encoded unsigned swap transaction to be used in `POST /ultra/v1/execute`
+        
+        :::note
+        - Refer to [Ultra API doc](/docs/ultra-api/get-order) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mode:
+                    type: string
+                    description: |
+                      - Either 'manual' or 'ultra', defaults to `ultra`
+                      - Defaults to `ultra`, unless manual parameters are defined which is not the intended use of the API
+                  inputMint:
+                    type: string
+                  outputMint:
+                    type: string
+                  inAmount:
+                    type: string
+                  outAmount:
+                    type: string
+                  otherAmountThreshold:
+                    type: string
+                  swapMode:
+                    type: string
+                  slippageBps:
+                    type: number
+                  inUsdValue: 
+                    type: number
+                  outUsdValue:
+                    type: number
+                  priceImpact:
+                    type: number
+                  swapUsdValue:
+                    type: number
+                  priceImpactPct:
+                    type: string
+                    description: |
+                      - Please use `priceImpact` field instead, this is still available only for backwards compatibility
+                  routePlan:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        swapInfo:
+                          type: object
+                          properties:
+                            ammKey:
+                              type: string
+                            label:
+                              type: string
+                            inputMint:
+                              type: string
+                            outputMint:
+                              type: string
+                            inAmount:
+                              type: string
+                            outAmount:
+                              type: string
+                            feeAmount:
+                              type: string
+                            feeMint:
+                              type: string
+                          required:
+                            - ammKey
+                            - label
+                            - inputMint
+                            - outputMint
+                            - inAmount
+                            - outAmount
+                            - feeAmount
+                            - feeMint
+                        percent:
+                          type: number
+                        bps:
+                          type: number
+                      required:
+                        - swapInfo
+                        - percent
+                        - bps
+                  feeMint:
+                    type: string
+                  feeBps:
+                    type: number
+                  signatureFeeLamports:
+                    type: number
+                    description: |
+                      - The number of lamports the taker has to pay as a base network fee, if a valid transaction is returned. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee.
+                  prioritizationFeeLamports:
+                    type: number
+                    description: |
+                      - The number of lamports the taker has to pay for higher priority landing, if a valid transaction is returned. Includes priority fees and tips for services such as Jito, if any. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee.
+                  rentFeeLamports:
+                    type: number
+                    description: |
+                      - The number of lamports the taker has to pay for rent, if a valid transaction is returned. This may be 0 if the transaction is gasless, in which case the gas payer will cover this fee. Note that this value is just an estimate.
+                  swapType:
+                    type: string
+                    description: |
+                      - Deprecated, in favour of router
+                  router:
+                    type: string
+                    enum:
+                      - aggregator
+                      - jupiterz
+                      - dflow
+                      - okx                  
+                  transaction:
+                    type: string
+                    nullable: true
+                    description: |
+                      - Unsigned base-64 encoded transaction to be signed and used in `/execute`
+                      - If `taker` is null, this field will be null. Else, it will either be a valid base64 encoded transaction or the empty string
+                  gasless:
+                    type: boolean
+                  requestId:
+                    description: |
+                      - Required to make a request to `/execute`
+                    type: string
+                  totalTime:
+                    type: number
+                  taker:
+                    type: string
+                    nullable: true
+                  quoteId:
+                    type: string
+                  maker:
+                    type: string
+                  expireAt:
+                    type: string
+                  platformFee:
+                    type: object
+                    properties:
+                      amount:
+                        type: string
+                      feeBps:
+                        type: number
+                    required:
+                      - amount
+                      - feeBps
+                  errorCode:
+                    type: number
+                    description: |
+                      - This field will be present if `taker` is defined and `transaction` is the empty string
+                      - It is unique for each error scenarios
+                  errorMessage:
+                    type: string
+                    description: |
+                      - This field will be present if `taker` is defined and `transaction` is the empty string
+                      - This field can still return despite having a valid order/quote
+                      - This is meant for display purposes only and it is discouraged to match these error messages as they could be parameterized
+                required:
+                  - mode
+                  - inputMint
+                  - outputMint
+                  - inAmount
+                  - outAmount
+                  - otherAmountThreshold
+                  - priceImpactPct
+                  - swapMode
+                  - slippageBps
+                  - routePlan
+                  - feeBps
+                  - signatureFeeLamports
+                  - prioritizationFeeLamports
+                  - rentFeeLamports
+                  - swapType
+                  - router
+                  - transaction
+                  - gasless
+                  - requestId
+                  - totalTime
+                  - taker
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+      parameters:
+        - in: query
+          name: inputMint
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: outputMint
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: amount
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: taker
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: referralAccount
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: referralFee
+          schema:
+            type: number
+            minimum: 50
+            maximum: 255
+          required: false
+        - in: query
+          name: excludeRouters
+          schema:
+            type: string
+            enum:
+              - metis
+              - jupiterz
+              - dflow
+              - okx
+          required: false
+        - in: query
+          name: excludeDexes
+          description: |
+            - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label), for example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
+            - **Important**: This only excludes DEXes on the Metis router, does not apply to other routers
+            - For example:
+              - **Exclude** Raydium: `excludeRouters=<all-except-Metis>` and `excludeDexes=Raydium`
+              - **Only include** Meteora DLMM: `excludeRouters=<all-except-Metis>` and `excludeDexes=<all-except-MeteoraDLMM>`
+          schema:
+            type: string
+  /execute:
+    post:
+      tags:
+        - Ultra
+      operationId: postExecute
+      summary: execute
+      description: |
+        Execute the signed transaction and get the execution status
+        
+        :::note
+        - Do note that the `requestId` is found in the response of `/order`
+        - Refer to [Ultra API doc](/docs/ultra-api/execute-order) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - Success
+                      - Failed
+                  signature:
+                    type: string
+                  slot:
+                    type: string
+                  error:
+                    type: string
+                  code:
+                    type: number
+                  totalInputAmount:
+                    type: string
+                  totalOutputAmount:
+                    type: string
+                  inputAmountResult:
+                    type: string
+                  outputAmountResult:
+                    type: string
+                  swapEvents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        inputMint:
+                          type: string
+                        inputAmount:
+                          type: string
+                        outputMint:
+                          type: string
+                        outputAmount:
+                          type: string
+                      required:
+                        - inputMint
+                        - inputAmount
+                        - outputMint
+                        - outputAmount
+                required:
+                  - status
+                  - code
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                required:
+                  - error
+                  - code
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                required:
+                  - error
+                  - code
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signedTransaction:
+                  type: string
+                  description: |
+                    - The signed transaction to execute
+                requestId:
+                  type: string
+                  description: |
+                    - Found in response of `/order`
+              required:
+                - signedTransaction
+                - requestId
+  /holdings/{address}:
+    get:
+      tags:
+        - Ultra
+      operationId: getHoldings
+      summary: holdings
+      description: |
+        Request for detailed token holdings of an account including token account information
+        
+        :::note
+        - Refer to [Ultra API doc](/docs/ultra-api/get-holdings) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HoldingsResponse"
+      parameters:
+          - schema:
+              type: string
+            in: path
+            name: address
+            required: true
+            description: The wallet address to get holdings for
+  /holdings/{address}/native:
+    get:
+      tags:
+        - Ultra
+      operationId: getNativeHoldings
+      summary: holdings (native)
+      description: |
+        Request for native SOL holdings only, without other tokens
+        
+        :::note
+        - This is a more efficient endpoint when you only need SOL balance
+        - Refer to [Ultra API doc](/docs/ultra-api/get-holdings) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeHoldingsResponse"
+      parameters:
+          - schema:
+              type: string
+            in: path
+            name: address
+            required: true
+            description: The wallet address to get native SOL balance for
+
+  /shield:
+    get:
+      tags:
+        - Ultra
+      operationId: getShield
+      summary: shield
+      description: |
+        Request for token information and warnings of mints
+          
+        :::note
+        - Refer to [Ultra API doc](/docs/ultra-api/get-shield) for more information
+        :::
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  warnings:
+                    type: object
+                    additionalProperties:
+                      description: |
+                        - Token mint address as key
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                            enum:
+                              - NOT_VERIFIED
+                              - LOW_LIQUIDITY
+                              - NOT_SELLABLE
+                              - LOW_ORGANIC_ACTIVITY
+                              - HAS_MINT_AUTHORITY
+                              - HAS_FREEZE_AUTHORITY
+                              - HAS_PERMANENT_DELEGATE
+                              - NEW_LISTING
+                              - VERY_LOW_TRADING_ACTIVITY
+                              - HIGH_SUPPLY_CONCENTRATION
+                              - NON_TRANSFERABLE
+                              - MUTABLE_TRANSFER_FEES
+                              - SUSPICIOUS_DEV_ACTIVITY
+                              - SUSPICIOUS_TOP_HOLDER_ACTIVITY
+                              - HIGH_SINGLE_OWNERSHIP
+                              - "{}%_TRANSFER_FEES"
+                            description: |
+                              - Type of warning for the token
+                          message:
+                            type: string
+                            description: |
+                              - Human-readable warning message
+                          severity:
+                            type: string
+                            enum:
+                              - info
+                              - warning
+                              - critical
+                            description: |
+                              - Severity level of the warning
+                          source:
+                            type: string
+                            enum:
+                              - RugCheck
+                            description: |
+                              - Optional external source of the warning
+                required:
+                  - warnings
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+      parameters:
+          - in: query
+            name: mints
+            schema:
+              type: string
+            required: true
+            description: |
+              - Comma separated list of mints to get information for
+  /order/routers:
+    get:
+      tags:
+        - Ultra
+      operationId: getRouters
+      summary: routers
+      description: |
+        Request for the list of routers available in the routing engine of Ultra, which is [Juno](/docs/routing#juno-liquidity-engine)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                      enum:
+                        - Metis v1.6
+                        - JupiterZ
+                        - DFlow
+                        - OKX DEX Router
+                    icon:
+                      type: string
+                  required:
+                    - id
+                    - name
+  # /search:
+  #   get:
+  #     tags:
+  #       - Ultra
+  #     operationId: searchTokensUltra
+  #     summary: search
+  #     description: |
+  #       Request a search by token's symbol, name or mint address
+          
+  #       :::note
+  #       - Refer to [Ultra API doc](/docs/ultra-api/search-token) for more information
+  #       :::
+  #     responses:
+  #       '200':
+  #         description: Successful response
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 "$ref": "#/components/schemas/MintInformation"
+  #       '400':
+  #         description: Bad request
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 error:
+  #                   type: string
+  #               required:
+  #                 - error
+  #       '500':
+  #         description: Internal server error
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 error:
+  #                   type: string
+  #               required:
+  #                 - error
+  #     parameters:
+  #       - in: query
+  #         name: query
+  #         schema:
+  #           type: string
+  #         required: true
+  #         description: |
+  #           - Search for a token and its information by its symbol, name or mint address
+  #           - Comma-separate to search for multiple
+  #           - Limit to 100 mint addresses in query
+  #           - Default to 20 mints in response when searching via symbol or name
+
   # SwapAPI
   /quote:
     get:
@@ -635,34 +1245,6 @@ components:
         - swapInstruction
         - addressLookupTableAddresses
 
-    IndexedRouteMapResponse:
-      type: object
-      required:
-        - mintKeys
-        - indexedRouteMap
-      properties:
-        mintKeys:
-          type: array
-          items:
-            type: string
-          description: All the mints that are indexed to match in indexedRouteMap
-        indexedRouteMap:
-          type: object
-          description: All the possible route and their corresponding output mints
-          additionalProperties:
-            type: array
-            items:
-              type: number
-          example:
-            '1':
-              - 2
-              - 3
-              - 4
-            '2':
-              - 1
-              - 3
-              - 4
-
     ErrorResponse:
       type: object
       properties:
@@ -843,6 +1425,86 @@ components:
         numNetBuyers:
           type: integer
           nullable: true
+
+    HoldingsResponse:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Total SOL in lamports
+        uiAmount:
+          type: number
+          description: Total SOL in UI units after applying decimals
+        uiAmountString:
+          type: string
+          description: Total SOL as string in UI units after applying decimals
+        tokens:
+          type: object
+          description: Other token holdings organized by mint address as keys
+          additionalProperties:
+            description: Token mint address as key
+            type: array
+            items:
+              $ref: "#/components/schemas/TokenAccount"
+      required:
+        - amount
+        - uiAmount
+        - uiAmountString
+        - tokens
+    
+    NativeHoldingsResponse:
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Total SOL in lamports
+        uiAmount:
+          type: number
+          description: Total SOL in UI units after applying decimals
+        uiAmountString:
+          type: string
+          description: Total SOL as string in UI units after applying decimals
+      required:
+        - amount
+        - uiAmount
+        - uiAmountString
+    
+    TokenAccount:
+      type: object
+      properties:
+        account:
+          type: string
+          description: The token account address
+        amount:
+          type: string
+          description: Token amount in atomic/raw units
+        uiAmount:
+          type: number
+          description: Token amount in UI units after applying decimals
+        uiAmountString:
+          type: string
+          description: Token amount as string in UI units after applying decimals
+        isFrozen:
+          type: boolean
+          description: Whether the token account is frozen
+        isAssociatedTokenAccount:
+          type: boolean
+          description: Whether this is an associated token account
+        decimals:
+          type: number
+          description: Number of decimal places for the token
+        programId:
+          type: string
+          description: The token program ID
+      required:
+        - account
+        - amount
+        - uiAmount
+        - uiAmountString
+        - isFrozen
+        - isAssociatedTokenAccount
+        - decimals
+        - programId
 
   parameters:
     InputMintParameter:

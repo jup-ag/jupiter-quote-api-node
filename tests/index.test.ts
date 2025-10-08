@@ -1,7 +1,7 @@
 import { ResponseError, createJupiterApiClient } from "src";
 import { describe, expect, it } from "vitest";
-describe("api", () => {
-  const apiClient = createJupiterApiClient();
+describe("SwapAPI", () => {
+  const apiClient = createJupiterApiClient().swap;
   it("success state", async () => {
     await apiClient.quoteGet({
       inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",

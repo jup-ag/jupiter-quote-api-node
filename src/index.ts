@@ -1,5 +1,4 @@
-import { TokenApi } from "generated/apis";
-import { SwapApi } from "../generated/apis/SwapApi";
+import { SwapApi, TokenApi, UltraApi } from "generated/apis";
 import { ConfigurationParameters, Configuration } from "../generated/runtime";
 
 interface UrlConfig {
@@ -9,6 +8,10 @@ interface UrlConfig {
 
 // Define server URLs
 const serverUrls: Record<string, UrlConfig> = {
+  ultra: {
+    PUBLIC: "https://lite-api.jup.ag/ultra/v1",
+    API_KEY: "https://api.jup.ag/ultra/v1",
+  },
   swap: {
     PUBLIC: "https://lite-api.jup.ag/swap/v1",
     API_KEY: "https://api.jup.ag/swap/v1",
@@ -26,6 +29,7 @@ const serverUrls: Record<string, UrlConfig> = {
  */
 export const createJupiterApiClient = (config?: ConfigurationParameters) => {
   return {
+    ultra: new UltraApi(urlConfig(serverUrls.ultra, config)),
     swap: new SwapApi(urlConfig(serverUrls.swap, config)),
     token: new TokenApi(urlConfig(serverUrls.token, config))
   }

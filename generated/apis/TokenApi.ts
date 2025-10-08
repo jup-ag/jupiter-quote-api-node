@@ -16,16 +16,16 @@
 import * as runtime from '../runtime';
 import type {
   ErrorResponse,
+  GetOrder400Response,
   MintInformation,
-  SearchTokens400Response,
 } from '../models/index';
 import {
     ErrorResponseFromJSON,
     ErrorResponseToJSON,
+    GetOrder400ResponseFromJSON,
+    GetOrder400ResponseToJSON,
     MintInformationFromJSON,
     MintInformationToJSON,
-    SearchTokens400ResponseFromJSON,
-    SearchTokens400ResponseToJSON,
 } from '../models/index';
 
 export interface GetCategoryByIntervalRequest {

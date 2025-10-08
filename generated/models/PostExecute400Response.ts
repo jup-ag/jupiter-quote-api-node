@@ -16,42 +16,50 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface SearchTokens400Response
+ * @interface PostExecute400Response
  */
-export interface SearchTokens400Response {
+export interface PostExecute400Response {
     /**
      * 
      * @type {string}
-     * @memberof SearchTokens400Response
+     * @memberof PostExecute400Response
      */
     error: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PostExecute400Response
+     */
+    code: number;
 }
 
 /**
- * Check if a given object implements the SearchTokens400Response interface.
+ * Check if a given object implements the PostExecute400Response interface.
  */
-export function instanceOfSearchTokens400Response(value: object): boolean {
+export function instanceOfPostExecute400Response(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "error" in value;
+    isInstance = isInstance && "code" in value;
 
     return isInstance;
 }
 
-export function SearchTokens400ResponseFromJSON(json: any): SearchTokens400Response {
-    return SearchTokens400ResponseFromJSONTyped(json, false);
+export function PostExecute400ResponseFromJSON(json: any): PostExecute400Response {
+    return PostExecute400ResponseFromJSONTyped(json, false);
 }
 
-export function SearchTokens400ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): SearchTokens400Response {
+export function PostExecute400ResponseFromJSONTyped(json: any, ignoreDiscriminator: boolean): PostExecute400Response {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
         'error': json['error'],
+        'code': json['code'],
     };
 }
 
-export function SearchTokens400ResponseToJSON(value?: SearchTokens400Response | null): any {
+export function PostExecute400ResponseToJSON(value?: PostExecute400Response | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -61,6 +69,7 @@ export function SearchTokens400ResponseToJSON(value?: SearchTokens400Response | 
     return {
         
         'error': value.error,
+        'code': value.code,
     };
 }
 
