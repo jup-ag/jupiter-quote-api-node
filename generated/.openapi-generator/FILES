@@ -1,10 +1,16 @@
+.openapi-generator-ignore
 apis/SwapApi.ts
 apis/index.ts
 index.ts
 models/AccountMeta.ts
 models/IndexedRouteMapResponse.ts
 models/Instruction.ts
+models/JitoTipLamports.ts
+models/JitoTipLamportsWithPayer.ts
+models/JitoTipLamportsWithPayerJitoTipLamportsWithPayer.ts
 models/PlatformFee.ts
+models/PriorityLevelWithMaxLamports.ts
+models/PriorityLevelWithMaxLamportsPriorityLevelWithMaxLamports.ts
 models/QuoteResponse.ts
 models/RoutePlanStep.ts
 models/SwapInfo.ts
@@ -12,7 +18,6 @@ models/SwapInstructionsResponse.ts
 models/SwapMode.ts
 models/SwapRequest.ts
 models/SwapRequestPrioritizationFeeLamports.ts
-models/SwapRequestPrioritizationFeeLamportsPriorityLevelWithMaxLamports.ts
 models/SwapResponse.ts
 models/index.ts
 runtime.ts

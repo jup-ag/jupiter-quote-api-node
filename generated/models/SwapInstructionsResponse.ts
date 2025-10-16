@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Swap API
- * The heart and soul of Jupiter lies in the Quote and Swap API.  ### API Rate Limit Since 1 December 2024, we have updated our API structure. Please refer to [Developer Docs](https://dev.jup.ag/docs/) for further details on usage and rate limits.  ### API Usage - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
+ * API reference for Jupiter\'s Swap API, including Quote, Swap and Swap Instructions endpoints.  ### Rate Limits Since 1 December 2024, we have updated our API structure. Please refer to https://dev.jup.ag/ for further details on usage and rate limits.  ### Usage - API Wrapper Typescript https://github.com/jup-ag/jupiter-quote-api-node  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -27,12 +27,12 @@ import {
  */
 export interface SwapInstructionsResponse {
     /**
-     * - If you set `{\"prioritizationFeeLamports\": {\"jitoTipLamports\": 5000}}`, you will see a custom tip instruction to Jito here.
+     * - If you set jito tips using the `prioritizationFeeLamports` parameter, you will see a custom tip instruction to Jito here.
      * 
      * @type {Array<Instruction>}
      * @memberof SwapInstructionsResponse
      */
-    otherInstructions?: Array<Instruction>;
+    otherInstructions: Array<Instruction>;
     /**
      * - To setup the compute budget for the transaction.
      * 
@@ -73,6 +73,7 @@ export interface SwapInstructionsResponse {
  */
 export function instanceOfSwapInstructionsResponse(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "otherInstructions" in value;
     isInstance = isInstance && "computeBudgetInstructions" in value;
     isInstance = isInstance && "setupInstructions" in value;
     isInstance = isInstance && "swapInstruction" in value;
@@ -91,7 +92,7 @@ export function SwapInstructionsResponseFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'otherInstructions': !exists(json, 'otherInstructions') ? undefined : ((json['otherInstructions'] as Array<any>).map(InstructionFromJSON)),
+        'otherInstructions': ((json['otherInstructions'] as Array<any>).map(InstructionFromJSON)),
         'computeBudgetInstructions': ((json['computeBudgetInstructions'] as Array<any>).map(InstructionFromJSON)),
         'setupInstructions': ((json['setupInstructions'] as Array<any>).map(InstructionFromJSON)),
         'swapInstruction': InstructionFromJSON(json['swapInstruction']),
@@ -109,7 +110,7 @@ export function SwapInstructionsResponseToJSON(value?: SwapInstructionsResponse 
     }
     return {
         
-        'otherInstructions': value.otherInstructions === undefined ? undefined : ((value.otherInstructions as Array<any>).map(InstructionToJSON)),
+        'otherInstructions': ((value.otherInstructions as Array<any>).map(InstructionToJSON)),
         'computeBudgetInstructions': ((value.computeBudgetInstructions as Array<any>).map(InstructionToJSON)),
         'setupInstructions': ((value.setupInstructions as Array<any>).map(InstructionToJSON)),
         'swapInstruction': InstructionToJSON(value.swapInstruction),

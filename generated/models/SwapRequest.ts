@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Swap API
- * The heart and soul of Jupiter lies in the Quote and Swap API.  ### API Rate Limit Since 1 December 2024, we have updated our API structure. Please refer to [Developer Docs](https://dev.jup.ag/docs/) for further details on usage and rate limits.  ### API Usage - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
+ * API reference for Jupiter\'s Swap API, including Quote, Swap and Swap Instructions endpoints.  ### Rate Limits Since 1 December 2024, we have updated our API structure. Please refer to https://dev.jup.ag/ for further details on usage and rate limits.  ### Usage - API Wrapper Typescript https://github.com/jup-ag/jupiter-quote-api-node  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -33,7 +33,7 @@ import {
  */
 export interface SwapRequest {
     /**
-     * The user public key.
+     * 
      * @type {string}
      * @memberof SwapRequest
      */
@@ -47,8 +47,10 @@ export interface SwapRequest {
      */
     payer?: string;
     /**
-     * - To automatically wrap/unwrap SOL in the transaction
-     * - If false, it will use wSOL token account
+     * - To automatically wrap/unwrap SOL in the transaction, as WSOL is an SPL token while native SOL is not
+     * - When true, it will strictly use SOL amount to wrap it to swap, and each time after you swap, it will unwrap all WSOL back to SOL
+     * - When false, it will strictly use WSOL amount to swap, and each time after you swap, it will not unwrap the WSOL back to SOL
+     * - To set this parameter to false, you need to have the WSOL token account initialized
      * - Parameter will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close
      * 
      * @type {boolean}
@@ -66,10 +68,10 @@ export interface SwapRequest {
      */
     useSharedAccounts?: boolean;
     /**
-     * - An token account that will be used to collect fees
+     * - An initialized token account that will be used to collect fees
      * - The mint of the token account **can only be either the input or output mint of the swap**
-     * - You no longer are required to use the Referral Program
-     * - See [Add Fees](/docs/swap-api/add-fees-to-swap) guide for more details
+     * - Swap API no longer requires the use of the Referral Program
+     * - If `platformFeeBps` is passed in `/quote`, the `feeAccount` must be passed as well
      * 
      * @type {string}
      * @memberof SwapRequest
@@ -118,7 +120,7 @@ export interface SwapRequest {
     dynamicComputeUnitLimit?: boolean;
     /**
      * - When enabled, it will not do any additional RPC calls to check on required accounts
-     * - Enable it only when you already setup all the accounts needed for the trasaction, like wrapping or unwrapping sol, or destination account is already created
+     * - The returned swap transaction will still attempt to create required accounts regardless if it exists or not
      * 
      * @type {boolean}
      * @memberof SwapRequest
@@ -126,8 +128,7 @@ export interface SwapRequest {
     skipUserAccountsRpcCalls?: boolean;
     /**
      * - When enabled, it estimates slippage and apply it in the swap transaction directly, overwriting the `slippageBps` parameter in the quote response.
-     * - Used together with `dynamicSlippage` in `/quote`, otherwise the slippage used will be the one in the `/quote`'s `slippageBps`
-     * - [See notes for more information](/docs/swap-api/send-swap-transaction#how-jupiter-estimates-slippage)
+     * - This is no longer maintained, we are focusing efforts on RTSE on Ultra Swap API
      * 
      * @type {boolean}
      * @memberof SwapRequest

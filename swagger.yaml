@@ -3,23 +3,20 @@ info:
   title: Swap API
   version: 1.0.0
   description: |
-    The heart and soul of Jupiter lies in the Quote and Swap API.
+    API reference for Jupiter's Swap API, including Quote, Swap and Swap Instructions endpoints.
 
-    ### API Rate Limit
-    Since 1 December 2024, we have updated our API structure. Please refer to [Developer Docs](https://dev.jup.ag/docs/) for further details on usage and rate limits.
+    ### Rate Limits
+    Since 1 December 2024, we have updated our API structure. Please refer to https://dev.jup.ag/ for further details on usage and rate limits.
 
-    ### API Usage
-    - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)
+    ### Usage
+    - API Wrapper Typescript https://github.com/jup-ag/jupiter-quote-api-node
 
     ### Data Types To Note
     - Public keys are base58 encoded strings
     - Raw data such as Vec<u8\> are base64 encoded strings
 
 servers:
-  - url: https://lite-api.jup.ag/swap/v1
-    description: Free tier API endpoint with rate limits
   - url: https://api.jup.ag/swap/v1
-    description: Paid tier API endpoint with higher rate limits to be used with an API Key
 
 paths:
   /quote:
@@ -30,10 +27,6 @@ paths:
       summary: quote
       description: |
         Request for a quote to be used in `POST /swap`
-        
-        :::note
-        Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/get-quote) for more information
-        :::
       parameters:
         - $ref: '#/components/parameters/InputMintParameter'
         - $ref: '#/components/parameters/OutputMintParameter'
@@ -47,6 +40,7 @@ paths:
         - $ref: '#/components/parameters/AsLegacyTransactionParameter'
         - $ref: '#/components/parameters/PlatformFeeBpsParameter'
         - $ref: '#/components/parameters/MaxAccountsParameter'
+        - $ref: '#/components/parameters/InstructionVersion'
         - $ref: '#/components/parameters/DynamicSlippage'
       responses:
         '200':
@@ -63,10 +57,6 @@ paths:
       summary: swap
       description: |
         Request for a base64-encoded unsigned swap transaction based on the `/quote` response
-        
-        :::note
-        Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction) for more information
-        :::
       requestBody:
         required: true
         content:
@@ -88,10 +78,6 @@ paths:
       summary: swap-instructions
       description: |
         Request for swap instructions that you can use from the quote you get from `/quote`
-        
-        :::note
-        Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions) for more information
-        :::
       requestBody:
         required: true
         content:
@@ -180,18 +166,19 @@ components:
           type: string
           description: |
             - Calculated output amount from routing engine
-            - Exlcuding slippage or platform fees
+            - The value includes platform fees and DEX fees, excluding slippage
         otherAmountThreshold:
           type: string
           description: |
-            - Calculated minimum output amount after accounting for `slippageBps` and `platformFeeBps`
+            - Calculated minimum output amount after accounting for `slippageBps` on the `outAmount` value
             - Not used by `/swap` endpoint to build transaction
         swapMode:
           $ref: '#/components/schemas/SwapMode'
           required: true
         slippageBps:
           type: integer
-          format: int32
+          format: uint16
+          minimum: 0
         platformFee:
           $ref: '#/components/schemas/PlatformFee'
         priceImpactPct:
@@ -201,7 +188,8 @@ components:
           items:
             $ref: '#/components/schemas/RoutePlanStep'
         contextSlot:
-          type: number
+          type: integer
+          format: uint64
         timeTaken:
           type: number
 
@@ -218,7 +206,7 @@ components:
           type: string
         feeBps:
           type: integer
-          format: int32
+          format: uint16
 
     RoutePlanStep:
       type: object
@@ -227,10 +215,12 @@ components:
           $ref: '#/components/schemas/SwapInfo'
         percent:
           type: integer
-          format: int32
+          format: uint8
+        bps:
+          type: integer
+          format: uint16
       required:
         - swapInfo
-        - percent
 
     SwapInfo:
       type: object
@@ -267,7 +257,6 @@ components:
         - quoteResponse
       properties:
         userPublicKey:
-          description: The user public key.
           type: string
         payer:
           description: |
@@ -276,8 +265,10 @@ components:
           type: string
         wrapAndUnwrapSol:
           description: |
-            - To automatically wrap/unwrap SOL in the transaction
-            - If false, it will use wSOL token account
+            - To automatically wrap/unwrap SOL in the transaction, as WSOL is an SPL token while native SOL is not
+            - When true, it will strictly use SOL amount to wrap it to swap, and each time after you swap, it will unwrap all WSOL back to SOL
+            - When false, it will strictly use WSOL amount to swap, and each time after you swap, it will not unwrap the WSOL back to SOL
+            - To set this parameter to false, you need to have the WSOL token account initialized
             - Parameter will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close
           type: boolean
           default: true
@@ -290,10 +281,10 @@ components:
           type: boolean
         feeAccount:
           description: |
-            - An token account that will be used to collect fees
+            - An initialized token account that will be used to collect fees
             - The mint of the token account **can only be either the input or output mint of the swap**
-            - You no longer are required to use the Referral Program
-            - See [Add Fees](/docs/swap-api/add-fees-to-swap) guide for more details
+            - Swap API no longer requires the use of the Referral Program
+            - If `platformFeeBps` is passed in `/quote`, the `feeAccount` must be passed as well
           type: string
         trackingAccount:
           description: |
@@ -306,28 +297,12 @@ components:
             - To specify a level or amount of additional fees to prioritize the transaction
             - It can be used for EITHER priority fee OR Jito tip (not both at the same time)
             - If you want to include both, you will need to use `/swap-instructions` to add both at the same time
-          type: object
-          properties:
-            priorityLevelWithMaxLamports:
-              type: object
-              properties:
-                priorityLevel:
-                  type: string
-                  enum:
-                    - medium
-                    - high
-                    - veryHigh
-                maxLamports:
-                  description: |
-                    - Maximum lamports to cap the priority fee estimation, to prevent overpaying
-                  type: integer
-            jitoTipLamports:
-              type: integer
-              description: |
-                - Exact amount of tip to use in a tip instruction
-                - Refer to Jito docs on how to estimate the tip amount based on percentiles
-                - It has to be used together with a connection to a Jito RPC
-                - [See their docs](https://docs.jito.wtf/)
+            - Defaults to `auto`, but preferred to use `priorityLevelWithMaxLamports` as it may be more accurate when accounting local fee market
+            - Fixed lamports can be passed in as an integer in the `prioritizationFeeLamports` parameter
+          oneOf:
+            - $ref: '#/components/schemas/PriorityLevelWithMaxLamports'
+            - $ref: '#/components/schemas/JitoTipLamports'
+            - $ref: '#/components/schemas/JitoTipLamportsWithPayer'
         asLegacyTransaction:
           description: |
             - Builds a legacy transaction rather than the default versioned transaction
@@ -350,14 +325,13 @@ components:
         skipUserAccountsRpcCalls:
           description: |
             - When enabled, it will not do any additional RPC calls to check on required accounts
-            - Enable it only when you already setup all the accounts needed for the trasaction, like wrapping or unwrapping sol, or destination account is already created
+            - The returned swap transaction will still attempt to create required accounts regardless if it exists or not
           type: boolean
           default: false
         dynamicSlippage:
           description: |
             - When enabled, it estimates slippage and apply it in the swap transaction directly, overwriting the `slippageBps` parameter in the quote response.
-            - Used together with `dynamicSlippage` in `/quote`, otherwise the slippage used will be the one in the `/quote`'s `slippageBps`
-            - [See notes for more information](/docs/swap-api/send-swap-transaction#how-jupiter-estimates-slippage)
+            - This is no longer maintained, we are focusing efforts on RTSE on Ultra Swap API
           type: boolean
           default: false
         computeUnitPriceMicroLamports:
@@ -366,11 +340,13 @@ components:
             - `computeUnitLimit (1400000) * computeUnitPriceMicroLamports`
             - We recommend using `prioritizationFeeLamports` and `dynamicComputeUnitLimit` instead of passing in your own compute unit price
           type: integer
+          format: uint64
         blockhashSlotsToExpiry:
           description: |
             - Pass in the number of slots we want the transaction to be valid for
             - Example: If you pass in 10 slots, the transaction will be valid for ~400ms * 10 = approximately 4 seconds before it expires
           type: integer
+          format: uint8
         quoteResponse:
           $ref: '#/components/schemas/QuoteResponse'
 
@@ -381,8 +357,10 @@ components:
           type: string
         lastValidBlockHeight:
           type: integer
+          format: uint64
         prioritizationFeeLamports:
           type: integer
+          format: uint64
       required:
         - swapTransaction
         - lastValidBlockHeight
@@ -392,7 +370,7 @@ components:
       properties:
         otherInstructions:
           description: |
-            - If you set `{\"prioritizationFeeLamports\": {\"jitoTipLamports\": 5000}}`, you will see a custom tip instruction to Jito here.
+            - If you set jito tips using the `prioritizationFeeLamports` parameter, you will see a custom tip instruction to Jito here.
           type: array
           items:
             $ref: '#/components/schemas/Instruction'
@@ -414,7 +392,7 @@ components:
           $ref: '#/components/schemas/Instruction'
         cleanupInstruction:
           description: |
-            - To unwrap the SOL if `wrapAndUnwrapSol = true`.
+            - To wrap and unwrap the SOL.
           $ref: '#/components/schemas/Instruction'
         addressLookupTableAddresses:
           description: |
@@ -424,6 +402,7 @@ components:
             type: string
       required:
         - computeBudgetInstructions
+        - otherInstructions
         - setupInstructions
         - swapInstruction
         - addressLookupTableAddresses
@@ -456,6 +435,66 @@ components:
               - 3
               - 4
 
+    PriorityLevelWithMaxLamports:
+      title: "priorityLevelWithMaxLamports"
+      type: object
+      properties:
+        priorityLevelWithMaxLamports:
+          type: object
+          properties:
+            priorityLevel:
+              type: string
+              enum: [medium, high, veryHigh]
+            maxLamports:
+              type: integer
+              format: uint64
+              description: |
+                - Maximum lamports to cap the priority fee estimation, to prevent overpaying
+            global:
+              type: boolean
+              default: false
+              description: |
+                - A boolean to choose between using a global or local fee market to estimate. If `global` is set to `false`, the estimation focuses on fees relevant to the **writable accounts** involved in the instruction.
+          required: [priorityLevel, maxLamports]
+          additionalProperties: false
+      required: [priorityLevelWithMaxLamports]
+      additionalProperties: false
+
+    JitoTipLamports:
+      title: "jitoTipLamports"
+      type: object
+      properties:
+        jitoTipLamports:
+          type: integer
+          format: uint64
+          description: |
+            - Exact amount of tip to use in a tip instruction
+            - Refer to Jito docs on how to estimate the tip amount based on percentiles
+            - It has to be used together with a connection to a Jito RPC
+            - See their docs at https://docs.jito.wtf/
+      required: [jitoTipLamports]
+      additionalProperties: false
+    
+    JitoTipLamportsWithPayer:
+      title: "jitoTipLamportsWithPayer"
+      type: object
+      properties:
+        jitoTipLamportsWithPayer:
+          type: object
+          properties:
+            lamports:
+              type: integer
+              format: uint64
+              description: Exact amount of lamports to use for the tip
+            payer:
+              type: string
+              description: Public key of an account that will be used to pay for the tip
+          required: [lamports, payer]
+          additionalProperties: false
+      required: [jitoTipLamportsWithPayer]
+      additionalProperties: false
+    
+
   parameters:
     InputMintParameter:
       name: inputMint
@@ -479,18 +518,26 @@ components:
       required: true
       schema:
         type: integer
+        format: uint64
     SlippageParameter:
       name: slippageBps
+      description: |
+        - Default: 50
+        - This is threshold denoted in basis points.
+        - If exact in and output amount exceeds the threshold, then the swap transaction will fail.
       in: query
       schema:
         type: integer
+        format: uint16
+        default: 50
     SwapModeParameter:
       name: swapMode
       description: |
-        - ExactOut is for supporting use cases where you need an exact output amount, like using [Swap API as a payment service](/docs/swap-api/payments-through-swap)
+        - ExactOut is for supporting use cases where you need an exact output amount
         - In the case of `ExactIn`, the slippage is on the output token
         - In the case of `ExactOut`, the slippage is on the input token
-        - Not all AMMs support `ExactOut`
+        - Not all AMMs support `ExactOut`: Currently only Orca Whirlpool, Raydium CLMM, Raydium CPMM
+        - We do not recommend using `ExactOut` for most use cases
       in: query
       schema:
         type: string
@@ -504,7 +551,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `dexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **only use** that DEX
-        - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label)
+        - Full list of DEXes here: https://lite-api.jup.ag/swap/v1/program-id-to-label
       in: query
       schema:
         type: array
@@ -516,7 +563,7 @@ components:
         - Multiple DEXes can be pass in by comma separating them
         - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
         - If a DEX is indicated, the route will **not use** that DEX
-        - [Full list of DEXes here](https://lite-api.jup.ag/swap/v1/program-id-to-label)
+        - Full list of DEXes here: https://lite-api.jup.ag/swap/v1/program-id-to-label
       in: query
       schema:
         type: array
@@ -534,7 +581,7 @@ components:
     OnlyDirectRoutesParameter:
       name: onlyDirectRoutes
       description: |
-        - Direct Routes limits Jupiter routing to single hop routes only
+        - Direct route limits Jupiter routing to single hop routes only
         - This may result in worse routes
       in: query
       schema:
@@ -556,20 +603,32 @@ components:
       in: query
       schema:
         type: integer
+        format: uint64 # usize
         default: 64
     PlatformFeeBpsParameter:
       name: platformFeeBps
       description: |
         - Take fees in basis points
-        - Used together with `feeAccount` in /swap, see [Adding Fees](/docs/swap-api/add-fees-to-swap) guide
+        - If `platformFeeBps` is passed in, the `feeAccount` in `/swap` must be passed as well
       in: query
       schema:
         type: integer
+        format: uint16
+    InstructionVersion:
+      name: instructionVersion
+      description: |
+        - The version of instruction to use in the swap program
+      in: query
+      schema:
+        type: string
+        enum:
+          - V1
+          - V2
+        default: V1
     DynamicSlippage:
       name: dynamicSlippage
       description: |
-        - If true, `slippageBps` will be overriden by Dynamic Slippage's estimated value
-        - The value is returned in `/swap` endpoint
+        - No longer applicable, only required to pass in via `/swap` endpoint
       in: query
       schema:
         type: boolean

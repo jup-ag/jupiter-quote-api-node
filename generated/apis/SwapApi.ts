@@ -2,7 +2,7 @@
 /* eslint-disable */
 /**
  * Swap API
- * The heart and soul of Jupiter lies in the Quote and Swap API.  ### API Rate Limit Since 1 December 2024, we have updated our API structure. Please refer to [Developer Docs](https://dev.jup.ag/docs/) for further details on usage and rate limits.  ### API Usage - API Wrapper Typescript [@jup-ag/api](https://github.com/jup-ag/jupiter-quote-api-node)  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
+ * API reference for Jupiter\'s Swap API, including Quote, Swap and Swap Instructions endpoints.  ### Rate Limits Since 1 December 2024, we have updated our API structure. Please refer to https://dev.jup.ag/ for further details on usage and rate limits.  ### Usage - API Wrapper Typescript https://github.com/jup-ag/jupiter-quote-api-node  ### Data Types To Note - Public keys are base58 encoded strings - Raw data such as Vec<u8\\> are base64 encoded strings 
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -44,6 +44,7 @@ export interface QuoteGetRequest {
     asLegacyTransaction?: boolean;
     platformFeeBps?: number;
     maxAccounts?: number;
+    instructionVersion?: QuoteGetInstructionVersionEnum;
     dynamicSlippage?: boolean;
 }
 
@@ -89,7 +90,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for a quote to be used in `POST /swap`  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/get-quote) for more information ::: 
+     * Request for a quote to be used in `POST /swap` 
      * quote
      */
     async quoteGetRaw(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<QuoteResponse>> {
@@ -155,6 +156,10 @@ export class SwapApi extends runtime.BaseAPI {
             queryParameters['maxAccounts'] = requestParameters.maxAccounts;
         }
 
+        if (requestParameters.instructionVersion !== undefined) {
+            queryParameters['instructionVersion'] = requestParameters.instructionVersion;
+        }
+
         if (requestParameters.dynamicSlippage !== undefined) {
             queryParameters['dynamicSlippage'] = requestParameters.dynamicSlippage;
         }
@@ -172,7 +177,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for a quote to be used in `POST /swap`  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/get-quote) for more information ::: 
+     * Request for a quote to be used in `POST /swap` 
      * quote
      */
     async quoteGet(requestParameters: QuoteGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<QuoteResponse> {
@@ -181,7 +186,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for swap instructions that you can use from the quote you get from `/quote`  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions) for more information ::: 
+     * Request for swap instructions that you can use from the quote you get from `/quote` 
      * swap-instructions
      */
     async swapInstructionsPostRaw(requestParameters: SwapInstructionsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SwapInstructionsResponse>> {
@@ -207,7 +212,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for swap instructions that you can use from the quote you get from `/quote`  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction#build-your-own-transaction-with-instructions) for more information ::: 
+     * Request for swap instructions that you can use from the quote you get from `/quote` 
      * swap-instructions
      */
     async swapInstructionsPost(requestParameters: SwapInstructionsPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SwapInstructionsResponse> {
@@ -216,7 +221,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction) for more information ::: 
+     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response 
      * swap
      */
     async swapPostRaw(requestParameters: SwapPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SwapResponse>> {
@@ -242,7 +247,7 @@ export class SwapApi extends runtime.BaseAPI {
     }
 
     /**
-     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response  :::note Refer to [Swap API doc](https://dev.jup.ag/docs/swap-api/build-swap-transaction) for more information ::: 
+     * Request for a base64-encoded unsigned swap transaction based on the `/quote` response 
      * swap
      */
     async swapPost(requestParameters: SwapPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SwapResponse> {
@@ -260,3 +265,11 @@ export const QuoteGetSwapModeEnum = {
     ExactOut: 'ExactOut'
 } as const;
 export type QuoteGetSwapModeEnum = typeof QuoteGetSwapModeEnum[keyof typeof QuoteGetSwapModeEnum];
+/**
+ * @export
+ */
+export const QuoteGetInstructionVersionEnum = {
+    V1: 'V1',
+    V2: 'V2'
+} as const;
+export type QuoteGetInstructionVersionEnum = typeof QuoteGetInstructionVersionEnum[keyof typeof QuoteGetInstructionVersionEnum];
