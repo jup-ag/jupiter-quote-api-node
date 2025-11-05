@@ -50,7 +50,7 @@ export interface SwapRequest {
      * - To automatically wrap/unwrap SOL in the transaction, as WSOL is an SPL token while native SOL is not
      * - When true and input mint is SOL, it will wrap the SOL amount to WSOL and swap
      * - When true and output mint is SOL, it will unwrap the WSOL back to SOL
-     * - When false and intput mint is SOL, it will use existing WSOL amount to swap
+     * - When false and input mint is SOL, it will use existing WSOL amount to swap
      * - When false and output mint is SOL, it will not unwrap the WSOL to SOL
      * - To set this parameter to false, you need to have the WSOL token account initialized
      * 
