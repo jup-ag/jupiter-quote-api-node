@@ -48,10 +48,11 @@ export interface SwapRequest {
     payer?: string;
     /**
      * - To automatically wrap/unwrap SOL in the transaction, as WSOL is an SPL token while native SOL is not
-     * - When true, it will strictly use SOL amount to wrap it to swap, and each time after you swap, it will unwrap all WSOL back to SOL
-     * - When false, it will strictly use WSOL amount to swap, and each time after you swap, it will not unwrap the WSOL back to SOL
+     * - When true and input mint is SOL, it will wrap the SOL amount to WSOL and swap
+     * - When true and output mint is SOL, it will unwrap the WSOL back to SOL
+     * - When false and input mint is SOL, it will use existing WSOL amount to swap
+     * - When false and output mint is SOL, it will not unwrap the WSOL to SOL
      * - To set this parameter to false, you need to have the WSOL token account initialized
-     * - Parameter will be ignored if `destinationTokenAccount` is set because the `destinationTokenAccount` may belong to a different user that we have no authority to close
      * 
      * @type {boolean}
      * @memberof SwapRequest
@@ -104,11 +105,24 @@ export interface SwapRequest {
      * - Public key of a token account that will be used to receive the token out of the swap
      * - If not provided, the signer's token account will be used
      * - If provided, we assume that the token account is already initialized
+     * - `destinationTokenAccount` and `nativeDestinationAccount` are mutually exclusive
      * 
      * @type {string}
      * @memberof SwapRequest
      */
     destinationTokenAccount?: string;
+    /**
+     * - Public key of an account that will be used to receive the native SOL token out of the swap
+     * - If not provided, the swap will default unwrap the WSOL and transfer the native SOL to the swap authority account
+     * - If provided, we will unwrap the WSOL and transfer the native SOL to the account
+     * - Only works if the output mint is SOL, is using the V2 instructions and the account passed in is not owned by token program
+     * - When sending native SOL to a new account, you must swap at least enough to cover the rent required to create it.
+     * - `destinationTokenAccount` and `nativeDestinationAccount` are mutually exclusive
+     * 
+     * @type {string}
+     * @memberof SwapRequest
+     */
+    nativeDestinationAccount?: string;
     /**
      * - When enabled, it will do a swap simulation to get the compute unit used and set it in ComputeBudget's compute unit limit
      * - This incurs one extra RPC call to simulate this
@@ -189,6 +203,7 @@ export function SwapRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'prioritizationFeeLamports': !exists(json, 'prioritizationFeeLamports') ? undefined : SwapRequestPrioritizationFeeLamportsFromJSON(json['prioritizationFeeLamports']),
         'asLegacyTransaction': !exists(json, 'asLegacyTransaction') ? undefined : json['asLegacyTransaction'],
         'destinationTokenAccount': !exists(json, 'destinationTokenAccount') ? undefined : json['destinationTokenAccount'],
+        'nativeDestinationAccount': !exists(json, 'nativeDestinationAccount') ? undefined : json['nativeDestinationAccount'],
         'dynamicComputeUnitLimit': !exists(json, 'dynamicComputeUnitLimit') ? undefined : json['dynamicComputeUnitLimit'],
         'skipUserAccountsRpcCalls': !exists(json, 'skipUserAccountsRpcCalls') ? undefined : json['skipUserAccountsRpcCalls'],
         'dynamicSlippage': !exists(json, 'dynamicSlippage') ? undefined : json['dynamicSlippage'],
@@ -216,6 +231,7 @@ export function SwapRequestToJSON(value?: SwapRequest | null): any {
         'prioritizationFeeLamports': SwapRequestPrioritizationFeeLamportsToJSON(value.prioritizationFeeLamports),
         'asLegacyTransaction': value.asLegacyTransaction,
         'destinationTokenAccount': value.destinationTokenAccount,
+        'nativeDestinationAccount': value.nativeDestinationAccount,
         'dynamicComputeUnitLimit': value.dynamicComputeUnitLimit,
         'skipUserAccountsRpcCalls': value.skipUserAccountsRpcCalls,
         'dynamicSlippage': value.dynamicSlippage,
