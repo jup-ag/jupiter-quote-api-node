@@ -55,18 +55,6 @@ export interface SwapInfo {
      * @memberof SwapInfo
      */
     outAmount: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SwapInfo
-     */
-    feeAmount: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SwapInfo
-     */
-    feeMint: string;
 }
 
 /**
@@ -79,8 +67,6 @@ export function instanceOfSwapInfo(value: object): boolean {
     isInstance = isInstance && "outputMint" in value;
     isInstance = isInstance && "inAmount" in value;
     isInstance = isInstance && "outAmount" in value;
-    isInstance = isInstance && "feeAmount" in value;
-    isInstance = isInstance && "feeMint" in value;
 
     return isInstance;
 }
@@ -101,8 +87,6 @@ export function SwapInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'outputMint': json['outputMint'],
         'inAmount': json['inAmount'],
         'outAmount': json['outAmount'],
-        'feeAmount': json['feeAmount'],
-        'feeMint': json['feeMint'],
     };
 }
 
@@ -121,8 +105,6 @@ export function SwapInfoToJSON(value?: SwapInfo | null): any {
         'outputMint': value.outputMint,
         'inAmount': value.inAmount,
         'outAmount': value.outAmount,
-        'feeAmount': value.feeAmount,
-        'feeMint': value.feeMint,
     };
 }
 

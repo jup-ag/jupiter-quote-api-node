@@ -230,8 +230,6 @@ components:
         - outputMint
         - inAmount
         - outAmount
-        - feeAmount
-        - feeMint
       properties:
         ammKey:
           type: string
@@ -244,10 +242,6 @@ components:
         inAmount:
           type: string
         outAmount:
-          type: string
-        feeAmount:
-          type: string
-        feeMint:
           type: string
 
     SwapRequest:
