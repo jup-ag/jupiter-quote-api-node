@@ -1,7 +1,12 @@
 {
+  // $schema defines the path to the JSON schema for validation and IDE auto-completion.
   "$schema": "node_modules/@openapitools/openapi-generator-cli/config.schema.json",
-  "spaces": 2,
+  
   "generator-cli": {
+    // Specifies the exact version of the OpenAPI Generator CLI to use.
+    // Pinning the version ensures deterministic builds across different environments.
     "version": "7.3.0"
   }
+  // OPTIMIZATION: Removed the "spaces" field as it is non-standard for OpenAPI Generator CLI 
+  // and contributes unnecessary configuration noise unless specifically required by another tool.
 }
