@@ -216,6 +216,7 @@ components:
         percent:
           type: integer
           format: uint8
+          nullable: true
         bps:
           type: integer
           format: uint16
@@ -230,8 +231,6 @@ components:
         - outputMint
         - inAmount
         - outAmount
-        - feeAmount
-        - feeMint
       properties:
         ammKey:
           type: string
@@ -244,10 +243,6 @@ components:
         inAmount:
           type: string
         outAmount:
-          type: string
-        feeAmount:
-          type: string
-        feeMint:
           type: string
 
     SwapRequest:

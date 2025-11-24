@@ -37,7 +37,7 @@ export interface RoutePlanStep {
      * @type {number}
      * @memberof RoutePlanStep
      */
-    percent?: number;
+    percent?: number | null;
     /**
      * 
      * @type {number}
