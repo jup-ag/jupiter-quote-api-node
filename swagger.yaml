@@ -216,6 +216,7 @@ components:
         percent:
           type: integer
           format: uint8
+          nullable: true
         bps:
           type: integer
           format: uint16
