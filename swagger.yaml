@@ -172,6 +172,14 @@ components:
           description: |
             - Calculated minimum output amount after accounting for `slippageBps` on the `outAmount` value
             - Not used by `/swap` endpoint to build transaction
+        instructionVersion:
+          type: string
+          description: |
+            - The version of instruction to use in the swap program
+          enum:
+            - V1
+            - V2
+          nullable: true
         swapMode:
           $ref: '#/components/schemas/SwapMode'
           required: true
