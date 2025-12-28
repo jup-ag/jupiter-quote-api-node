@@ -73,6 +73,13 @@ export interface QuoteResponse {
      */
     otherAmountThreshold: string;
     /**
+     * - The version of instruction to use in the swap program
+     * 
+     * @type {string}
+     * @memberof QuoteResponse
+     */
+    instructionVersion?: QuoteResponseInstructionVersionEnum | null;
+    /**
      * 
      * @type {SwapMode}
      * @memberof QuoteResponse
@@ -116,6 +123,17 @@ export interface QuoteResponse {
     timeTaken?: number;
 }
 
+
+/**
+ * @export
+ */
+export const QuoteResponseInstructionVersionEnum = {
+    V1: 'V1',
+    V2: 'V2'
+} as const;
+export type QuoteResponseInstructionVersionEnum = typeof QuoteResponseInstructionVersionEnum[keyof typeof QuoteResponseInstructionVersionEnum];
+
+
 /**
  * Check if a given object implements the QuoteResponse interface.
  */
@@ -149,6 +167,7 @@ export function QuoteResponseFromJSONTyped(json: any, ignoreDiscriminator: boole
         'outputMint': json['outputMint'],
         'outAmount': json['outAmount'],
         'otherAmountThreshold': json['otherAmountThreshold'],
+        'instructionVersion': !exists(json, 'instructionVersion') ? undefined : json['instructionVersion'],
         'swapMode': SwapModeFromJSON(json['swapMode']),
         'slippageBps': json['slippageBps'],
         'platformFee': !exists(json, 'platformFee') ? undefined : PlatformFeeFromJSON(json['platformFee']),
@@ -173,6 +192,7 @@ export function QuoteResponseToJSON(value?: QuoteResponse | null): any {
         'outputMint': value.outputMint,
         'outAmount': value.outAmount,
         'otherAmountThreshold': value.otherAmountThreshold,
+        'instructionVersion': value.instructionVersion,
         'swapMode': SwapModeToJSON(value.swapMode),
         'slippageBps': value.slippageBps,
         'platformFee': PlatformFeeToJSON(value.platformFee),
