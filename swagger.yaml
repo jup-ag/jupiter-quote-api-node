@@ -528,11 +528,15 @@ components:
         - Raw amount to swap (before decimals)
         - Input Amount if `SwapMode=ExactIn`
         - Output Amount if `SwapMode=ExactOut`
+        - This is a u64 in atomic units. It is typed as `string` to preserve full
+          precision: a JS `number` is an IEEE-754 double and silently loses
+          precision above 2^53-1, while a u64 can be up to ~1.84e19. Response-side
+          amounts (`inAmount`, `outAmount`, ...) are already strings for the same
+          reason.
       in: query
       required: true
       schema:
-        type: integer
-        format: uint64
+        type: string
     SlippageParameter:
       name: slippageBps
       description: |

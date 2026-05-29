@@ -34,7 +34,7 @@ import {
 export interface QuoteGetRequest {
     inputMint: string;
     outputMint: string;
-    amount: number;
+    amount: string;
     slippageBps?: number;
     swapMode?: QuoteGetSwapModeEnum;
     dexes?: Array<string>;
