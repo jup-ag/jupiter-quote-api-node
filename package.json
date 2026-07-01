@@ -15,7 +15,9 @@
     "dev-swap": "FLOW=quoteAndSwap ts-node ./example/index.ts",
     "dev-quote": "FLOW=quote ts-node ./example/index.ts",
     "test": "vitest",
-    "build": "npm run openapi-gen && tsup src/index.ts --dts --format esm,cjs",
+    "build": "npm run openapi-gen && npm run bundle",
+    "bundle": "tsup src/index.ts --dts --format esm,cjs",
+    "prepublishOnly": "npm run bundle",
     "openapi-gen": "openapi-generator-cli generate -i swagger.yaml -o generated -g typescript-fetch --skip-validate-spec --additional-properties=supportsES6=true,typescriptThreePlus=true",
     "openapi-gen-rust": "openapi-generator-cli generate -i swagger.yaml -o generated -g rust"
   },
