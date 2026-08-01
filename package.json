@@ -10,13 +10,18 @@
     "url": "https://github.com/jup-ag/jupiter-quote-api-node.git"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "type": "module",
   "sideEffects": false,
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
     "build": "bun run generate && tsdown",
     "format": "oxfmt --write .",
