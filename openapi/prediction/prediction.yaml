@@ -1,0 +1,2688 @@
+openapi: 3.0.3
+info:
+  title: Jupiter Prediction Market API
+  version: 1.0.0
+  description: Jupiter Prediction Market API Schema
+
+servers:
+  - url: https://api.jup.ag/prediction/v1
+    description: Jupiter Prediction Market API Endpoint
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Events
+  - name: Markets
+  - name: Orders
+  - name: Positions
+  - name: History
+  - name: Trading
+  - name: Orderbook
+  - name: Milestones
+  - name: Vault
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+  schemas:
+    EventMetadata:
+      type: object
+      properties:
+        eventId:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        slug:
+          type: string
+        series:
+          type: string
+        closeTime:
+          type: string
+          description: ISO 8601 formatted close time
+        imageUrl:
+          type: string
+          format: uri
+        isLive:
+          type: boolean
+      required:
+        - eventId
+    MarketMetadata:
+      type: object
+      properties:
+        marketId:
+          type: string
+        eventId:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        description:
+          type: string
+        provider:
+          type: string
+        status:
+          type: string
+        result:
+          type: string
+          nullable: true
+        closeTime:
+          type: number
+        openTime:
+          type: number
+        isTeamMarket:
+          type: boolean
+        marketOptions:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              buyYes:
+                type: boolean
+        rulesPrimary:
+          type: string
+        rulesSecondary:
+          type: string
+      required:
+        - marketId
+    MarketPricing:
+      type: object
+      properties:
+        buyYesPriceUsd:
+          type: number
+          nullable: true
+        buyNoPriceUsd:
+          type: number
+          nullable: true
+        sellYesPriceUsd:
+          type: number
+          nullable: true
+        sellNoPriceUsd:
+          type: number
+          nullable: true
+        volume:
+          type: number
+          description: Trading volume for this market
+    Market:
+      type: object
+      description: Market fields are returned flat (there is no nested `metadata` object).
+      properties:
+        marketId:
+          type: string
+          description: Market identifier
+        eventId:
+          type: string
+          description: Parent event identifier
+        provider:
+          type: string
+          enum:
+            - polymarket
+            - gx
+            - bisonfi
+          description: Market data provider
+        title:
+          type: string
+          description: Market title
+        status:
+          type: string
+          enum:
+            - open
+            - closed
+            - cancelled
+          description: Current market status
+        result:
+          type: string
+          nullable: true
+          enum:
+            - "yes"
+            - "no"
+          description: Market result. null until resolved, then "yes" or "no"
+        openTime:
+          type: number
+          description: Unix timestamp (seconds) when the market opens
+        closeTime:
+          type: number
+          description: Unix timestamp (seconds) when the market closes
+        resolveAt:
+          nullable: true
+          oneOf:
+            - type: string
+            - type: number
+          description: When the market resolved. null while open; returned as an ISO 8601 string once resolved
+        marketResultPubkey:
+          type: string
+          nullable: true
+          description: Public key of the market result account
+        imageUrl:
+          type: string
+          nullable: true
+          format: uri
+          description: Market image URL
+        rulesPrimary:
+          type: string
+          description: Primary resolution rules
+        rulesSecondary:
+          type: string
+          description: Secondary resolution rules
+        outcomes:
+          type: array
+          items:
+            type: string
+          description: Outcome labels for the market
+        marketOptions:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              buyYes:
+                type: boolean
+          description: Selectable options for team or multi-outcome markets
+        clobTokenIds:
+          type: array
+          items:
+            type: string
+          description: Underlying CLOB token IDs (provider-specific)
+        isTeamMarket:
+          type: boolean
+          description: True for team or sports markets
+        team:
+          type: object
+          nullable: true
+          description: Team metadata, present for team markets
+        sportsLine:
+          type: number
+          nullable: true
+          description: Sports line or handicap, when applicable
+        sportsMarketType:
+          type: string
+          nullable: true
+          description: Sports market type, when applicable
+        outcomeMint:
+          type: string
+          nullable: true
+          description: >-
+            Outcome token mint for this market side (Jupiter Forecast / bisonfi).
+            Buying the market gives you this token; it can also be traded directly
+            through the Swap API.
+        outcomeTokenProgram:
+          type: string
+          nullable: true
+          description: >-
+            Token program that owns `outcomeMint`. Jupiter Forecast uses
+            Token-2022 (`TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb`).
+        marketPda:
+          type: string
+          nullable: true
+          description: On-chain market account (Jupiter Forecast / bisonfi).
+        outcomeSide:
+          type: string
+          nullable: true
+          description: Outcome side for Jupiter Forecast markets (`up` or `down`).
+        tradable:
+          type: boolean
+          description: >-
+            Whether this Jupiter Forecast side can be traded right now. The
+            Discover example filters on this field.
+        lifecycleStatus:
+          type: string
+          enum:
+            - open
+            - resolving
+            - settled
+          description: >-
+            Jupiter Forecast trading lifecycle: `open`, `resolving` after the
+            close time, or `settled` after issuer resolution. Only `open` is
+            tradable.
+        pricing:
+          $ref: "#/components/schemas/MarketPricing"
+      required:
+        - marketId
+        - status
+        - result
+        - openTime
+        - closeTime
+        - resolveAt
+    Event:
+      type: object
+      properties:
+        eventId:
+          type: string
+          description: Application-level identifier
+        isActive:
+          type: boolean
+          description: Whether the event is active (listed on events)
+        isLive:
+          type: boolean
+          description: Whether the event is currently live
+        category:
+          type: string
+          description: "The category for the event, allowed values: all, crypto, sports,
+            politics, esports, culture, economics, tech"
+        subcategory:
+          type: string
+          description: The subcategory for the event
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags associated with the event
+        metadata:
+          $ref: "#/components/schemas/EventMetadata"
+        markets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Market"
+        volumeUsd:
+          type: string
+          description: Total volume for the event in micro USD
+        volume24hr:
+          type: string
+          description: Rolling 24-hour volume in micro USD
+        liveScore:
+          nullable: true
+          description: Live score data for sports events; null when no score is available
+        closeCondition:
+          type: string
+          description: Close condition for the event
+        beginAt:
+          type: string
+          nullable: true
+          description: Unix timestamp (seconds) when the event begins
+        rulesPdf:
+          type: string
+          description: Document to full rules for the event
+      required:
+        - eventId
+        - isActive
+        - isLive
+        - category
+        - subcategory
+        - volumeUsd
+        - closeCondition
+        - beginAt
+        - rulesPdf
+    Pagination:
+      type: object
+      properties:
+        start:
+          type: integer
+          minimum: 0
+        end:
+          type: integer
+          minimum: 0
+        total:
+          type: integer
+          minimum: 0
+        hasNext:
+          type: boolean
+      required:
+        - start
+        - end
+        - total
+        - hasNext
+    ErrorResponse:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - invalid_request_error
+            - authentication_error
+            - permission_error
+            - idempotency_error
+            - rate_limit_error
+            - api_error
+        message:
+          type: string
+        code:
+          type: string
+        param:
+          type: string
+        request_id:
+          type: string
+        doc_url:
+          type: string
+      required:
+        - type
+        - message
+        - request_id
+    Order:
+      type: object
+      properties:
+        pubkey:
+          type: string
+          description: Order account public key
+        owner:
+          type: string
+          description: Order owner public key
+        ownerPubkey:
+          type: string
+          description: Order owner public key (alias of owner, use ownerPubkey when
+            available)
+        market:
+          type: string
+          description: Associated market public key
+        marketId:
+          type: string
+          description: External market identifier used to derive the PDA
+        marketIdHash:
+          type: string
+          description: Hashed market identifier used for on-chain PDAs
+        eventId:
+          type: string
+          description: External event identifier
+        position:
+          type: string
+          description: Associated position public key
+        status:
+          type: string
+          enum:
+            - pending
+            - filled
+            - failed
+          description: Current order status
+        isYes:
+          type: boolean
+          description: True when order is for the YES side
+        isBuy:
+          type: boolean
+          description: True when order is a buy order
+        createdAt:
+          type: integer
+          description: Unix timestamp (seconds) when the order was created
+        updatedAt:
+          type: integer
+          description: Unix timestamp (seconds) when the order last changed on-chain
+        contracts:
+          type: string
+          description: Number of contracts (u64 as string)
+        maxFillPriceUsd:
+          type: string
+          description: Maximum fill price in micro USD (u64 as string)
+        maxBuyPriceUsd:
+          type: string
+          nullable: true
+          description: Buyer-specified max fill price (micro USD)
+        minSellPriceUsd:
+          type: string
+          nullable: true
+          description: Seller-specified min fill price (micro USD)
+        filledAt:
+          type: integer
+          description: Unix timestamp (seconds) when the order was filled (0 when pending)
+        filledContracts:
+          type: string
+          description: Number of filled contracts (u64 as string)
+        avgFillPriceUsd:
+          type: string
+          description: Average fill price in micro USD (u64 as string)
+        settled:
+          type: boolean
+          description: Whether the order has been settled on-chain
+        orderId:
+          type: string
+          description: External order identifier from the venue
+        sizeUsd:
+          type: string
+          description: Order notional in micro USD (u128 as string)
+        eventMetadata:
+          $ref: "#/components/schemas/EventMetadata"
+        marketMetadata:
+          allOf:
+            - $ref: "#/components/schemas/MarketMetadata"
+            - properties:
+                marketId:
+                  type: string
+                eventId:
+                  type: string
+                title:
+                  type: string
+                status:
+                  type: string
+                result:
+                  type: string
+                closeTime:
+                  type: number
+                openTime:
+                  type: number
+                isTeamMarket:
+                  type: boolean
+        externalOrderId:
+          type: string
+          description: Client-provided order identifier
+        bump:
+          type: integer
+          minimum: 0
+      required:
+        - pubkey
+        - owner
+        - ownerPubkey
+        - market
+        - marketId
+        - marketIdHash
+        - eventId
+        - position
+        - status
+        - isYes
+        - isBuy
+        - createdAt
+        - updatedAt
+        - contracts
+        - maxFillPriceUsd
+        - maxBuyPriceUsd
+        - minSellPriceUsd
+        - filledAt
+        - filledContracts
+        - avgFillPriceUsd
+        - settled
+        - orderId
+        - sizeUsd
+        - eventMetadata
+        - marketMetadata
+        - externalOrderId
+        - bump
+    CreateOrderResponse:
+      type: object
+      properties:
+        transaction:
+          type: string
+          nullable: true
+          description: Base64 encoded transaction
+        txMeta:
+          type: object
+          nullable: true
+          properties:
+            blockhash:
+              type: string
+            lastValidBlockHeight:
+              type: integer
+              minimum: 0
+          required:
+            - blockhash
+            - lastValidBlockHeight
+          description: Transaction metadata
+        externalOrderId:
+          type: string
+          nullable: true
+        requiredSigners:
+          type: array
+          items:
+            type: string
+          description: Public keys that must sign the returned transaction
+        execution:
+          $ref: "#/components/schemas/Execution"
+        executionModel:
+          type: string
+          nullable: true
+          description: >-
+            Execution model for the order. `atomic_swap` for Jupiter Forecast
+            (bisonfi) orders, which execute as a single atomic swap through
+            `POST /execute`. `null` for keeper-filled prediction orders.
+        settlement:
+          type: string
+          nullable: true
+          description: >-
+            Settlement mode. `auto` for Jupiter Forecast orders, which settle
+            automatically. `null` for keeper-filled prediction orders.
+        jupiterSwapRequestId:
+          type: string
+          nullable: true
+          description: >-
+            Jupiter swap request id when the order executes as a swap (Jupiter
+            Forecast). `null` otherwise.
+        order:
+          type: object
+          properties:
+            orderPubkey:
+              type: string
+              nullable: true
+              description: Order account public key
+            orderAtaPubkey:
+              type: string
+              nullable: true
+              description: Order escrow token account
+            userPubkey:
+              type: string
+              description: Order owner public key
+            marketId:
+              type: string
+              description: Associated market identifier
+            marketIdHash:
+              type: string
+              description: Hashed market identifier used for on-chain PDAs
+            positionPubkey:
+              type: string
+              description: Position PDA used for the order
+            isBuy:
+              type: boolean
+              description: True when the order increases exposure
+            isYes:
+              type: boolean
+              description: True when the order is on the YES side
+            contracts:
+              type: string
+              description: Legacy whole-contract quantity. Use contractsMicro or contractsDecimal for the exact fractional quantity.
+            contractsMicro:
+              type: string
+              description: Contracts in micro-contract units (u64 as string, 1000000 = 1 contract)
+            contractsDecimal:
+              type: string
+              description: Contracts as a decimal string
+            newContracts:
+              type: string
+              description: Position contracts after executing the order (legacy whole-contract quantity)
+            newContractsMicro:
+              type: string
+              description: Position contracts after the order, in micro-contract units
+            newContractsDecimal:
+              type: string
+              description: Position contracts after the order, as a decimal string
+            maxBuyPriceUsd:
+              type: string
+              nullable: true
+              description: Max fill price for buys (micro USD)
+            minSellPriceUsd:
+              type: string
+              nullable: true
+              description: Min fill price for sells (micro USD)
+            externalOrderId:
+              type: string
+              nullable: true
+              description: Client provided order identifier
+            orderCostUsd:
+              type: string
+              description: Notional for this order in micro USD
+            newAvgPriceUsd:
+              type: string
+              description: Average position entry price after the order
+            newSizeUsd:
+              type: string
+              description: Total position cost basis after the order
+            newPayoutUsd:
+              type: string
+              description: Position max payout after the order
+            estimatedProtocolFeeUsd:
+              type: string
+              description: Estimated protocol fee (micro USD)
+            estimatedVenueFeeUsd:
+              type: string
+              description: Estimated venue fee (micro USD)
+            estimatedTotalFeeUsd:
+              type: string
+              description: Estimated total fees applied (micro USD)
+            payoutUsd:
+              type: string
+              description: Position max payout for this order (micro USD)
+            slippageBps:
+              type: integer
+              minimum: 0
+              description: >-
+                Estimated slippage for this order, in basis points (0 = none, 250 = 2.5%).
+                For a Polymarket buy this is the estimated price impact from sweeping
+                orderbook levels; for a sell it is the max allowed slippage from best bid
+                to the protected sell floor. Treat it as a quote signal, not a guaranteed loss.
+            maxSlippageBps:
+              type: integer
+              minimum: 0
+              nullable: true
+              description: Maximum slippage allowed for this order, in basis points
+          required:
+            - orderPubkey
+            - orderAtaPubkey
+            - userPubkey
+            - marketId
+            - marketIdHash
+            - positionPubkey
+            - isBuy
+            - isYes
+            - contracts
+            - newContracts
+            - maxBuyPriceUsd
+            - minSellPriceUsd
+            - externalOrderId
+            - orderCostUsd
+            - newAvgPriceUsd
+            - newSizeUsd
+            - newPayoutUsd
+            - estimatedProtocolFeeUsd
+            - estimatedVenueFeeUsd
+            - estimatedTotalFeeUsd
+      required:
+        - transaction
+        - txMeta
+        - externalOrderId
+        - order
+    CreateOrderRequest:
+      type: object
+      properties:
+        ownerPubkey:
+          type: string
+          description: Order owner public key
+        marketId:
+          type: string
+          minLength: 1
+          description: Hashed or canonical market ID for buys
+        positionPubkey:
+          type: string
+          minLength: 32
+          description: Required for sells
+        isYes:
+          type: boolean
+        isBuy:
+          type: boolean
+        contracts:
+          anyOf:
+            - type: string
+            - type: number
+          description: Legacy whole-contract sell quantity (only when `isBuy` is `false`). Cannot express fractions; prefer contractsMicro or contractsDecimal. Provide only one of contracts, contractsMicro, or contractsDecimal.
+        contractsMicro:
+          anyOf:
+            - type: string
+            - type: number
+          description: Exact sell quantity in micro-contract units (1000000 = 1 contract). Provide only one of contracts, contractsMicro, or contractsDecimal.
+        contractsDecimal:
+          anyOf:
+            - type: string
+            - type: number
+          description: Exact sell quantity as a decimal (e.g. 5.777773). Provide only one of contracts, contractsMicro, or contractsDecimal.
+        depositAmount:
+          anyOf:
+            - type: string
+            - type: number
+          description: Amount must conform to the token decimals used by the token mint in
+            `depositMint`
+        depositMint:
+          type: string
+          default: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+          description: Mint address for the deposit token
+      required:
+        - isBuy
+    Execution:
+      type: object
+      description: >-
+        Execution details returned with an order build. Sign the build's
+        `transaction`, then pass `context` unchanged to `POST /execute`.
+      properties:
+        endpoint:
+          type: string
+          description: Relative execute path. Resolves to `https://api.jup.ag/prediction/v1/execute`.
+          example: /api/v1/execute
+        context:
+          type: object
+          additionalProperties: true
+          description: >-
+            Opaque execution context. Pass this object unchanged to `POST /execute`.
+            Includes a `type` field (`create_order` for keeper-filled orders,
+            `bisonfi_swap` for Jupiter Forecast orders).
+      required:
+        - endpoint
+        - context
+    ExecuteRequest:
+      type: object
+      properties:
+        signedTransaction:
+          type: string
+          description: Base64-encoded signed transaction from the order build.
+        context:
+          type: object
+          additionalProperties: true
+          description: >-
+            Optional. The `execution.context` object from the order build, passed
+            unchanged. Validated against the signed transaction when present. For a
+            Forecast swap it carries `jupiterSwapRequestId` and `ownerPubkey`.
+        requestId:
+          type: string
+          description: Optional client correlation ID, echoed back in the response.
+      required:
+        - signedTransaction
+    ExecuteResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - Success
+            - Failed
+          description: Transaction execution result.
+        signature:
+          type: string
+          nullable: true
+          description: Transaction signature (base58) when execution succeeds.
+        error:
+          type: string
+          nullable: true
+          description: Error message if the transaction failed, or `null` on success.
+        requestId:
+          type: string
+          description: Echoed from the request when provided.
+      required:
+        - status
+    Position:
+      type: object
+      properties:
+        pubkey:
+          type: string
+          description: Position account public key
+        owner:
+          type: string
+          description: Position owner public key
+        ownerPubkey:
+          type: string
+          description: Position owner public key (alias of owner, prefer ownerPubkey going
+            forward)
+        market:
+          type: string
+          description: Deterministic market PDA derived from marketId
+        marketId:
+          type: string
+          description: External market identifier (ticker)
+        marketIdHash:
+          type: string
+          description: Hashed market identifier used for on-chain PDAs
+        isYes:
+          type: boolean
+          description: True if this is a YES position
+        contracts:
+          type: string
+          description: Legacy whole-contract quantity held. Use contractsMicro or contractsDecimal for the exact fractional quantity.
+        contractsMicro:
+          type: string
+          description: Contracts held in micro-contract units (u64 as string, 1000000 = 1 contract)
+        contractsDecimal:
+          type: string
+          description: Contracts held as a decimal string
+        source:
+          type: string
+          description: Origin of the position (e.g. "program")
+        maxSlippageBps:
+          type: integer
+          minimum: 0
+          description: Maximum slippage recorded for the position, in basis points
+        totalCostUsd:
+          type: string
+          description: Total cost basis in micro USD (u128 as string)
+        sizeUsd:
+          type: string
+          description: Alias of total cost basis in micro USD (u128 as string)
+        valueUsd:
+          type: string
+          nullable: true
+          description: Mark-to-market value in micro USD (u128 as string); null once
+            market is closed
+        avgPriceUsd:
+          type: string
+          description: Average entry price per contract in micro USD (u64 as string)
+        markPriceUsd:
+          type: string
+          nullable: true
+          description: Current mark price per contract in micro USD (u64 as string); null
+            once market is closed
+        sellPriceUsd:
+          type: string
+          nullable: true
+          description: Current best exit price for this side (micro USD string), or null
+            when unavailable
+        pnlUsd:
+          type: string
+          nullable: true
+          description: Unrealized PnL in micro USD (i128 as string); null once market is
+            closed
+        pnlUsdPercent:
+          type: number
+          nullable: true
+          description: Unrealized PnL percentage relative to size; null once market is
+            closed
+        pnlUsdAfterFees:
+          type: string
+          nullable: true
+          description: Unrealized PnL after fees in micro USD (i128 as string); null once
+            market is closed
+        pnlUsdAfterFeesPercent:
+          type: number
+          nullable: true
+          description: Unrealized PnL after fees percentage relative to size; null once
+            market is closed
+        openOrders:
+          type: integer
+          minimum: 0
+          description: Number of open orders
+        feesPaidUsd:
+          type: string
+          description: Total fees paid in micro USD (u64 as string)
+        realizedPnlUsd:
+          type: number
+          description: Realized PnL in micro USD (i64 as number)
+        claimed:
+          type: boolean
+          description: Whether payout has been claimed
+        claimedUsd:
+          type: string
+          description: Amount claimed in micro USD (u64 as string)
+        openedAt:
+          type: integer
+          description: Unix timestamp when the position was opened
+        updatedAt:
+          type: integer
+          description: Unix timestamp of the last position update
+        claimableAt:
+          type: integer
+          nullable: true
+          description: Unix timestamp (seconds) when the position becomes claimable; null
+            when unavailable
+        payoutUsd:
+          type: string
+          description: Notional payout if position wins (contracts * $1)
+        bump:
+          type: integer
+          minimum: 0
+        eventId:
+          type: string
+          description: External event identifier if available
+        eventMetadata:
+          $ref: "#/components/schemas/EventMetadata"
+        marketMetadata:
+          allOf:
+            - $ref: "#/components/schemas/MarketMetadata"
+            - properties:
+                marketId:
+                  type: string
+                eventId:
+                  type: string
+                title:
+                  type: string
+                status:
+                  type: string
+                result:
+                  type: string
+                closeTime:
+                  type: number
+                openTime:
+                  type: number
+                isTeamMarket:
+                  type: boolean
+        settlementDate:
+          type: integer
+          nullable: true
+          description: Unix timestamp (seconds) when the market settles; null when
+            unavailable
+        claimable:
+          type: boolean
+          description: True when the position qualifies for payout claim
+      required:
+        - pubkey
+        - owner
+        - ownerPubkey
+        - market
+        - marketId
+        - marketIdHash
+        - isYes
+        - contracts
+        - totalCostUsd
+        - sizeUsd
+        - valueUsd
+        - avgPriceUsd
+        - markPriceUsd
+        - sellPriceUsd
+        - pnlUsd
+        - pnlUsdPercent
+        - pnlUsdAfterFees
+        - pnlUsdAfterFeesPercent
+        - openOrders
+        - feesPaidUsd
+        - realizedPnlUsd
+        - claimed
+        - claimedUsd
+        - openedAt
+        - updatedAt
+        - claimableAt
+        - payoutUsd
+        - bump
+        - eventId
+        - eventMetadata
+        - marketMetadata
+        - settlementDate
+        - claimable
+    ClosePositionRequest:
+      type: object
+      properties:
+        ownerPubkey:
+          type: string
+          minLength: 32
+          description: Position owner public key
+    ClaimPositionResponse:
+      type: object
+      properties:
+        transaction:
+          type: string
+          description: Base64 encoded transaction
+        txMeta:
+          type: object
+          properties:
+            blockhash:
+              type: string
+            lastValidBlockHeight:
+              type: integer
+              minimum: 0
+          required:
+            - blockhash
+            - lastValidBlockHeight
+        position:
+          type: object
+          properties:
+            positionPubkey:
+              type: string
+              description: Position account public key
+            marketPubkey:
+              type: string
+              description: Market account public key
+            userPubkey:
+              type: string
+              description: User public key requesting claim
+            ownerPubkey:
+              type: string
+              description: Position owner public key
+            isYes:
+              type: boolean
+            contracts:
+              type: string
+              description: Legacy whole-contract quantity settled. Use contractsMicro or contractsDecimal for the exact fractional quantity.
+            contractsMicro:
+              type: string
+              description: Contracts settled in micro-contract units (u64 as string, 1000000 = 1 contract)
+            contractsDecimal:
+              type: string
+              description: Contracts settled as a decimal string
+            payoutAmountUsd:
+              type: string
+              description: Payout amount in micro USD (u64 as string)
+          required:
+            - positionPubkey
+            - marketPubkey
+            - userPubkey
+            - ownerPubkey
+            - isYes
+            - contracts
+            - payoutAmountUsd
+      required:
+        - transaction
+        - txMeta
+        - position
+    CloseAllPositionsRequest:
+      type: object
+      properties:
+        ownerPubkey:
+          type: string
+          minLength: 32
+          description: Position owner public key
+        minSellPriceSlippageBps:
+          type: number
+          description: Slippage tolerance applied to each sell, in basis points. Required.
+      required:
+        - minSellPriceSlippageBps
+    ClaimPositionRequest:
+      type: object
+      properties:
+        ownerPubkey:
+          type: string
+          minLength: 32
+          description: Position owner public key
+    HistoryEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique history event identifier
+        eventType:
+          type: string
+          enum:
+            - order_created
+            - order_filled
+            - order_failed
+            - order_closed
+            - payout_claimed
+            - position_updated
+            - position_lost
+          description: Type of history event. Position wins surface as payout_claimed (there is no position_won).
+        signature:
+          type: string
+          description: Solana transaction signature
+        slot:
+          type: string
+          description: Solana slot number (u64 as string)
+        timestamp:
+          type: integer
+          description: Unix timestamp (seconds) when the event occurred
+        orderPubkey:
+          type: string
+          description: Associated order account public key
+        positionPubkey:
+          type: string
+          description: Associated position account public key
+        marketId:
+          type: string
+          description: External market identifier
+        ownerPubkey:
+          type: string
+          description: Position or order owner public key
+        keeperPubkey:
+          type: string
+          description: Keeper that processed the transaction
+        externalOrderId:
+          type: string
+          description: Client-provided order identifier
+        orderId:
+          type: string
+          description: External order identifier from the venue
+        isBuy:
+          type: boolean
+          description: True when the event relates to a buy order
+        isYes:
+          type: boolean
+          description: True when the event relates to the YES side
+        contracts:
+          type: string
+          description: Number of contracts in the order. Legacy whole-contract value; see contractsMicro/contractsDecimal for the exact quantity.
+        contractsMicro:
+          type: string
+          description: Contracts in micro-contract units (u64 as string, 1000000 = 1 contract)
+        contractsDecimal:
+          type: string
+          description: Contracts as a decimal string
+        filledContracts:
+          type: string
+          description: Number of contracts filled (legacy whole-contract value)
+        filledContractsMicro:
+          type: string
+          description: Filled contracts in micro-contract units
+        filledContractsDecimal:
+          type: string
+          description: Filled contracts as a decimal string
+        contractsSettled:
+          type: string
+          description: Number of contracts settled in this event (legacy whole-contract value)
+        contractsSettledMicro:
+          type: string
+          description: Settled contracts in micro-contract units
+        contractsSettledDecimal:
+          type: string
+          description: Settled contracts as a decimal string
+        maxFillPriceUsd:
+          type: string
+          description: Maximum fill price in micro USD (u64 as string)
+        avgFillPriceUsd:
+          type: string
+          description: Average fill price in micro USD (u64 as string)
+        maxBuyPriceUsd:
+          type: string
+          nullable: true
+          description: Buyer-specified max fill price in micro USD (u64 as string)
+        minSellPriceUsd:
+          type: string
+          nullable: true
+          description: Seller-specified min fill price in micro USD (u64 as string)
+        depositAmountUsd:
+          type: string
+          description: Amount deposited for this order in micro USD (u64 as string)
+        totalCostUsd:
+          type: string
+          description: Total cost of the order in micro USD (u64 as string)
+        feeUsd:
+          type: string
+          nullable: true
+          description: Fee charged for this event in micro USD (u64 as string)
+        grossProceedsUsd:
+          type: string
+          description: Gross proceeds before fees in micro USD (u64 as string)
+        netProceedsUsd:
+          type: string
+          description: Net proceeds after fees in micro USD (u64 as string)
+        transferAmountToken:
+          type: string
+          nullable: true
+          description: Token amount transferred in this event (native token units as
+            string)
+        realizedPnl:
+          type: string
+          nullable: true
+          description: Realized PnL from this event in micro USD (i64 as string)
+        realizedPnlBeforeFees:
+          type: string
+          nullable: true
+          description: Realized PnL before fees in micro USD (i64 as string)
+        payoutAmountUsd:
+          type: string
+          description: Payout amount in micro USD (u64 as string), populated for
+            payout_claimed events
+        eventId:
+          type: string
+          description: External event identifier
+        marketMetadata:
+          allOf:
+            - $ref: "#/components/schemas/MarketMetadata"
+            - properties:
+                marketId:
+                  type: string
+                eventId:
+                  type: string
+                title:
+                  type: string
+                status:
+                  type: string
+                result:
+                  type: string
+                closeTime:
+                  type: number
+                openTime:
+                  type: number
+                isTeamMarket:
+                  type: boolean
+          description: Metadata for the associated market
+        eventMetadata:
+          $ref: "#/components/schemas/EventMetadata"
+          description: Metadata for the parent event
+      required:
+        - id
+        - eventType
+        - signature
+        - slot
+        - timestamp
+        - orderPubkey
+        - positionPubkey
+        - marketId
+        - ownerPubkey
+        - keeperPubkey
+        - externalOrderId
+        - orderId
+        - isBuy
+        - isYes
+        - contracts
+        - filledContracts
+        - contractsSettled
+        - maxFillPriceUsd
+        - avgFillPriceUsd
+        - maxBuyPriceUsd
+        - minSellPriceUsd
+        - depositAmountUsd
+        - totalCostUsd
+        - feeUsd
+        - grossProceedsUsd
+        - netProceedsUsd
+        - transferAmountToken
+        - realizedPnl
+        - realizedPnlBeforeFees
+        - payoutAmountUsd
+        - eventId
+        - marketMetadata
+        - eventMetadata
+    TradingStatusResponse:
+      type: object
+      properties:
+        trading_active:
+          type: boolean
+      required:
+        - trading_active
+    GameScore:
+      type: object
+      properties:
+        eventId:
+          type: string
+          description: Application-level event identifier
+        gameId:
+          type: string
+        leagueAbbreviation:
+          type: string
+          nullable: true
+        homeTeam:
+          type: string
+          nullable: true
+        awayTeam:
+          type: string
+          nullable: true
+        score:
+          type: string
+          nullable: true
+          description: Raw score string from the provider (e.g. "2-0")
+        period:
+          type: string
+          nullable: true
+          description: Current period (e.g. "2H")
+        elapsed:
+          type: string
+          nullable: true
+          description: Elapsed time within the game (e.g. "90")
+        status:
+          type: string
+          nullable: true
+          description: Provider status string (e.g. "InProgress")
+        live:
+          type: boolean
+          description: True while the game is in progress
+        ended:
+          type: boolean
+          description: True once the game has finished
+        finishedTimestamp:
+          type: string
+          nullable: true
+          description: ISO 8601 timestamp when the game finished, if ended
+        updatedAt:
+          type: string
+          description: ISO 8601 timestamp of the last score update
+      required:
+        - eventId
+        - gameId
+        - live
+        - ended
+        - updatedAt
+  parameters: {}
+paths:
+  /events/search:
+    get:
+      tags:
+        - Events
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - kalshi
+              - polymarket
+              - bisonfi
+            default: polymarket
+            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+          required: false
+          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+          name: provider
+          in: query
+        - schema:
+            type: string
+            minLength: 1
+            maxLength: 200
+            description: Search term matched against event titles
+          required: true
+          description: Search term matched against event titles
+          name: query
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 20
+          required: false
+          name: limit
+          in: query
+      responses:
+        "200":
+          description: Events matching the search query
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Event"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                required:
+                  - data
+  /events:
+    get:
+      tags:
+        - Events
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - kalshi
+              - polymarket
+              - bisonfi
+            default: polymarket
+            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+          required: false
+          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+          name: provider
+          in: query
+        - schema:
+            type: boolean
+            nullable: true
+          required: false
+          name: includeMarkets
+          in: query
+        - schema:
+            type: boolean
+          required: false
+          description: Include all allowed sports market types (moneyline, spread, totals) and extra (e.g. Saba) markets mapped onto Polymarket events. Defaults to false (moneyline only). F1 events always include every sportsMarketType.
+          name: includeAllMarkets
+          in: query
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: start
+          in: query
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: end
+          in: query
+        - schema:
+            type: string
+            enum:
+              - all
+              - crypto
+              - sports
+              - politics
+              - esports
+              - culture
+              - economics
+              - tech
+          required: false
+          name: category
+          in: query
+        - schema:
+            anyOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+              - type: string
+          required: false
+          name: subcategory
+          in: query
+        - schema:
+            type: string
+            enum:
+              - volume
+              - beginAt
+            description: Sort field for events (volume or begin time). Pair with
+              sortDirection to control ascending/descending.
+          required: false
+          description: Sort field for events (volume or begin time). Pair with
+            sortDirection to control ascending/descending.
+          name: sortBy
+          in: query
+        - schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            description: Direction for the chosen sort field. Defaults to desc for volume
+              and asc for beginAt.
+          required: false
+          description: Direction for the chosen sort field. Defaults to desc for volume
+            and asc for beginAt.
+          name: sortDirection
+          in: query
+        - schema:
+            type: string
+            enum:
+              - new
+              - live
+              - trending
+              - upcoming
+            description: Apply named filters. Use `new` for events created in the last 24
+              hours, `live` for events that have begun, `trending` for events
+              with recent trade activity, and `upcoming` for events that have not
+              begun yet.
+          required: false
+          description: Apply named filters. Use `new` for events created in the last 24
+            hours, `live` for events that have begun, `trending` for events
+            with recent trade activity, and `upcoming` for events that have not
+            begun yet.
+          name: filter
+          in: query
+        - schema:
+            type: string
+            description: Filter events by tag (e.g. `soccer`).
+          required: false
+          description: Filter events by tag (e.g. `soccer`).
+          name: tags
+          in: query
+      responses:
+        "200":
+          description: List of all events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Event"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                required:
+                  - data
+                  - pagination
+  /events/{eventId}:
+    get:
+      tags:
+        - Events
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: Event identifier
+          required: true
+          description: Event identifier
+          name: eventId
+          in: path
+        - schema:
+            type: boolean
+            nullable: true
+          required: false
+          name: includeMarkets
+          in: query
+        - schema:
+            type: boolean
+          required: false
+          description: Include all allowed sports market types (moneyline, spread, totals) and extra (e.g. Saba) markets mapped onto Polymarket events. Defaults to false (moneyline only). F1 events always include every sportsMarketType.
+          name: includeAllMarkets
+          in: query
+      responses:
+        "200":
+          description: Event data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "404":
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /events/suggested/{pubkey}:
+    get:
+      tags:
+        - Events
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: Order public key to base suggested events on
+          required: true
+          description: Order public key to base suggested events on
+          name: pubkey
+          in: path
+        - schema:
+            type: string
+            enum:
+              - kalshi
+              - polymarket
+              - bisonfi
+            default: polymarket
+            description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+          required: false
+          description: Data provider for events (defaults to polymarket). Use `bisonfi` for Jupiter Forecast markets.
+          name: provider
+          in: query
+      responses:
+        "200":
+          description: Suggested events derived from the user's order activity
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Event"
+                required:
+                  - data
+  /events/scores:
+    get:
+      tags:
+        - Events
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            example: POLY-351731,POLY-30615
+          required: true
+          description: Comma-separated event IDs to fetch live scores for (max 100)
+          name: eventIds
+          in: query
+      responses:
+        "200":
+          description: Latest live scores for the given event IDs. Events without a score row are omitted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/GameScore"
+                required:
+                  - data
+  /events/{eventId}/score:
+    get:
+      tags:
+        - Events
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+          required: true
+          description: Event identifier
+          name: eventId
+          in: path
+      responses:
+        "200":
+          description: Latest live score for the event, or null if no score row exists.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameScore"
+  /events/{eventId}/markets:
+    get:
+      tags:
+        - Markets
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: Event identifier
+          required: true
+          description: Event identifier
+          name: eventId
+          in: path
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: start
+          in: query
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: end
+          in: query
+      responses:
+        "200":
+          description: List of markets for the given event
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Market"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                required:
+                  - data
+                  - pagination
+  /events/{eventId}/markets/{marketId}:
+    get:
+      tags:
+        - Markets
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: Event identifier
+          required: true
+          description: Event identifier
+          name: eventId
+          in: path
+        - schema:
+            type: string
+            minLength: 1
+            description: Market identifier
+          required: true
+          description: Market identifier
+          name: marketId
+          in: path
+      responses:
+        "200":
+          description: Market data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Market"
+        "404":
+          description: Market not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /markets/{marketId}:
+    get:
+      tags:
+        - Markets
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: Market identifier
+          required: true
+          description: Market identifier
+          name: marketId
+          in: path
+      responses:
+        "200":
+          description: Market data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Market"
+        "404":
+          description: Market not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /orders:
+    get:
+      tags:
+        - Orders
+      parameters:
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: start
+          in: query
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: end
+          in: query
+        - schema:
+            type: string
+            minLength: 1
+          required: false
+          name: ownerPubkey
+          in: query
+      responses:
+        "200":
+          description: List of all orders registered on-chain
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Order"
+                  pagination:
+                    type: object
+                    properties:
+                      start:
+                        type: integer
+                        minimum: 0
+                      end:
+                        type: integer
+                        minimum: 0
+                      total:
+                        type: integer
+                        minimum: 0
+                      hasNext:
+                        type: boolean
+                    required:
+                      - start
+                      - end
+                      - total
+                      - hasNext
+                required:
+                  - data
+                  - pagination
+        "400":
+          description: Failed to fetch orders
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      tags:
+        - Orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "200":
+          description: Unsigned transaction for creating an order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateOrderResponse"
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /execute:
+    post:
+      tags:
+        - Orders
+      summary: Execute a signed order transaction
+      description: >-
+        Submit a signed order transaction for execution. Pass the base64
+        `signedTransaction` together with the `execution.context` object returned
+        by the order build (`POST /orders`, or `DELETE /positions/{positionPubkey}`
+        for a sell), unchanged. Jupiter Forecast (bisonfi) orders execute as an
+        atomic swap through this endpoint and the transaction signature is
+        returned on success.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExecuteRequest"
+      responses:
+        "200":
+          description: Execution result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExecuteResponse"
+        "400":
+          description: Execution failed or invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /orders/{orderPubkey}:
+    get:
+      tags:
+        - Orders
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: Order account public key
+          required: true
+          description: Order account public key
+          name: orderPubkey
+          in: path
+      responses:
+        "200":
+          description: Order data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+        "400":
+          description: Failed to fetch order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /orders/status/{orderPubkey}:
+    get:
+      tags:
+        - Orders
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: Order account public key
+          required: true
+          description: Order account public key
+          name: orderPubkey
+          in: path
+      responses:
+        "200":
+          description: Latest status for an order with event history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orderPubkey:
+                    type: string
+                  status:
+                    type: string
+                  latestEventType:
+                    type: string
+                  latestSignature:
+                    type: string
+                  externalOrderId:
+                    type: string
+                  orderId:
+                    type: string
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        eventType:
+                          type: string
+                        status:
+                          type: string
+                        rawStatus:
+                          type: string
+                        timestamp:
+                          type: integer
+                        signature:
+                          type: string
+                        externalOrderId:
+                          type: string
+                        orderId:
+                          type: string
+                      required:
+                        - eventType
+                        - status
+                        - rawStatus
+                        - timestamp
+                        - signature
+                        - externalOrderId
+                        - orderId
+                required:
+                  - orderPubkey
+                  - status
+                  - latestEventType
+                  - latestSignature
+                  - externalOrderId
+                  - orderId
+                  - history
+        "400":
+          description: Failed to fetch order status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Order history not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /positions:
+    get:
+      tags:
+        - Positions
+      parameters:
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: start
+          in: query
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: end
+          in: query
+        - schema:
+            type: string
+            minLength: 1
+            description: Position owner public key
+          required: false
+          description: Position owner public key
+          name: ownerPubkey
+          in: query
+        - schema:
+            type: string
+            minLength: 1
+          required: false
+          name: marketPubkey
+          in: query
+        - schema:
+            type: string
+            minLength: 1
+          required: false
+          name: marketId
+          in: query
+        - schema:
+            type: string
+            enum:
+              - "true"
+              - "false"
+            description: Filter by position side (true = YES, false = NO)
+          required: false
+          description: Filter by position side (true = YES, false = NO)
+          name: isYes
+          in: query
+      responses:
+        "200":
+          description: List of on-chain positions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Position"
+                  pagination:
+                    type: object
+                    properties:
+                      start:
+                        type: integer
+                        minimum: 0
+                      end:
+                        type: integer
+                        minimum: 0
+                      total:
+                        type: integer
+                        minimum: 0
+                      hasNext:
+                        type: boolean
+                    required:
+                      - start
+                      - end
+                      - total
+                      - hasNext
+                required:
+                  - data
+                  - pagination
+        "400":
+          description: Failed to fetch positions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+        - Positions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloseAllPositionsRequest"
+      responses:
+        "200":
+          description: Unsigned transactions that sell all contracts across every open
+            position for the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      anyOf:
+                        - $ref: "#/components/schemas/CreateOrderResponse"
+                        - $ref: "#/components/schemas/ClaimPositionResponse"
+                required:
+                  - data
+        "400":
+          description: Unable to build close positions transactions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /positions/{positionPubkey}:
+    get:
+      tags:
+        - Positions
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: Position account public key
+          required: true
+          description: Position account public key
+          name: positionPubkey
+          in: path
+      responses:
+        "200":
+          description: Position data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Position"
+        "400":
+          description: Failed to fetch position
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Position not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      tags:
+        - Positions
+      parameters:
+        - schema:
+            type: string
+            minLength: 32
+            description: Position account public key
+          required: true
+          description: Position account public key
+          name: positionPubkey
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClosePositionRequest"
+      responses:
+        "200":
+          description: Unsigned transaction that sells all contracts for a position
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateOrderResponse"
+        "400":
+          description: Unable to build close position transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Position not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /positions/{positionPubkey}/claim:
+    post:
+      tags:
+        - Positions
+      parameters:
+        - schema:
+            type: string
+            minLength: 32
+            description: Position account public key
+          required: true
+          description: Position account public key
+          name: positionPubkey
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClaimPositionRequest"
+      responses:
+        "200":
+          description: Unsigned transaction to claim payout for a winning position
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimPositionResponse"
+        "400":
+          description: Unable to build claim payout transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Position not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /history:
+    get:
+      tags:
+        - History
+      parameters:
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: start
+          in: query
+        - schema:
+            type: integer
+            nullable: true
+            minimum: 0
+          required: false
+          name: end
+          in: query
+        - schema:
+            type: string
+            minLength: 32
+            description: History owner public key
+          required: false
+          description: History owner public key
+          name: ownerPubkey
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            description: History event ID
+          required: false
+          description: History event ID
+          name: id
+          in: query
+        - schema:
+            type: string
+            minLength: 32
+            description: Filter by position public key
+          required: false
+          description: Filter by position public key
+          name: positionPubkey
+          in: query
+      responses:
+        "200":
+          description: Paginated event history, or single event when id is provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/HistoryEvent"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                required:
+                  - data
+                  - pagination
+  /forecast:
+    get:
+      tags:
+        - Forecast
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+          required: true
+          description: Market identifier to fetch the forecast for. Required; omitting it returns 400.
+          name: marketId
+          in: query
+      responses:
+        "200":
+          description: Forecast time-series for the market
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  forecast_history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        market_ticker:
+                          type: string
+                        event_ticker:
+                          type: string
+                        end_period_ts:
+                          type: number
+                        period_interval:
+                          type: number
+                        numerical_forecast:
+                          type: number
+                        raw_numerical_forecast:
+                          type: number
+                        formatted_forecast:
+                          type: string
+        "400":
+          description: Invalid or missing market ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Failed to fetch forecast data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /trading-status:
+    get:
+      tags:
+        - Trading
+      responses:
+        "200":
+          description: Whether trading is currently enabled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TradingStatusResponse"
+  /orderbook/{marketId}:
+    get:
+      tags:
+        - Orderbook
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: Kalshi or Polymarket market identifier
+            example: KXF1-25-LN
+          required: true
+          description: Kalshi or Polymarket market identifier
+          name: marketId
+          in: path
+      responses:
+        "200":
+          description: Orderbook depth for the given market
+          content:
+            application/json:
+              schema:
+                type: object
+                nullable: true
+                properties:
+                  yes:
+                    type: array
+                    description: YES-side levels sorted by price ascending. Each entry is a [price_cents, size] tuple. price_cents is rounded, so sub-cent levels show 0; size may be fractional.
+                    items:
+                      type: array
+                      items:
+                        type: number
+                      minItems: 2
+                      maxItems: 2
+                  no:
+                    type: array
+                    description: NO-side levels sorted by price ascending. Each entry is a [price_cents, size] tuple. price_cents is rounded, so sub-cent levels show 0; size may be fractional.
+                    items:
+                      type: array
+                      items:
+                        type: number
+                      minItems: 2
+                      maxItems: 2
+                  yes_dollars:
+                    type: array
+                    description: "YES-side levels with price as decimal dollar string. Each entry is a [price_string, size] tuple, e.g. [\"0.0100\", 346014]."
+                    items:
+                      type: array
+                      minItems: 2
+                      maxItems: 2
+                  no_dollars:
+                    type: array
+                    description: "NO-side levels with price as decimal dollar string. Each entry is a [price_string, size] tuple, e.g. [\"0.0100\", 219]."
+                    items:
+                      type: array
+                      minItems: 2
+                      maxItems: 2
+                required:
+                  - yes
+                  - no
+                  - yes_dollars
+                  - no_dollars
+        "502":
+          description: Failed to fetch orderbook data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /profiles/{ownerPubkey}:
+    get:
+      tags:
+        - Profile
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: ownerPubkey
+          in: path
+      responses:
+        "200":
+          description: Profile stats
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ownerPubkey:
+                    type: string
+                  realizedPnlUsd:
+                    type: string
+                  totalVolumeUsd:
+                    type: string
+                  predictionsCount:
+                    type: string
+                  correctPredictions:
+                    type: string
+                  wrongPredictions:
+                    type: string
+                  totalActiveContracts:
+                    type: string
+                    description: Legacy whole-contract count. Use totalActiveContractsMicro or totalActiveContractsDecimal for the exact value.
+                  totalActiveContractsMicro:
+                    type: string
+                    description: Active contracts in micro-contract units (1000000 = 1 contract)
+                  totalActiveContractsDecimal:
+                    type: string
+                    description: Active contracts as a decimal string
+                  totalPositionsValueUsd:
+                    type: string
+                required:
+                  - ownerPubkey
+                  - realizedPnlUsd
+                  - totalVolumeUsd
+                  - predictionsCount
+                  - correctPredictions
+                  - wrongPredictions
+                  - totalActiveContracts
+                  - totalPositionsValueUsd
+        "404":
+          description: Profile not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+  /profiles/{ownerPubkey}/pnl-history:
+    get:
+      tags:
+        - Profile
+      parameters:
+        - schema:
+            type: string
+          required: true
+          name: ownerPubkey
+          in: path
+        - schema:
+            type: string
+            enum:
+              - 24h
+              - 1w
+              - 1m
+            default: 1w
+          required: false
+          name: interval
+          in: query
+        - schema:
+            type: integer
+            minimum: 0
+            exclusiveMinimum: true
+            maximum: 1000
+            default: 10
+          required: false
+          name: count
+          in: query
+      responses:
+        "200":
+          description: PnL history for charting
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ownerPubkey:
+                    type: string
+                  history:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        timestamp:
+                          type: integer
+                        realizedPnlUsd:
+                          type: string
+                      required:
+                        - timestamp
+                        - realizedPnlUsd
+                required:
+                  - ownerPubkey
+                  - history
+  /trades:
+    get:
+      tags:
+        - Trades
+      responses:
+        "200":
+          description: Recent order_filled events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Trade identifier (e.g. "order-1906029")
+                        ownerPubkey:
+                          type: string
+                        marketId:
+                          type: string
+                        message:
+                          type: string
+                        timestamp:
+                          type: number
+                        action:
+                          type: string
+                          enum:
+                            - buy
+                            - sell
+                        side:
+                          type: string
+                          enum:
+                            - "yes"
+                            - "no"
+                        eventTitle:
+                          type: string
+                        marketTitle:
+                          type: string
+                        amountUsd:
+                          type: string
+                        priceUsd:
+                          type: string
+                        eventImageUrl:
+                          type: string
+                        eventId:
+                          type: string
+                        isTeamMarket:
+                          type: boolean
+                        marketOptions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              label:
+                                type: string
+                              buyYes:
+                                type: boolean
+                      required:
+                        - id
+                        - ownerPubkey
+                        - marketId
+                        - message
+                        - timestamp
+                        - action
+                        - side
+                        - eventTitle
+                        - marketTitle
+                        - amountUsd
+                        - priceUsd
+                        - eventImageUrl
+                        - eventId
+                required:
+                  - data
+  /leaderboards:
+    get:
+      tags:
+        - Leaderboards
+      parameters:
+        - schema:
+            type: string
+            enum:
+              - all_time
+              - weekly
+              - monthly
+            default: all_time
+          required: false
+          name: period
+          in: query
+        - schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 100
+          required: false
+          name: limit
+          in: query
+        - schema:
+            type: string
+            enum:
+              - pnl
+              - volume
+              - win_rate
+            default: pnl
+          required: false
+          name: metric
+          in: query
+      responses:
+        "200":
+          description: Leaderboard entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ownerPubkey:
+                          type: string
+                        realizedPnlUsd:
+                          type: string
+                        totalVolumeUsd:
+                          type: string
+                        predictionsCount:
+                          type: number
+                        correctPredictions:
+                          type: number
+                        wrongPredictions:
+                          type: number
+                        winRatePct:
+                          type: string
+                        period:
+                          type: string
+                        periodStart:
+                          type: string
+                          nullable: true
+                        periodEnd:
+                          type: string
+                          nullable: true
+                      required:
+                        - ownerPubkey
+                        - realizedPnlUsd
+                        - totalVolumeUsd
+                        - predictionsCount
+                        - correctPredictions
+                        - wrongPredictions
+                        - winRatePct
+                        - period
+                        - periodStart
+                        - periodEnd
+                  summary:
+                    type: object
+                    properties:
+                      all_time:
+                        type: object
+                        properties:
+                          totalVolumeUsd:
+                            type: string
+                          predictionsCount:
+                            type: number
+                        required:
+                          - totalVolumeUsd
+                          - predictionsCount
+                      weekly:
+                        type: object
+                        properties:
+                          totalVolumeUsd:
+                            type: string
+                          predictionsCount:
+                            type: number
+                        required:
+                          - totalVolumeUsd
+                          - predictionsCount
+                      monthly:
+                        type: object
+                        properties:
+                          totalVolumeUsd:
+                            type: string
+                          predictionsCount:
+                            type: number
+                        required:
+                          - totalVolumeUsd
+                          - predictionsCount
+                    required:
+                      - all_time
+                      - weekly
+                      - monthly
+                required:
+                  - data
+                  - summary
+  /vault-info:
+    get:
+      tags:
+        - Vault
+      responses:
+        "200":
+          description: Vault account data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pubkey:
+                    type: string
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: string
+                  vaultBalance:
+                    type: string
+                required:
+                  - pubkey
+                  - data
+                  - vaultBalance
+        "404":
+          description: Vault account not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error

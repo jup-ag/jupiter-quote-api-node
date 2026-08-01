@@ -1,0 +1,718 @@
+openapi: 3.0.3
+info:
+  title: Swap API V2
+  version: 2.0.0
+  description: |
+    Jupiter Swap API V2. Three endpoints: `/order` (default happy path with managed execution),
+    `/build` (advanced path returning raw swap instructions), and `/execute` (managed transaction execution for `/order`).
+
+servers:
+  - url: https://api.jup.ag/swap/v2
+    description: Swap API V2 Endpoint
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+
+  schemas:
+    Instruction:
+      type: object
+      properties:
+        programId:
+          type: string
+          description: Program executing the instruction
+        accounts:
+          type: array
+          items:
+            type: object
+            properties:
+              pubkey:
+                type: string
+              isWritable:
+                type: boolean
+              isSigner:
+                type: boolean
+            required: [pubkey, isWritable, isSigner]
+        data:
+          type: string
+          description: Base64-encoded instruction data
+      required: [programId, accounts, data]
+
+    SwapInfo:
+      type: object
+      properties:
+        ammKey:
+          type: string
+        label:
+          type: string
+        inputMint:
+          type: string
+        outputMint:
+          type: string
+        inAmount:
+          type: string
+        outAmount:
+          type: string
+      required: [ammKey, label, inputMint, outputMint, inAmount, outAmount]
+
+    RoutePlanStep:
+      type: object
+      properties:
+        swapInfo:
+          $ref: "#/components/schemas/SwapInfo"
+        percent:
+          type: number
+          description: Percentage of total swap routed through this step
+        bps:
+          type: number
+          description: Basis points of total swap routed through this step
+        usdValue:
+          type: number
+          description: USD value of this step
+      required: [swapInfo, percent, bps]
+
+    PlatformFee:
+      type: object
+      properties:
+        amount:
+          type: string
+        feeBps:
+          type: number
+          description: Jupiter platform fee component in basis points. This is the fee Jupiter intends to make from the swap and does not include gasless support cost recoup.
+        feeMint:
+          type: string
+
+    SwapEvent:
+      type: object
+      properties:
+        inputMint:
+          type: string
+        inputAmount:
+          type: string
+        outputMint:
+          type: string
+        outputAmount:
+          type: string
+
+  parameters:
+    BuildSlippageBpsParameter:
+      name: slippageBps
+      in: query
+      schema:
+        anyOf:
+          - type: string
+            enum:
+              - rtse
+          - type: number
+            minimum: 0
+            maximum: 10000
+        default: 50
+      description: Slippage tolerance in basis points. Defaults to 50.
+
+    BuildComputeUnitPricePercentileParameter:
+      name: computeUnitPricePercentile
+      in: query
+      schema:
+        anyOf:
+          - type: string
+            enum:
+              - medium
+              - high
+              - veryHigh
+          - type: integer
+            minimum: 0
+            maximum: 10000
+      description: 'Percentile of compute unit price to use. Named levels: "medium" (25th), "high" (50th), "veryHigh" (75th), or a number 0-10000 in basis points.'
+
+    InputMintParameter:
+      name: inputMint
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The mint address of the input token
+      example: So11111111111111111111111111111111111111112
+
+    OutputMintParameter:
+      name: outputMint
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The mint address of the output token
+      example: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+
+    AmountParameter:
+      name: amount
+      in: query
+      required: true
+      schema:
+        type: string
+      description: The amount to swap in the smallest unit of the input token
+      example: "1000000000"
+
+paths:
+  /order:
+    get:
+      operationId: GetOrder
+      tags:
+        - Swap
+      summary: Get Order
+      description: |
+        Get a swap quote and assembled transaction. This is the default happy path with all Ultra benefits
+        (predictive execution, RTSE, Jupiter Beam, gasless, multi-router competition).
+
+        Without optional parameters, all routers compete for the best price (Metis, JupiterZ RFQ, Dflow, OKX).
+        Setting `payer` to a wallet different from `taker` restricts routing to Metis.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: "#/components/parameters/InputMintParameter"
+        - $ref: "#/components/parameters/OutputMintParameter"
+        - $ref: "#/components/parameters/AmountParameter"
+        - name: taker
+          in: query
+          schema:
+            type: string
+          description: |
+            - The public key of the wallet that will sign the transaction
+            - If not provided, the response will contain a quote but no transaction
+            - Must be present if you intend to sign and execute the transaction via `/execute`
+          example: GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ
+        - name: receiver
+          in: query
+          schema:
+            type: string
+          description: |
+            - The public key of the account that will receive the output tokens
+            - Must differ from `taker`
+            - Expects a wallet address, not a token account
+            - For non-SOL output: tokens are sent to the receiver's associated token account (ATA). If the ATA is not initialised, a create ATA instruction is added to the transaction
+            - For SOL output: native SOL is transferred directly to the receiver
+            - Does not support destination wSOL token accounts
+        - name: swapMode
+          in: query
+          schema:
+            type: string
+            enum: [ExactIn]
+          description: |
+            - Swap mode. Currently only `ExactIn` is supported.
+        - name: slippageBps
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+          description: |
+            - Slippage tolerance in basis points (0-10000)
+            - If not set, Jupiter automatically determines an appropriate slippage
+          example: 50
+        - name: referralAccount
+          in: query
+          schema:
+            type: string
+          description: |
+            - Address of your referral account for the Jupiter referral project
+            - Must be used together with `referralFee`
+            - See the [Referral Program](/tool-kits/referral-program) for setup
+        - name: referralFee
+          in: query
+          schema:
+            type: number
+            minimum: 50
+            maximum: 255
+          description: |
+            - Referral fee in basis points (50-255)
+            - Must be used together with `referralAccount`
+          example: 50
+        - name: payer
+          in: query
+          schema:
+            type: string
+          description: |
+            - The public key of an account that will cover gas-related fees (signature fees, priority fees, and rent) on behalf of the taker
+            - Has no effect when set equal to `taker`. Must be a different wallet to activate integrator-sponsored gas
+            - Enabling this restricts routing to Metis (JupiterZ is disabled when an integrator payer is set)
+          example: gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB
+        - name: priorityFeeLamports
+          in: query
+          schema:
+            type: number
+          description: |
+            - Priority fee in lamports
+            - If not set, Jupiter automatically determines an appropriate priority fee
+            - Setting this overrides the automatic optimisation
+        - name: jitoTipLamports
+          in: query
+          schema:
+            type: number
+          description: |
+            - Jito MEV tip in lamports for faster block inclusion
+        - name: broadcastFeeType
+          in: query
+          schema:
+            type: string
+            enum: [maxCap, exactFee]
+          description: |
+            - Fee cap strategy: `maxCap` treats the fee as a maximum, `exactFee` uses the exact amount
+            - Ignored if neither `priorityFeeLamports` nor `jitoTipLamports` are set
+        - name: excludeRouters
+          in: query
+          schema:
+            type: string
+          description: |
+            - Comma-separated list of routers to exclude
+            - Available routers: `metis`, `jupiterz`, `dflow`, `okx`
+          example: jupiterz,dflow
+        - name: excludeDexes
+          in: query
+          schema:
+            type: string
+          description: |
+            - Comma-separated list of DEXes to exclude from the Metis router
+            - **Important**: This only affects the Metis router, not other routers
+            - For example: `excludeDexes=Raydium,Orca+V2,Meteora+DLMM`
+      responses:
+        "200":
+          description: Quote with optional assembled transaction
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mode:
+                    type: string
+                    description: '"ultra" or "manual" based on parameters used'
+                  inputMint:
+                    type: string
+                  outputMint:
+                    type: string
+                  inAmount:
+                    type: string
+                  outAmount:
+                    type: string
+                  inUsdValue:
+                    type: number
+                  outUsdValue:
+                    type: number
+                  priceImpact:
+                    type: number
+                    description: Price impact in percentage points (e.g. -0.1 = -0.1%). Divide by 100 to convert to a decimal fraction.
+                  swapUsdValue:
+                    type: number
+                  otherAmountThreshold:
+                    type: string
+                    description: Minimum output amount after slippage
+                  swapMode:
+                    type: string
+                  slippageBps:
+                    type: number
+                  priceImpactPct:
+                    type: string
+                    description: "Deprecated: decimal price impact ratio. Use priceImpact divided by 100 instead."
+                    deprecated: true
+                  routePlan:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RoutePlanStep"
+                  referralAccount:
+                    type: string
+                  feeMint:
+                    type: string
+                  feeBps:
+                    type: number
+                    description: Total fee rate charged for the swap in basis points. This includes the Jupiter platform fee plus any additional charges, such as gasless support cost recoup.
+                  platformFee:
+                    $ref: "#/components/schemas/PlatformFee"
+                  signatureFeeLamports:
+                    type: number
+                  signatureFeePayer:
+                    type: string
+                    nullable: true
+                  prioritizationFeeLamports:
+                    type: number
+                    description: Includes priority fees and tips (Jito, Nozomi)
+                  prioritizationFeePayer:
+                    type: string
+                    nullable: true
+                  rentFeeLamports:
+                    type: number
+                    description: Estimated rent fee
+                  rentFeePayer:
+                    type: string
+                    nullable: true
+                  swapType:
+                    type: string
+                    description: "Deprecated: use router instead"
+                    deprecated: true
+                    enum: [aggregator, rfq, aggregator+rfq, dflow, okx]
+                  router:
+                    type: string
+                    enum: [metis, jupiterz, dflow, okx]
+                    description: Which router won the quote
+                  transaction:
+                    type: string
+                    nullable: true
+                    description: |
+                      - Base64-encoded transaction. Null if taker is not provided.
+                      - Empty string if taker is provided but transaction could not be built (check errorCode).
+                  lastValidBlockHeight:
+                    type: string
+                  gasless:
+                    type: boolean
+                    description: |
+                      True when signature and priority fees are paid by a wallet other than the taker. Set by three independent paths:
+                      - Automatic Jupiter sponsorship: `signatureFeePayer = gasTzr94Pmp4Gf8vknQnqxeYxdgwFjbgdJa4msYRpnB`
+                      - JupiterZ market maker: `signatureFeePayer` is the MM address (varies per quote); Jupiter's gas wallet can pay the rent to create the taker's output token account when referral fees are not set
+                      - Integrator payer: `signatureFeePayer` is your `payer` parameter
+                      For a deterministic opt-out, check `signatureFeePayer == taker` on every response.
+                  requestId:
+                    type: string
+                    description: Unique request ID. Pass this to /execute.
+                  totalTime:
+                    type: number
+                    description: Response time in milliseconds
+                  taker:
+                    type: string
+                    nullable: true
+                  quoteId:
+                    type: string
+                    description: Quote ID for RFQ swaps
+                  maker:
+                    type: string
+                    description: Market maker address for RFQ swaps
+                  expireAt:
+                    type: string
+                    description: Quote expiration timestamp for RFQ swaps
+                  errorCode:
+                    type: number
+                    description: |
+                      Present when `taker` is defined and `transaction` is the empty string. The router quoted a price but could not build a transaction. Match on `router` + `errorCode` to identify the error.
+
+                      Aggregator routers (router is metis, dflow, okx):
+                      - 1: Insufficient funds
+                      - 2: Insufficient SOL for gas
+                      - 3: Swap below minimum for gasless
+
+                      JupiterZ router (router is jupiterz):
+                      - 1: Insufficient balance to fund the swap
+                      - 2: Missing associated token account
+                      - 3: Quote could not be built into a transaction
+                  errorMessage:
+                    type: string
+                    description: |
+                      Human-readable error description. Present when `taker` is defined and `transaction` is the empty string.
+                      Match on `router` + `errorCode` instead of this string, as the message text may be parameterised.
+                  error:
+                    type: string
+                    description: Duplicate of errorMessage for backwards compatibility
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                  error:
+                    type: string
+
+  /build:
+    get:
+      operationId: GetBuild
+      tags:
+        - Swap
+      summary: Build Transaction
+      description: |
+        Get a swap quote with raw instructions for building custom transactions.
+        This is the advanced path for integrators who need full transaction control
+        (add custom instructions, CPI, custom payer).
+
+        You are responsible for assembling the transaction, signing, and sending via your own RPC.
+        The `/execute` endpoint is not available for `/build` transactions.
+
+        Routing is Metis only. No swap fees are charged by Jupiter.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - $ref: "#/components/parameters/InputMintParameter"
+        - $ref: "#/components/parameters/OutputMintParameter"
+        - $ref: "#/components/parameters/AmountParameter"
+        - name: taker
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Public key of the user initiating the swap.
+          example: GkwFnmMDvn3HGMpJpWBg8tgJxr3NxNvg3AXxvXVPbRGJ
+        - $ref: "#/components/parameters/BuildSlippageBpsParameter"
+        - name: mode
+          in: query
+          schema:
+            type: string
+            enum: [fast]
+          description: |
+            Quoting mode. "fast" trades quote optimality for reduced latency.
+        - name: dexes
+          in: query
+          schema:
+            type: string
+          description: |
+            - Comma-separated list of DEXes to restrict routing to.
+            - Mutually exclusive with excludeDexes.
+        - name: excludeDexes
+          in: query
+          schema:
+            type: string
+          description: |
+            - Comma-separated list of DEXes to exclude.
+            - Mutually exclusive with dexes.
+        - name: platformFeeBps
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 10000
+          description: |
+            Platform fee in basis points. If positive, feeAccount is required.
+          example: 50
+        - name: feeAccount
+          in: query
+          schema:
+            type: string
+          description: Token account to collect platform fees. Required if platformFeeBps is positive.
+        - name: maxAccounts
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 64
+          description: Maximum number of accounts for the swap route. Defaults to 64.
+        - name: payer
+          in: query
+          schema:
+            type: string
+          description: Account that pays transaction fees and rent. Defaults to taker when not passed in.
+        - name: wrapAndUnwrapSol
+          in: query
+          schema:
+            type: boolean
+          description: Whether to wrap/unwrap SOL. Defaults to true.
+        - name: destinationTokenAccount
+          in: query
+          schema:
+            type: string
+          description: |
+            - SPL token account to receive output tokens.
+            - Mutually exclusive with nativeDestinationAccount.
+        - name: nativeDestinationAccount
+          in: query
+          schema:
+            type: string
+          description: |
+            - Native SOL account to receive output.
+            - Mutually exclusive with destinationTokenAccount.
+        - name: blockhashSlotsToExpiry
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 300
+          description: Number of slots until the blockhash expires. Defaults to 150.
+        - name: tipAmount
+          in: query
+          schema:
+            type: string
+          description: SOL tip amount in lamports. Adds a tip instruction for use with /submit. The tip payer is the taker (or payer if specified).
+          required: false
+        - $ref: "#/components/parameters/BuildComputeUnitPricePercentileParameter"
+        - name: forJitoBundle
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: |
+            Set to `true` if the transaction will be submitted as part of a Jito bundle.
+            This excludes DEXes that are incompatible with Jito bundles.
+      responses:
+        "200":
+          description: Quote with raw swap instructions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  inputMint:
+                    type: string
+                  outputMint:
+                    type: string
+                  inAmount:
+                    type: string
+                  outAmount:
+                    type: string
+                  otherAmountThreshold:
+                    type: string
+                    description: Minimum output amount after slippage
+                  swapMode:
+                    type: string
+                  slippageBps:
+                    type: number
+                  routePlan:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RoutePlanStep"
+                  computeBudgetInstructions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Instruction"
+                    description: Compute unit price instruction (does not include compute unit limit)
+                  setupInstructions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Instruction"
+                    description: Pre-swap setup instructions (e.g. create ATAs)
+                  swapInstruction:
+                    $ref: "#/components/schemas/Instruction"
+                  cleanupInstruction:
+                    $ref: "#/components/schemas/Instruction"
+                    nullable: true
+                    description: Post-swap cleanup instruction
+                  otherInstructions:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Instruction"
+                  tipInstruction:
+                    nullable: true
+                    allOf:
+                      - $ref: "#/components/schemas/Instruction"
+                  addressesByLookupTableAddress:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+                    nullable: true
+                    description: Address lookup table mappings for v0 transactions
+                  blockhashWithMetadata:
+                    type: object
+                    properties:
+                      blockhash:
+                        type: array
+                        items:
+                          type: number
+                        description: Blockhash as byte array
+                      lastValidBlockHeight:
+                        type: number
+                      fetchedAt:
+                        type: string
+                        description: ISO 8601 timestamp of when the blockhash was fetched
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /execute:
+    post:
+      operationId: PostExecute
+      tags:
+        - Swap
+      summary: Execute Transaction
+      description: |
+        Execute a signed transaction from `/order`. Handles transaction landing, confirmation, and retry.
+
+        Only available for transactions obtained via `/order`. Transactions built via `/build` must be
+        sent through your own RPC.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [signedTransaction, requestId]
+              properties:
+                signedTransaction:
+                  type: string
+                  description: Base64-encoded signed transaction
+                requestId:
+                  type: string
+                  description: The requestId from the /order response
+                lastValidBlockHeight:
+                  type: string
+                  description: Optional block height for nonce validation
+      responses:
+        "200":
+          description: Execution result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [Success, Failed]
+                  signature:
+                    type: string
+                    description: Transaction signature
+                  slot:
+                    type: string
+                    description: Confirmed slot
+                  error:
+                    type: string
+                    description: Error message (present if Failed)
+                  code:
+                    type: number
+                    description: |
+                      - Error code. 0 = success.
+                      - Ultra: -1 (missing cached order), -2 (invalid signed tx), -3 (invalid message bytes).
+                      - Aggregator: -1000 (failed to land), -1001 (unknown), -1002 (invalid tx), -1003 (not fully signed), -1004 (invalid block height).
+                      - RFQ: -2000 (failed to land), -2001 (unknown), -2002 (invalid payload), -2003 (quote expired), -2004 (swap rejected).
+                  totalInputAmount:
+                    type: string
+                    description: Total input token amount deducted from the user's wallet, including the fee if feeMint is the input mint
+                  totalOutputAmount:
+                    type: string
+                    description: Final output token amount reflected in the user's wallet, after any fee collected in the output mint
+                  inputAmountResult:
+                    type: string
+                    description: Input amount that went into the swap route, after any fee collected in the input mint
+                  outputAmountResult:
+                    type: string
+                    description: Output amount produced by the swap route, before any fee collected in the output mint
+                  swapEvents:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/SwapEvent"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  signature:
+                    type: string
+                  error:
+                    type: string

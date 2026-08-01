@@ -1,0 +1,677 @@
+openapi: 3.0.3
+info:
+  title: Jupiter Lend Borrow API
+  description: |
+    OpenAPI specification for Jupiter Lend borrow integrator endpoints.
+
+    **Base URL:** `https://api.jup.ag/lend/v1`
+
+    Share this file with documentation tools (ReadMe, Stoplight, Postman, Redoc, Mintlify,
+    Swagger UI, etc.) to generate API reference docs.
+
+    | Method | Path | Description |
+    | ------ | ---- | ----------- |
+    | GET | `/borrow/vaults` | List borrow vaults |
+    | GET | `/borrow/positions` | List positions for wallet addresses |
+    | POST | `/borrow/operate` | Build unsigned operate transaction |
+    | POST | `/borrow/operate-instructions` | Build operate Solana instructions |
+
+    **Notes**
+    - Pass multiple wallets to `GET /borrow/positions` as a comma-separated `users` query value.
+    - `colAmount` / `debtAmount` are signed integer strings in token base units.
+    - Use `positionId: 0` in operate requests to open a new position.
+    - Optional `market` query/body context: `main` (default) or `ethena`.
+  version: 1.0.0
+servers:
+- url: https://api.jup.ag/lend/v1
+  description: Jupiter Lend API endpoint
+tags:
+- name: Borrow
+  description: Vault discovery, position lookup, and operate transaction building
+paths:
+  /borrow/vaults:
+    get:
+      tags:
+      - Borrow
+      summary: List borrow vaults
+      description: Returns all whitelisted borrow vaults for the requested market.
+      operationId: listBorrowVaults
+      parameters:
+      - $ref: '#/components/parameters/market'
+      - name: rpcUrl
+        in: query
+        description: Optional custom Solana RPC URL used to resolve on-chain vault state.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uri
+      responses:
+        '200':
+          description: Borrow vaults
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BorrowVault'
+              example:
+              - id: 1
+                address: nMzVs8GiXMVUENEwkev7JZfDcCENmz18ScheeVRdnb1
+                supplyToken:
+                  address: So11111111111111111111111111111111111111112
+                  chainId: solana
+                  name: Wrapped SOL
+                  symbol: WSOL
+                  uiSymbol: SOL
+                  decimals: 9
+                  price: '68.403265633557'
+                borrowToken:
+                  address: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+                  chainId: solana
+                  name: USD Coin
+                  symbol: USDC
+                  uiSymbol: USDC
+                  decimals: 6
+                  price: '0.999733471531'
+                totalSupply: '1953931136795475'
+                totalBorrow: '61778760293506'
+                collateralFactor: '800'
+                liquidationThreshold: '850'
+                borrowRate: '471'
+                totalPositions: 9071
+                metadata:
+                  maxLeverage: false
+                  nativeStake: false
+                  pegged: false
+                  multiply:
+                    enabled: true
+                    reduceFactor: 300
+      security:
+      - ApiKeyAuth: []
+  /borrow/positions:
+    get:
+      tags:
+      - Borrow
+      summary: List borrow positions for users
+      description: |
+        Returns borrow positions (NFTs) for one or more wallet addresses.
+
+        Pass multiple wallets as a comma-separated list in the `users` query parameter.
+      operationId: listBorrowPositions
+      parameters:
+      - name: users
+        in: query
+        description: Comma-separated Solana wallet addresses.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf,TEsTKPSD2RBQxFHgxqmr3YLayAWWz2kpESk5wdoeB62
+      - $ref: '#/components/parameters/market'
+      responses:
+        '200':
+          description: Borrow positions for the requested users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BorrowPosition'
+              example:
+              - id: 3518
+                vaultId: 8
+                address: 9tjzV49wccwf9A8J5fZ5josjWYnS41fUpNmcwqcqYrPF
+                supply: '0'
+                beforeSupply: '0'
+                borrow: '0'
+                beforeBorrow: '0'
+                isLiquidated: false
+                supplyLiquidation: '0'
+                borrowLiquidation: '0'
+                isSupplyPosition: true
+                tick: -2147483648
+                tickId: 1
+                dustBorrow: '0'
+                ownerAddress: HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf
+                vault:
+                  id: 8
+                  address: DchXYJwVjPaEUxCiySXVbNyNppAFbQM7Ku76uKvyaDNT
+                config: {}
+      security:
+      - ApiKeyAuth: []
+  /borrow/operate:
+    post:
+      tags:
+      - Borrow
+      summary: Build unsigned operate transaction
+      description: |
+        Builds a base64-encoded unsigned versioned transaction for a borrow operate action.
+
+        Positive `colAmount` / `debtAmount` values deposit collateral or borrow debt.
+        Negative values withdraw collateral or pay back debt.
+      operationId: buildBorrowOperateTransaction
+      parameters:
+      - $ref: '#/components/parameters/market'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperatePayload'
+            example:
+              vaultId: 1
+              positionId: 0
+              signer: 4AwWnVxWKdZCZ8zVGdD7S3EwzRHkVRiXJxQKzwjbBayj
+              colAmount: '10000'
+              debtAmount: '100'
+        required: true
+      responses:
+        '200':
+          description: Unsigned operate transaction
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperateTransactionResponse'
+              example:
+                nftId: 9062
+                transaction: AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAgSLx7tPDvhw1CP7ZRClws8DN/LJyixatJZus2rQZ5pAG4cj71J70/rvu0J/yTO1674UGxqeljWsbxMzyBLGGTIhSXDKb3wVHYzXo0QFPryr6iEn/iNAYzX5PAlDQtaHW8lZfXf/XyEr3Wopfe9zqFiLis6v4f8U6hxuQhWGjqLG94CERPvP3H/BclenozhcxbxUXvL+eHEhCG764X4ME0EGHl8szytbAyAc7IdpMQ3ZAWF7Tn2sEZyyHpR1gWMtyb6oAuWSMFFuPlFmrZgneVXPFM1IT/BLHA9RbwtgiUIANaxKCIpkUG7pyNCcpG772SuCkkknsAKWSbiImP8gVvFqPeA4oganO3BaPj9y3TzLqfiwk9dDCxaIuRcmdJ+MiQSCv4el+RWy7kuZColtQumOW/ySBZLynRpY6hFkqzWzMMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEcn8RD5rZyCj3b2Rq49ZiVsmScRvvn3bU9qhBHACBPVR6mnvvwFsKRZEO8A58f97e1/yRiQ5ahJERwinC6lqslJomRsm5Gr9y9W+wdHAcnDKneVfnQTMTEQq+wdbs8IgIyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZxvp6877brTo9ZfNqq8l0MbG75MLS9uDkfKYCA0UvXWEK/huRLkhelf0V6yk33/xLN6MW0KY4Ev8Cukm0xsGNHgbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCpjWK6m/JZmhh7wDcE7nwe+sC7C7VoO3NCsHbuaiJo3IYBEBEABwIPCwEFBAgMBgMJDREOChDyI8aJUuHythAnAAAAAAAA
+      security:
+      - ApiKeyAuth: []
+  /borrow/operate-instructions:
+    post:
+      tags:
+      - Borrow
+      summary: Build operate instructions
+      description: Returns Solana instructions and lookup table addresses for a borrow operate action.
+      operationId: buildBorrowOperateInstructions
+      parameters:
+      - $ref: '#/components/parameters/market'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperatePayload'
+            example:
+              vaultId: 1
+              positionId: 0
+              signer: 4AwWnVxWKdZCZ8zVGdD7S3EwzRHkVRiXJxQKzwjbBayj
+              colAmount: '10000'
+              debtAmount: '100'
+        required: true
+      responses:
+        '200':
+          description: Operate instructions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperateInstructionsResponse'
+              example:
+                nftId: 9062
+                instructions:
+                - programId: jupr81YtYssSyPt8jbnGuiWon5f6x9TcDEFxYe3Bdzi
+                  accounts:
+                  - pubkey: GpLjUnj5q8V6jkaaT7q26rQ4hzn7KYoebLRWfk16hTwh
+                    isSigner: true
+                    isWritable: true
+                  data: xRQKAWGgsVsBAF8jAAA=
+                addressLookupTableAddresses:
+                - 3eB86bwSJanGwLo5WoMQZL7Bk7uubCRggZKshJKJVKwx
+      security:
+      - ApiKeyAuth: []
+components:
+  schemas:
+    Market:
+      type: string
+      default: main
+      enum:
+      - main
+      - ethena
+    Token:
+      required:
+      - address
+      - chainId
+      - decimals
+      - name
+      - price
+      - symbol
+      - uiSymbol
+      type: object
+      properties:
+        address:
+          type: string
+          description: SPL token mint address.
+        chainId:
+          type: string
+          example: solana
+        name:
+          type: string
+        symbol:
+          type: string
+        uiSymbol:
+          type: string
+        decimals:
+          type: integer
+        logoUrl:
+          type: string
+          format: uri
+        price:
+          type: string
+          description: Token price as a decimal string.
+        coingeckoId:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        stakingApr:
+          type: number
+          description: Present on vault supply/borrow tokens when applicable.
+        nativeStakeVoteAccount:
+          type: string
+          description: Present on native-stake collateral tokens when applicable.
+        scaledUiConfig:
+          type: object
+          description: Token-2022 scaled-UI-amount config. Present on scaled-UI tokens (e.g. tokenised stocks).
+          properties:
+            authority:
+              type: string
+            multiplier:
+              type: number
+            newMultiplier:
+              type: number
+            newMultiplierEffectiveTimestamp:
+              type: string
+    OracleSource:
+      required:
+      - divisor
+      - invert
+      - multiplier
+      - source
+      - sourceType
+      type: object
+      properties:
+        source:
+          type: string
+        invert:
+          type: boolean
+        multiplier:
+          type: string
+        divisor:
+          type: string
+        sourceType:
+          type: object
+          additionalProperties: true
+          example:
+            chainlink: {}
+    LiquiditySupplyData:
+      type: object
+      properties:
+        modeWithInterest:
+          type: boolean
+        supply:
+          type: string
+        withdrawalLimit:
+          type: string
+        lastUpdateTimestamp:
+          type: string
+        expandPercent:
+          type: integer
+        expandDuration:
+          oneOf:
+          - type: string
+          - type: integer
+        baseWithdrawalLimit:
+          type: string
+        withdrawableUntilLimit:
+          type: string
+        withdrawable:
+          type: string
+    LiquidityBorrowData:
+      type: object
+      properties:
+        modeWithInterest:
+          type: boolean
+        borrow:
+          type: string
+        borrowLimit:
+          type: string
+        lastUpdateTimestamp:
+          oneOf:
+          - type: string
+          - type: integer
+        expandPercent:
+          type: integer
+        expandDuration:
+          type: integer
+        baseBorrowLimit:
+          type: string
+        maxBorrowLimit:
+          type: string
+        borrowLimitUtilization:
+          type: string
+        borrowableUntilLimit:
+          type: string
+        borrowable:
+          type: string
+    VaultMetadata:
+      required:
+      - maxLeverage
+      - multiply
+      - nativeStake
+      - pegged
+      type: object
+      properties:
+        maxLeverage:
+          type: boolean
+        nativeStake:
+          type: boolean
+        pegged:
+          type: boolean
+        multiply:
+          required:
+          - enabled
+          - reduceFactor
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            reduceFactor:
+              type: integer
+    MarketReward:
+      required:
+      - apr
+      - metadata
+      - rewardToken
+      - side
+      - type
+      type: object
+      properties:
+        rewardToken:
+          $ref: '#/components/schemas/Token'
+        type:
+          type: string
+          enum:
+          - merkle
+        side:
+          type: string
+          enum:
+          - supply
+          - borrow
+        apr:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+    BorrowVault:
+      required:
+      - address
+      - borrowToken
+      - id
+      - metadata
+      - supplyToken
+      type: object
+      properties:
+        id:
+          type: integer
+        address:
+          type: string
+        supplyToken:
+          $ref: '#/components/schemas/Token'
+        borrowToken:
+          $ref: '#/components/schemas/Token'
+        totalSupply:
+          type: string
+        totalSupplyLiquidity:
+          type: string
+        totalBorrow:
+          type: string
+        totalBorrowLiquidity:
+          type: string
+        absorbedSupply:
+          type: string
+        absorbedBorrow:
+          type: string
+        supplyRateMagnifier:
+          type: string
+        borrowRateMagnifier:
+          type: string
+        borrowFee:
+          type: string
+        collateralFactor:
+          type: string
+        liquidationThreshold:
+          type: string
+        liquidationMaxLimit:
+          type: string
+        liquidationPenalty:
+          type: string
+        withdrawalGap:
+          type: string
+        supplyRate:
+          type: string
+        supplyRateLiquidity:
+          type: string
+        borrowRate:
+          type: string
+        borrowRateLiquidity:
+          type: string
+        withdrawLimit:
+          type: string
+        withdrawableUntilLimit:
+          type: string
+        withdrawable:
+          type: string
+        borrowLimit:
+          type: string
+        borrowableUntilLimit:
+          type: string
+        borrowable:
+          type: string
+        borrowLimitUtilization:
+          type: string
+        minimumBorrowing:
+          type: string
+        totalPositions:
+          type: integer
+        oracle:
+          type: string
+        oraclePrice:
+          type: string
+        oraclePriceOperate:
+          type: string
+        oraclePriceLiquidate:
+          type: string
+        oracleSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/OracleSource'
+        oracleTimestamp:
+          type: integer
+          format: int64
+        liquiditySupplyData:
+          $ref: '#/components/schemas/LiquiditySupplyData'
+        liquidityBorrowData:
+          $ref: '#/components/schemas/LiquidityBorrowData'
+        rewards:
+          type: array
+          items:
+            $ref: '#/components/schemas/MarketReward'
+        topTick:
+          type: integer
+        metadata:
+          $ref: '#/components/schemas/VaultMetadata'
+      description: Serialized vault data from `serializedVault()` in `app/core/borrowing.ts`.
+    BorrowPosition:
+      required:
+      - address
+      - beforeBorrow
+      - beforeSupply
+      - borrow
+      - borrowLiquidation
+      - config
+      - dustBorrow
+      - id
+      - isLiquidated
+      - isSupplyPosition
+      - ownerAddress
+      - supply
+      - supplyLiquidation
+      - tick
+      - tickId
+      - vault
+      - vaultId
+      type: object
+      properties:
+        id:
+          type: integer
+          description: NFT / position id.
+        vaultId:
+          type: integer
+        address:
+          type: string
+          description: Position NFT mint address.
+        supply:
+          type: string
+        beforeSupply:
+          type: string
+        borrow:
+          type: string
+        beforeBorrow:
+          type: string
+        isLiquidated:
+          type: boolean
+        supplyLiquidation:
+          type: string
+        borrowLiquidation:
+          type: string
+        isSupplyPosition:
+          type: boolean
+        tick:
+          type: integer
+        tickId:
+          type: integer
+        dustBorrow:
+          type: string
+        ownerAddress:
+          type: string
+        vault:
+          $ref: '#/components/schemas/BorrowVault'
+        config:
+          type: object
+          additionalProperties:
+            type: string
+          description: Key/value position config from the database, keyed in camelCase.
+      description: Serialized position data from `getVaultPositionsByUser()` in `app/core/borrowing.ts`.
+    OperatePayload:
+      required:
+      - colAmount
+      - debtAmount
+      - positionId
+      - signer
+      - vaultId
+      type: object
+      properties:
+        vaultId:
+          type: integer
+          description: Target vault id.
+          example: 1
+        positionId:
+          type: integer
+          description: Existing position id. Use `0` when opening a new position.
+          example: 0
+        positionOwner:
+          type: string
+          description: Optional position owner when operating on behalf of another wallet.
+          example: 4AwWnVxWKdZCZ8zVGdD7S3EwzRHkVRiXJxQKzwjbBayj
+        signer:
+          type: string
+          description: Transaction fee payer and signer wallet address.
+          example: 4AwWnVxWKdZCZ8zVGdD7S3EwzRHkVRiXJxQKzwjbBayj
+        colAmount:
+          pattern: ^-?[0-9]+$
+          type: string
+          description: Collateral delta in supply-token base units. Positive deposits collateral, negative
+            withdraws. Use -170141183460469231731687303715884105728 (MIN_I128) to withdraw all collateral.
+          example: '10000'
+        debtAmount:
+          pattern: ^-?[0-9]+$
+          type: string
+          description: Debt delta in borrow-token base units. Positive borrows, negative repays. Use -170141183460469231731687303715884105728
+            (MIN_I128) to repay all debt.
+          example: '100'
+      description: Request body validated by `operateValidator` in `app/validators/borrowing.ts`.
+    OperateTransactionResponse:
+      required:
+      - nftId
+      - transaction
+      type: object
+      properties:
+        nftId:
+          type: integer
+          description: Position NFT id affected by the operation.
+        transaction:
+          type: string
+          description: Base64-encoded unsigned versioned transaction.
+    SolanaAccountMeta:
+      required:
+      - isSigner
+      - isWritable
+      - pubkey
+      type: object
+      properties:
+        pubkey:
+          type: string
+        isSigner:
+          type: boolean
+        isWritable:
+          type: boolean
+    SolanaInstruction:
+      required:
+      - accounts
+      - data
+      - programId
+      type: object
+      properties:
+        programId:
+          type: string
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/SolanaAccountMeta'
+        data:
+          type: string
+          description: Base64-encoded instruction data.
+    OperateInstructionsResponse:
+      required:
+      - addressLookupTableAddresses
+      - instructions
+      - nftId
+      type: object
+      properties:
+        nftId:
+          type: integer
+        instructions:
+          type: array
+          items:
+            $ref: '#/components/schemas/SolanaInstruction'
+        addressLookupTableAddresses:
+          type: array
+          items:
+            type: string
+  parameters:
+    market:
+      name: market
+      in: query
+      description: Lend market identifier. Defaults to `main`.
+      required: false
+      style: form
+      explode: true
+      schema:
+        $ref: '#/components/schemas/Market'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal

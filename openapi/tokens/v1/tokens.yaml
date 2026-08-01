@@ -1,0 +1,303 @@
+openapi: 3.0.3
+info:
+  title: Jupiter Tokens API V1 (Deprecated)
+  version: 1.0.0
+  x-deprecated: true
+  description: Jupiter Tokens API V1 Schema (Deprecated)
+
+servers:
+  - url: https://api.jup.ag/tokens/v1
+    description: Jupiter Tokens API V1 Endpoint
+
+paths:
+  /token/{mint_address}:
+    get:
+      summary: token information
+      deprecated: true
+      description: |
+        Returns the specified mint address's token information and metadata. Tokens API V1 is deprecated, please use Tokens API V2 instead.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+      - name: mint_address
+        in: path
+        description: The token's mint address
+        required: true
+        schema:
+          type: string
+        example: So11111111111111111111111111111111111111112
+      responses:
+        '200':
+          description: Returns metadata about a particular token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MintIncludingDuplicates"
+  /market/{market_address}/mints:
+    get:
+      summary: mints in market
+      deprecated: true
+      description: |
+        Returns the mints involved in a market. Tokens API V1 is deprecated, please use Tokens API V2 instead.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+      - name: market_address
+        in: path
+        description: A market/pool address
+        required: true
+        schema:
+          type: string
+        example: BVRbyLjjfSBcoyiYFuxbgKYnWuiFaF9CSXEa5vdSZ9Hh
+      responses:
+        '200':
+          description: Returns the mints involved in a market
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /mints/tradable:
+    get:
+      summary: tradable
+      deprecated: true
+      description: |
+        Returns a list of all mints tradable via Jupiter routing. Tokens API V1 is deprecated, please use Tokens API V2 instead.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: List of mints which are tradable via Jupiter routing
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /tagged/{tag}:
+    get:
+      summary: tagged
+      deprecated: true
+      description: |
+        Returns a list of mints with specified tag(s) along with their metadata. Tokens API V1 is deprecated, please use Tokens API V2 instead.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+      - name: tag
+        in: path
+        description: A list of one or more tags, comma separated. The list is the
+          union of tokens with these tags.
+        required: true
+        schema:
+          type: string
+        example: lst,token-2022
+      responses:
+        '200':
+          description: The list of tokens with the tags given
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/MintIncludingDuplicates"
+  /new:
+    get:
+      summary: new
+      deprecated: true
+      description: |
+        Returns new tokens with metadata, created at timestamp and markets. Tokens API V1 is deprecated, please use Tokens API V2 instead.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+      - name: limit
+        in: query
+        description: How many records to output in the result
+        required: false
+        schema:
+          type: integer
+          nullable: true
+          format: int64
+        example: '10'
+      - name: offset
+        in: query
+        description: |-
+          The offset into the result set. Used in conjunction with
+          `limit` to page through the data.
+        required: false
+        schema:
+          type: integer
+          format: int64
+          nullable: true
+          default: 0
+        example: '20'
+      responses:
+        '200':
+          description: List of new tokens which are tradable with SOL
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/MintWithCreationTimeAndMarkets"
+  /all:
+    get:
+      summary: all
+      deprecated: true
+      description: |
+        Returns all tokens with all metadata. Tokens API V1 is deprecated, please use Tokens API V2 instead.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: List of all tokens with all metadata
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Mint"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+  schemas:
+    Mint:
+      type: object
+      required:
+      - address
+      - name
+      - symbol
+      - decimals
+      - tags
+      - created_at
+      - extensions
+      properties:
+        address:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        daily_volume:
+          type: number
+          nullable: true
+          format: double
+        decimals:
+          type: integer
+          format: int32
+        extensions: {}
+        freeze_authority:
+          type: string
+          nullable: true
+        logoURI:
+          type: string
+          nullable: true
+        mint_authority:
+          type: string
+          nullable: true
+        minted_at:
+          type: string
+          nullable: true
+          format: date-time
+        name:
+          type: string
+        permanent_delegate:
+          type: string
+          nullable: true
+        symbol:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+            nullable: true
+    MintIncludingDuplicates:
+      type: object
+      required:
+      - address
+      - name
+      - symbol
+      - decimals
+      - tags
+      - created_at
+      - extensions
+      properties:
+        address:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        daily_volume:
+          type: integer
+          nullable: true
+          format: double
+        decimals:
+          type: integer
+          format: int32
+        extensions: {}
+        freeze_authority:
+          type: string
+          nullable: true
+        logoURI:
+          type: string
+          nullable: true
+        mint_authority:
+          type: string
+          nullable: true
+        minted_at:
+          type: string
+          nullable: true
+          format: date-time
+        name:
+          type: string
+        permanent_delegate:
+          type: string
+          nullable: true
+        symbol:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+            nullable: true
+    MintWithCreationTimeAndMarkets:
+      type: object
+      required:
+      - mint
+      - created_at
+      - metadata_updated_at
+      - name
+      - symbol
+      - decimals
+      - known_markets
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        decimals:
+          type: integer
+          format: int32
+        freeze_authority:
+          type: string
+          nullable: true
+        known_markets:
+          type: array
+          items:
+            type: string
+        logo_uri:
+          type: string
+          nullable: true
+        metadata_updated_at:
+          type: string
+          format: date-time
+        mint:
+          type: string
+        mint_authority:
+          type: string
+          nullable: true
+        name:
+          type: string
+        symbol:
+          type: string

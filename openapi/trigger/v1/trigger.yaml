@@ -1,0 +1,819 @@
+openapi: 3.0.0
+info:
+  title: Jupiter Trigger Order API
+  version: 1.0.0
+  description: Jupiter Trigger Order API Schema
+
+servers:
+  - url: https://api.jup.ag/trigger/v1
+    description: Jupiter Trigger Order API Endpoint
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+  schemas: {}
+  parameters: {}
+paths:
+  /cancelOrders:
+    post:
+      summary: cancelOrders
+      description: |
+        Request for a base64-encoded unsigned trigger order cancellation transaction(s) to be used in `POST /trigger/v1/execute`
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maker:
+                  type: string
+                  default: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
+                computeUnitPrice:
+                  type: string
+                  default: auto
+                  description: |
+                    In microlamports, defaults to 95th percentile of priority fees
+                orders:
+                  type: array
+                  items:
+                    type: string
+                  description: |
+                    Array of orders to cancel, if none is provided, the API will generate cancel instructions for all open orders belonging to the maker
+              required:
+                - maker
+              title: cancelOrdersRequestBody
+              example:
+                maker: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+                orders:
+                  - 6fe8ByaiFHisjnYnH5qdpyiNtkn89mMBQUemRkVmKhro
+                  - 9jwzPKHxcrSozdrTYzPnTqy7psRvNGxaYUAiiyxwZKjj
+                computeUnitPrice:
+                  type: string
+                  default: auto
+      responses:
+        '200':
+          description: |
+            Returns the base64-encoded unsigned transaction(s) of all open orders associated to the provided "maker"
+            - If no orders were specified, it will batch 5 cancel order instructions in 1 transaction
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    description: "Required to make a request to `/execute`"
+                  transactions:
+                    type: array
+                    items:
+                      type: string
+                    description: "Array of unsigned base-64 encoded transaction(s)"
+                required:
+                  - requestId
+                  - transactions
+                example:
+                  requestId: f7d5dd40-a416-4dae-8367-7dc10cab6554
+                  transactions:
+                    - |
+                      AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkOCWPK8t5w2W1nIsonBw2T/TCNCKkrgBQia9/YVlLEcjM9zTXA2aZIqK0k40U/eCZ0Zu1176lxIuHLsY6UyQjTdash6wigo20Auc3RVYRWME9FjnpbdgdRKYjLJLe0lVi47IZO5XCZ/U0AirZsOIWLoumtNiLomxcYL6d2R2rSxzkNgnQl2IV0spQPT+7K7zraa8oytEZyZ4HSFpxmV2v3WgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEImJzcxhjwZ2dKxnfimarbEo/iDZzNgo5QjJ8b+bMOuSf2yH7EMQBZfZLsgOHg/C5SyLv/x1D4MHZgRX7jOy4YyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAADG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQrDSpbBZnFaYMEjPsolig3zCx7IWOB0XHNqEmJmY0siBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqXeleaIpvDk6bHUITYxyjNU3ParFA70LbecfV6NupbbBCAkABQKgAwIACQAJAy48AAAAAAAACAYABAAMBQ0BAQUCAAQMAgAAAIDw+gIAAAAADQEEAREIBgABAAoFDQEBCw8AAAIDBAYLDAoNDQUIBwsihW5Kr3Cf9Z9OyUY1qj0LZYDw+gIAAAAAAOH1BQAAAAAAAA0DBAAAAQk=
+                    - |
+                      AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkOCWPK8t5w2W1nIsonBw2T/TCNCKkrgBQia9/YVlLEcjM9zTXA2aZIqK0k40U/eCZ0Zu1176lxIuHLsY6UyQjTdash6wigo20Auc3RVYRWME9FjnpbdgdRKYjLJLe0lVi47IZO5XCZ/U0AirZsOIWLoumtNiLomxcYL6d2R2rSxzkNgnQl2IV0spQPT+7K7zraa8oytEZyZ4HSFpxmV2v3WgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEImJzcxhjwZ2dKxnfimarbEo/iDZzNgo5QjJ8b+bMOuSf2yH7EMQBZfZLsgOHg/C5SyLv/x1D4MHZgRX7jOy4YyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAADG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQrDSpbBZnFaYMEjPsolig3zCx7IWOB0XHNqEmJmY0siBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqXeleaIpvDk6bHUITYxyjNU3ParFA70LbecfV6NupbbBCAkABQKgAwIACQAJAy48AAAAAAAACAYABAAMBQ0BAQUCAAQMAgAAAIDw+gIAAAAADQEEAREIBgABAAoFDQEBCw8AAAIDBAYLDAoNDQUIBwsihW5Kr3Cf9Z9OyUY1qj0LZYDw+gIAAAAAAOH1BQAAAAAAAA0DBAAAAQk=
+              example:
+                requestId: "c3d4e5f6-a7b8-9012-cdef-123456789012"
+                transactions:
+                  - "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+        '400':
+          description: Bad request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                  cause:
+                    type: string
+                  signature:
+                    type: string
+                    description: 'Signature of the transaction, if generated'
+                    example: |
+                      38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status:
+                    type: string
+                    enum:
+                      - Failed
+                required:
+                  - error
+                  - code
+                example:
+                  error: invalid maker pubkey
+                  code: 400
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                  cause:
+                    type: string
+                  signature:
+                    type: string
+                    description: 'Signature of the transaction, if generated'
+                    example: |
+                      38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status:
+                    type: string
+                    enum:
+                      - Failed
+                required:
+                  - error
+                  - code
+                example:
+                  error: something went wrong while generating cancel instructions
+                  code: 500
+  /createOrder:
+    post:
+      summary: createOrder
+      description: |
+        Request for a base64-encoded unsigned trigger order creation transaction to be used in `POST /trigger/v1/execute`
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputMint:
+                  type: string
+                  default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                outputMint:
+                  type: string
+                  default: "So11111111111111111111111111111111111111112"
+                maker:
+                  type: string
+                  default: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
+                payer:
+                  type: string
+                  default: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
+                params:
+                  type: object
+                  properties:
+                    makingAmount:
+                      type: string
+                      description: Amount of input mint to swap
+                      default: "100000000"
+                    takingAmount:
+                      type: string
+                      description: Amount of output mint to receive
+                      default: "50000000"
+                    expiredAt:
+                      type: string
+                    slippageBps:
+                      type: string
+                      description: |
+                        Amount of slippage the order can be executed with
+                      default: 0
+                    feeBps:
+                      type: string
+                      description: |
+                        Requires the `feeAccount` parameter, the amount of fees in bps that will be sent to the fee account
+                  required:
+                    - makingAmount
+                    - takingAmount
+                computeUnitPrice:
+                  type: string
+                  default: auto
+                  description: |
+                    In microlamports, defaults to 95th percentile of priority fees
+                feeAccount:
+                  description: |
+                    - A token account (via the Referral Program) that will receive the fees
+                    - Refer to [Referral Program Github](https://github.com/TeamRaccoons/referral/tree/main) for more information
+                  type: string
+                wrapAndUnwrapSol:
+                  type: boolean
+                  default: true
+                  description: If either input or output mint is native SOL
+              required:
+                - inputMint
+                - outputMint
+                - maker
+                - payer
+                - params
+              title: createOrdersRequestBody
+              example:
+                maker: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+                payer: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+                inputMint: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+                outputMint: So11111111111111111111111111111111111111112
+                params:
+                  makingAmount: '100000000'
+                  takingAmount: '50000000'
+                computeUnitPrice: auto
+      responses:
+        '200':
+          description: |
+            Returns the base64-encoded unsigned transaction from the provided request body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    description: "Required to make a request to `/execute`"
+                  transaction:
+                    type: string
+                    description: "Unsigned base-64 encoded transaction"
+                  order:
+                    type: string
+                    description: "Base-58 account which is the Trigger Order account"
+                required:
+                  - requestId
+                  - transaction
+                example:
+                  requestId: f7d5dd40-a416-4dae-8367-7dc10cab6554
+                  transaction: |
+                    AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkOCWPK8t5w2W1nIsonBw2T/TCNCKkrgBQia9/YVlLEcjM9zTXA2aZIqK0k40U/eCZ0Zu1176lxIuHLsY6UyQjTdash6wigo20Auc3RVYRWME9FjnpbdgdRKYjLJLe0lVi47IZO5XCZ/U0AirZsOIWLoumtNiLomxcYL6d2R2rSxzkNgnQl2IV0spQPT+7K7zraa8oytEZyZ4HSFpxmV2v3WgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEImJzcxhjwZ2dKxnfimarbEo/iDZzNgo5QjJ8b+bMOuSf2yH7EMQBZfZLsgOHg/C5SyLv/x1D4MHZgRX7jOy4YyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAADG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQrDSpbBZnFaYMEjPsolig3zCx7IWOB0XHNqEmJmY0siBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqXeleaIpvDk6bHUITYxyjNU3ParFA70LbecfV6NupbbBCAkABQKgAwIACQAJAy48AAAAAAAACAYABAAMBQ0BAQUCAAQMAgAAAIDw+gIAAAAADQEEAREIBgABAAoFDQEBCw8AAAIDBAYLDAoNDQUIBwsihW5Kr3Cf9Z9OyUY1qj0LZYDw+gIAAAAAAOH1BQAAAAAAAA0DBAAAAQk=
+                  order: CX2iPk4nxarGPkk7ziViJTfL1z2e1LnGWRDimVQ4tzYf
+              example:
+                requestId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                order: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+        '400':
+          description: Bad request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                  cause:
+                    type: string
+                  signature:
+                    type: string
+                    description: 'Signature of the transaction, if generated'
+                    example: |
+                      38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status:
+                    type: string
+                    enum:
+                      - Failed
+                required:
+                  - error
+                  - code
+                example:
+                  error: invalid create order request
+                  cause: 'input mint making amount must be at least 5 USD, received: 1'
+                  code: 400
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                  cause:
+                    type: string
+                  signature:
+                    type: string
+                    description: 'Signature of the transaction, if generated'
+                    example: |
+                      38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status:
+                    type: string
+                    enum:
+                      - Failed
+                required:
+                  - error
+                  - code
+                example:
+                  error: unable to get latest blockhash
+                  code: 500
+  /cancelOrder:
+    post:
+      summary: cancelOrder
+      description: |
+        Request for a base64-encoded unsigned trigger order cancellation transaction to be used in `POST /trigger/v1/execute`
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maker:
+                  type: string
+                  default: "jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
+                order:
+                  type: string
+                  default: "6fe8ByaiFHisjnYnH5qdpyiNtkn89mMBQUemRkVmKhro"
+                computeUnitPrice:
+                  type: string
+                  default: auto
+                  description: |
+                    In microlamports, defaults to 95th percentile of priority fees
+              required:
+                - maker
+                - order
+              example:
+                maker: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+                order: 6fe8ByaiFHisjnYnH5qdpyiNtkn89mMBQUemRkVmKhro
+                computeUnitPrice: auto
+      responses:
+        '200':
+          description: |
+            Returns the base64-encoded unsigned transaction needed to cancel an order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    description: "Required to make a request to `/execute`"
+                  transaction:
+                    type: string
+                    description: "Unsigned base-64 encoded transaction"
+                required:
+                  - requestId
+                  - transaction
+                example:
+                  requestId: f7d5dd40-a416-4dae-8367-7dc10cab6554
+                  transaction: |
+                    AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAkOCWPK8t5w2W1nIsonBw2T/TCNCKkrgBQia9/YVlLEcjM9zTXA2aZIqK0k40U/eCZ0Zu1176lxIuHLsY6UyQjTdash6wigo20Auc3RVYRWME9FjnpbdgdRKYjLJLe0lVi47IZO5XCZ/U0AirZsOIWLoumtNiLomxcYL6d2R2rSxzkNgnQl2IV0spQPT+7K7zraa8oytEZyZ4HSFpxmV2v3WgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEImJzcxhjwZ2dKxnfimarbEo/iDZzNgo5QjJ8b+bMOuSf2yH7EMQBZfZLsgOHg/C5SyLv/x1D4MHZgRX7jOy4YyXJY9OJInxuz0QKRSODYMLWhOZ2v8QhASOe9jb6fhZAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAADG+nrzvtutOj1l82qryXQxsbvkwtL24OR8pgIDRS9dYQrDSpbBZnFaYMEjPsolig3zCx7IWOB0XHNqEmJmY0siBpuIV/6rgYT7aH9jRhjANdrEOdwa6ztVmKDwAAAAAAEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqXeleaIpvDk6bHUITYxyjNU3ParFA70LbecfV6NupbbBCAkABQKgAwIACQAJAy48AAAAAAAACAYABAAMBQ0BAQUCAAQMAgAAAIDw+gIAAAAADQEEAREIBgABAAoFDQEBCw8AAAIDBAYLDAoNDQUIBwsihW5Kr3Cf9Z9OyUY1qj0LZYDw+gIAAAAAAOH1BQAAAAAAAA0DBAAAAQk=
+              example:
+                requestId: "b2c3d4e5-f6a7-8901-bcde-f12345678901"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+        '400':
+          description: Bad request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                  cause:
+                    type: string
+                  signature:
+                    type: string
+                    description: 'Signature of the transaction, if generated'
+                    example: |
+                      38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status:
+                    type: string
+                    enum:
+                      - Failed
+                required:
+                  - error
+                  - code
+                example:
+                  error: invalid maker pubkey
+                  code: 400
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                  cause:
+                    type: string
+                  signature:
+                    type: string
+                    description: 'Signature of the transaction, if generated'
+                    example: |
+                      38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status:
+                    type: string
+                    enum:
+                      - Failed
+                required:
+                  - error
+                  - code
+                example:
+                  error: something went wrong while generating cancel instructions
+                  code: 500
+  /execute:
+    post:
+      summary: execute
+      description: |
+        Execute the signed transaction and get the execution status
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requestId:
+                  type: string
+                  description: "Found in the response of `/createOrder` or `/cancelOrder`"
+                signedTransaction:
+                  type: string
+                  description: "The signed transaction to execute"
+              required:
+                - requestId
+                - signedTransaction
+              title: executeRequestBody
+            example:
+              requestId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+              signedTransaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+      responses:
+        '200':
+          description: Signature of the successful transaction
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                  signature:
+                    type: string
+                    description: Signature of the successful transaction
+                  status:
+                    type: string
+                    enum:
+                      - Success
+                      - Failed
+                required:
+                  - signature
+                  - status
+                  - code
+                example:
+                  signature: |
+                    38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status: Success
+              example:
+                status: "Success"
+                signature: "5UfDuX7hXbTiKFJqS1MzGsNpbXTzMKJe2bZP1zrd7DnFBSChKvF2FVDNAuqz7SJpaHXTB9E5DP6tMjfZmVDMJRs"
+                code: 0
+        '400':
+          description: Bad request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                  cause:
+                    type: string
+                  signature:
+                    type: string
+                    description: 'Signature of the transaction, if generated'
+                    example: |
+                      38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status:
+                    type: string
+                    enum:
+                      - Failed
+                required:
+                  - error
+                  - code
+                example:
+                  error: invalid transaction
+                  code: 400
+                  status: Failed
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  code:
+                    type: number
+                  cause:
+                    type: string
+                  signature:
+                    type: string
+                    description: 'Signature of the transaction, if generated'
+                    example: |
+                      38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status:
+                    type: string
+                    enum:
+                      - Failed
+                required:
+                  - error
+                  - code
+                example:
+                  error: unable to confirm transaction
+                  code: 500
+                  signature: |
+                    38CtpugRBobyj1JMkHj9umQyj1D8q6bs1jcMRcw7Fiyp4BXv4uh4bD4TyJs6fsqYCDDfQpeRewA7HjLA1Eprc8uR
+                  status: Failed
+  /getTriggerOrders:
+    get:
+      summary: getTriggerOrders
+      description: |
+        Request for the active or historical orders associated to the provided account
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - schema:
+            type: string
+            example: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+          required: true
+          name: user
+          in: query
+        - schema:
+            type: string
+            default: '1'
+          required: false
+          name: page
+          in: query
+        - schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+            description: 'Whether to include failed transactions, expects ''true'' or ''false'''
+          required: false
+          description: 'Whether to include failed transactions, expects ''true'' or ''false'''
+          name: includeFailedTx
+          in: query
+        - schema:
+            type: string
+            enum:
+              - active
+              - history
+            description: The status of the orders to return
+          required: true
+          description: The status of the orders to return
+          name: orderStatus
+          in: query
+        - schema:
+            type: string
+          required: false
+          description: The input mint to filter by
+          name: inputMint
+          in: query
+        - schema:
+            type: string
+          required: false
+          description: The output mint to filter by
+          name: outputMint
+          in: query
+      responses:
+        '200':
+          description: Returns the open orders associated to the provided account hash
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: string
+                    description: The requested user's wallet public key
+                  orderStatus:
+                    type: string
+                    enum:
+                      - active
+                      - history
+                    description: The status of the requested orders
+                  orders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        userPubkey:
+                          type: string
+                        orderKey:
+                          type: string
+                        inputMint:
+                          type: string
+                        outputMint:
+                          type: string
+                        makingAmount:
+                          type: string
+                        takingAmount:
+                          type: string
+                        remainingMakingAmount:
+                          type: string
+                        remainingTakingAmount:
+                          type: string
+                        rawMakingAmount:
+                          type: string
+                        rawTakingAmount:
+                          type: string
+                        rawRemainingMakingAmount:
+                          type: string
+                        rawRemainingTakingAmount:
+                          type: string
+                        slippageBps:
+                          type: string
+                        expiredAt:
+                          type: string
+                          nullable: true
+                        createdAt:
+                          type: string
+                        updatedAt:
+                          type: string
+                        status:
+                          type: string
+                          description: |
+                            An open order with trades indicates that it has been
+                            partially filled
+                        openTx:
+                          type: string
+                        closeTx:
+                          type: string
+                        programVersion:
+                          type: string
+                        trades:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              orderKey:
+                                type: string
+                              keeper:
+                                type: string
+                              inputMint:
+                                type: string
+                              outputMint:
+                                type: string
+                              inputAmount:
+                                type: string
+                              outputAmount:
+                                type: string
+                              rawInputAmount:
+                                type: string
+                              rawOutputAmount:
+                                type: string
+                              feeMint:
+                                type: string
+                              feeAmount:
+                                type: string
+                              rawFeeAmount:
+                                type: string
+                              txId:
+                                type: string
+                              confirmedAt:
+                                type: string
+                              action:
+                                type: string
+                              productMeta:
+                                nullable: true
+                            required:
+                              - orderKey
+                              - keeper
+                              - inputMint
+                              - outputMint
+                              - inputAmount
+                              - outputAmount
+                              - rawInputAmount
+                              - rawOutputAmount
+                              - feeMint
+                              - feeAmount
+                              - rawFeeAmount
+                              - txId
+                              - confirmedAt
+                              - action
+                      required:
+                        - userPubkey
+                        - orderKey
+                        - inputMint
+                        - outputMint
+                        - makingAmount
+                        - takingAmount
+                        - remainingMakingAmount
+                        - remainingTakingAmount
+                        - rawMakingAmount
+                        - rawTakingAmount
+                        - rawRemainingMakingAmount
+                        - rawRemainingTakingAmount
+                        - slippageBps
+                        - expiredAt
+                        - createdAt
+                        - updatedAt
+                        - status
+                        - openTx
+                        - closeTx
+                        - programVersion
+                        - trades
+                  totalPages:
+                    type: number
+                    description: Total number of pages
+                  page:
+                    type: number
+                required:
+                  - user
+                  - orderStatus
+                  - orders
+                  - totalPages
+                  - page
+                example:
+                  user: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+                  orderStatus: history
+                  orders:
+                    - userPubkey: jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3
+                      orderKey: 99uWTWukow8k7dqcpbYoHxTAWGvn1YkT1VMmnEeTjuDr
+                      inputMint: So11111111111111111111111111111111111111112
+                      outputMint: HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC
+                      makingAmount: '0.05'
+                      takingAmount: '32.071840924'
+                      remainingMakingAmount: '0'
+                      remainingTakingAmount: '0'
+                      rawMakingAmount: '50000000'
+                      rawTakingAmount: '32071840924'
+                      rawRemainingMakingAmount: '0'
+                      rawRemainingTakingAmount: '0'
+                      slippageBps: '0'
+                      expiredAt: null
+                      createdAt: '2025-03-17T08:07:25Z'
+                      updatedAt: '2025-03-17T08:09:37Z'
+                      status: Completed
+                      openTx: |
+                        466G3XxE4NzxCj136SXe4BSjXzCVBQdvn6RsHMNGN2DGCS9PSceJSACqEWCxx22hsCXcEskvEFdm44wsHCF1auvL
+                      closeTx: |
+                        3PDo3pMJLqvAfNXwYjY7BSP57ZNQ5DgYDeK6xYszUVMneHzAZBQzsBSskym8uveMoLC4G8N8DjPaLBY726ZsBZvT
+                      programVersion: j1o2qRpjcyUwEvwtcfhEQefh773ZgjxcVRry7LDqg5X
+                      trades:
+                        - orderKey: 99uWTWukow8k7dqcpbYoHxTAWGvn1YkT1VMmnEeTjuDr
+                          keeper: j1oAbxxiDUWvoHxEDhWE7THLjEkDQW2cSHYn2vttxTF
+                          inputMint: So11111111111111111111111111111111111111112
+                          outputMint: HeLp6NuQkmYB4pYWo2zYs22mESHXPQYzXbB8n4V98jwC
+                          inputAmount: '0.05'
+                          outputAmount: '32.071840924'
+                          rawInputAmount: '50000000'
+                          rawOutputAmount: '32071840924'
+                          feeMint: DtL4JtjXwsJQndqXyd6ytJSmWDLWLESoXc7MkYNRQF9J
+                          feeAmount: '0'
+                          rawFeeAmount: '0'
+                          txId: |
+                            3PDo3pMJLqvAfNXwYjY7BSP57ZNQ5DgYDeK6xYszUVMneHzAZBQzsBSskym8uveMoLC4G8N8DjPaLBY726ZsBZvT
+                          confirmedAt: '2025-03-17T08:09:37Z'
+                          action: Fill
+                          productMeta: null
+                  totalPages: 1
+                  page: 1
+              example:
+                user: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                orderStatus: "open"
+                orders:
+                  - userPubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    orderKey: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+                    inputMint: "So11111111111111111111111111111111111111112"
+                    outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    makingAmount: "1.0"
+                    takingAmount: "200.0"
+                    remainingMakingAmount: "1.0"
+                    remainingTakingAmount: "200.0"
+                    rawMakingAmount: "1000000000"
+                    rawTakingAmount: "200000000"
+                    rawRemainingMakingAmount: "1000000000"
+                    rawRemainingTakingAmount: "200000000"
+                    slippageBps: "50"
+                    expiredAt: null
+                    createdAt: "2025-03-15T10:30:00.000Z"
+                    updatedAt: "2025-03-15T10:30:00.000Z"
+                    status: "Open"
+                    openTx: "4xKpN2..."
+                    closeTx: null
+                    programVersion: "j1to"
+                    trades: []
+                totalPages: 1
+                page: 1
+        '400':
+          description: Bad request body
+        '500':
+          description: Internal error

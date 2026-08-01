@@ -1,0 +1,1122 @@
+openapi: 3.1.0
+info:
+  title: Jupiter Portfolio API
+  version: 1.0.0
+  description: Jupiter Portfolio API Schema
+
+servers:
+  - url: https://api.jup.ag/portfolio/v1
+    description: Jupiter Portfolio API endpoint
+
+components:
+  schemas:
+    FetcherReport:
+      type: object
+      required:
+        - id
+        - status
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the fetcher
+        status:
+          type: string
+          enum:
+            - succeeded
+            - failed
+          description: Status of the fetcher execution
+        duration:
+          type: number
+          description: Execution duration in milliseconds
+        error:
+          type: string
+          description: Error message if status is failed
+
+    TokenInfo:
+      type: object
+      required:
+        - address
+        - name
+        - decimals
+        - symbol
+      properties:
+        address:
+          type: string
+          description: Token address
+        name:
+          type: string
+          description: Token name
+        decimals:
+          type: number
+          description: Number of decimals for the token
+        symbol:
+          type: string
+          description: Token symbol
+        logoURI:
+          type: string
+          description: URI of the token logo
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags associated with the token
+
+    PortfolioAsset:
+      type: object
+      required:
+        - networkId
+        - type
+        - value
+        - attributes
+      discriminator:
+        propertyName: type
+        mapping:
+          generic: '#/components/schemas/PortfolioAssetGeneric'
+          token: '#/components/schemas/PortfolioAssetToken'
+          collectible: '#/components/schemas/PortfolioAssetCollectible'
+      oneOf:
+        - $ref: '#/components/schemas/PortfolioAssetGeneric'
+          title: PortfolioAssetGeneric
+        - $ref: '#/components/schemas/PortfolioAssetToken'
+          title: PortfolioAssetToken
+        - $ref: '#/components/schemas/PortfolioAssetCollectible'
+          title: PortfolioAssetCollectible
+
+    PortfolioAssetGeneric:
+      type: object
+      required:
+        - networkId
+        - type
+        - value
+        - attributes
+        - data
+      properties:
+        type:
+          type: string
+          const: generic
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        value:
+          type: number
+        attributes:
+          $ref: '#/components/schemas/PortfolioAssetAttributes'
+        name:
+          type: string
+        imageUri:
+          type: string
+        ref:
+          $ref: '#/components/schemas/Ref'
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+        link:
+          type: string
+        data:
+          type: object
+          properties:
+            address:
+              type: string
+            amount:
+              type: number
+            price:
+              type: number
+
+    PortfolioAssetToken:
+      type: object
+      required:
+        - networkId
+        - type
+        - value
+        - attributes
+        - data
+      properties:
+        type:
+          type: string
+          const: token
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        value:
+          type: number
+        attributes:
+          $ref: '#/components/schemas/PortfolioAssetAttributes'
+        name:
+          type: string
+        imageUri:
+          type: string
+        ref:
+          $ref: '#/components/schemas/Ref'
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+        link:
+          type: string
+        data:
+          type: object
+          required:
+            - address
+            - amount
+            - price
+          properties:
+            address:
+              type: string
+            amount:
+              type: number
+            price:
+              type: number
+            yields:
+              type: array
+              items:
+                $ref: '#/components/schemas/Yield'
+
+    PortfolioAssetCollectible:
+      type: object
+      required:
+        - networkId
+        - type
+        - value
+        - attributes
+        - data
+      properties:
+        type:
+          type: string
+          const: collectible
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        value:
+          type: number
+        attributes:
+          $ref: '#/components/schemas/PortfolioAssetAttributes'
+        name:
+          type: string
+        imageUri:
+          type: string
+        ref:
+          $ref: '#/components/schemas/Ref'
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+        link:
+          type: string
+        data:
+          type: object
+          required:
+            - address
+            - amount
+            - price
+          properties:
+            address:
+              type: string
+            amount:
+              type: number
+            price:
+              type: number
+            name:
+              type: string
+            description:
+              type: string
+            imageUri:
+              type: string
+            dataUri:
+              type: string
+            attributes:
+              type: array
+              items:
+                $ref: '#/components/schemas/CollectibleAttribute'
+            collection:
+              $ref: '#/components/schemas/CollectibleCollection'
+
+    PortfolioAssetAttributes:
+      type: object
+      properties:
+        lockedUntil:
+          type: number
+          description: Date (in ms) when the asset will be unlocked. -1 means locked for an unknown period
+        isDeprecated:
+          type: boolean
+        isClaimable:
+          type: boolean
+        tags:
+          $ref: '#/components/schemas/Tags'
+        validator:
+          type: object
+          required:
+            - address
+            - yields
+          properties:
+            name:
+              type: string
+            imageUri:
+              type: string
+            address:
+              type: string
+            yields:
+              type: array
+              items:
+                $ref: '#/components/schemas/Yield'
+        prediction:
+          type: object
+          required:
+            - market
+            - sideName
+          properties:
+            market:
+              type: object
+              required:
+                - marketTitle
+              properties:
+                marketTitle:
+                  type: string
+                eventTitle:
+                  type: string
+                closeTime:
+                  type: number
+                  description: Timestamp in milliseconds
+                resolveAt:
+                  type: number
+                  description: Timestamp in milliseconds
+            sideName:
+              type: string
+            feesPaidValue:
+              type: number
+            pnlValue:
+              type: number
+            pnlPercent:
+              type: number
+            pnlAfterFeesValue:
+              type: number
+            pnlAfterFeesPercent:
+              type: number
+            createdAt:
+              type: number
+              description: Timestamp in milliseconds
+
+    SourceRef:
+      type: object
+      required:
+        - address
+        - name
+      properties:
+        address:
+          type: string
+        name:
+          type: string
+          enum:
+            - Pool
+            - Farm
+            - Market
+            - Vault
+            - Lending Market
+            - Strategy
+            - NFT Mint
+            - Reserve
+            - Proposal
+            - Distributor
+            - Locker
+            - Custody
+            - Pair
+            - Borrow Token
+            - Collateral Token
+            - Elevation Group
+            - Program
+            - Validator
+
+    NetworkId:
+      type: string
+      enum:
+        - solana
+
+    Tags:
+      type: array
+      items:
+        type: string
+
+    NetApy:
+      type: number
+      description: Net APY (Annual Percentage Yield) as fraction. 0.28 means 28% APY
+
+    Ref:
+      type: string
+      description: Account address
+
+    CollectibleAttribute:
+      type: object
+      properties:
+        trait_type:
+          type: string
+        value: {}
+      additionalProperties: true
+
+    CollectibleCollection:
+      type: object
+      required:
+        - floorPrice
+      properties:
+        id:
+          type: string
+        floorPrice:
+          type: number
+        name:
+          type: string
+
+    Yield:
+      type: object
+      properties:
+        apy:
+          type: number
+          description: Annual Percentage Yield as a fraction (0.28 = 28%)
+        apr:
+          type: number
+          description: Annual Percentage Rate as a fraction
+        description:
+          type: string
+
+    PortfolioElementLabel:
+      type: string
+      enum:
+        - Wallet
+        - Staked
+        - LiquidityPool
+        - Farming
+        - Vault
+        - Lending
+        - Vesting
+        - Deposit
+        - Rewards
+        - Airdrop
+        - Margin
+        - LimitOrder
+        - DCA
+        - SmartDCA
+        - Leverage
+
+    PortfolioElement:
+      type: object
+      required:
+        - networkId
+        - platformId
+        - value
+        - type
+        - label
+      discriminator:
+        propertyName: type
+        mapping:
+          multiple: '#/components/schemas/PortfolioElementMultiple'
+          liquidity: '#/components/schemas/PortfolioElementLiquidity'
+          leverage: '#/components/schemas/PortfolioElementLeverage'
+          borrowlend: '#/components/schemas/PortfolioElementBorrowLend'
+          trade: '#/components/schemas/PortfolioElementTrade'
+      oneOf:
+        - $ref: '#/components/schemas/PortfolioElementMultiple'
+          title: PortfolioElementMultiple
+        - $ref: '#/components/schemas/PortfolioElementLiquidity'
+          title: PortfolioElementLiquidity
+        - $ref: '#/components/schemas/PortfolioElementLeverage'
+          title: PortfolioElementLeverage
+        - $ref: '#/components/schemas/PortfolioElementBorrowLend'
+          title: PortfolioElementBorrowLend
+        - $ref: '#/components/schemas/PortfolioElementTrade'
+          title: PortfolioElementTrade
+
+    PortfolioElementMultiple:
+      type: object
+      required:
+        - networkId
+        - platformId
+        - value
+        - type
+        - label
+        - data
+      properties:
+        type:
+          type: string
+          const: multiple
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        platformId:
+          type: string
+        value:
+          type: number
+        label:
+          $ref: '#/components/schemas/PortfolioElementLabel'
+        name:
+          type: string
+        tags:
+          $ref: '#/components/schemas/Tags'
+        netApy:
+          $ref: '#/components/schemas/NetApy'
+        data:
+          type: object
+          required:
+            - assets
+          properties:
+            assets:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortfolioAsset'
+            assetsYields:
+              type: array
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Yield'
+            ref:
+              $ref: '#/components/schemas/Ref'
+            sourceRefs:
+              type: array
+              items:
+                $ref: '#/components/schemas/SourceRef'
+            link:
+              type: string
+
+    PortfolioElementLiquidity:
+      type: object
+      required:
+        - networkId
+        - platformId
+        - value
+        - type
+        - label
+        - data
+      properties:
+        type:
+          type: string
+          const: liquidity
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        platformId:
+          type: string
+        value:
+          type: number
+        label:
+          $ref: '#/components/schemas/PortfolioElementLabel'
+        name:
+          type: string
+        tags:
+          $ref: '#/components/schemas/Tags'
+        netApy:
+          $ref: '#/components/schemas/NetApy'
+        data:
+          type: object
+          required:
+            - liquidities
+          properties:
+            liquidities:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortfolioLiquidity'
+
+    PortfolioElementTrade:
+      type: object
+      required:
+        - networkId
+        - platformId
+        - value
+        - type
+        - label
+        - data
+      properties:
+        type:
+          type: string
+          const: trade
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        platformId:
+          type: string
+        value:
+          type: number
+        label:
+          $ref: '#/components/schemas/PortfolioElementLabel'
+        name:
+          type: string
+        tags:
+          $ref: '#/components/schemas/Tags'
+        netApy:
+          $ref: '#/components/schemas/NetApy'
+        data:
+          type: object
+          required:
+            - assets
+            - inputAddress
+            - outputAddress
+            - initialInputAmount
+            - withdrawnOutputAmount
+            - inputPrice
+            - outputPrice
+            - filledPercentage
+          properties:
+            assets:
+              type: object
+              required:
+                - input
+                - output
+              properties:
+                input:
+                  oneOf:
+                    - $ref: '#/components/schemas/PortfolioAsset'
+                    - type: 'null'
+                output:
+                  oneOf:
+                    - $ref: '#/components/schemas/PortfolioAsset'
+                    - type: 'null'
+            inputAddress:
+              type: string
+            outputAddress:
+              type: string
+            initialInputAmount:
+              type: number
+            withdrawnOutputAmount:
+              type: number
+            expectedOutputAmount:
+              type: number
+            inputPrice:
+              type: number
+            outputPrice:
+              type: number
+            filledPercentage:
+              type: number
+              description: Filled percentage between 0 and 1
+            createdAt:
+              type: number
+              description: Created at timestamp in ms
+            expireAt:
+              type: number
+              description: Expire at timestamp in ms
+            recurring:
+              type: object
+              required:
+                - cycles
+                - interval
+              properties:
+                cycles:
+                  type: number
+                  description: The total number of orders
+                interval:
+                  type: number
+                  description: The interval between two orders in ms
+                priceRange:
+                  type: object
+                  properties:
+                    min:
+                      type: number
+                      description: Minimum usd price
+                    max:
+                      type: number
+                      description: Maximum usd price
+            contract:
+              type: string
+            ref:
+              $ref: '#/components/schemas/Ref'
+            sourceRefs:
+              type: array
+              items:
+                $ref: '#/components/schemas/SourceRef'
+            link:
+              type: string
+
+    PortfolioElementLeverage:
+      type: object
+      required:
+        - networkId
+        - platformId
+        - value
+        - type
+        - label
+        - data
+      properties:
+        type:
+          type: string
+          const: leverage
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        platformId:
+          type: string
+        value:
+          type: number
+        label:
+          $ref: '#/components/schemas/PortfolioElementLabel'
+        name:
+          type: string
+        tags:
+          $ref: '#/components/schemas/Tags'
+        netApy:
+          $ref: '#/components/schemas/NetApy'
+        data:
+          type: object
+          required:
+            - value
+          properties:
+            isolated:
+              type: object
+              required:
+                - positions
+                - value
+              properties:
+                positions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/IsoLevPosition'
+                value:
+                  type: number
+            cross:
+              type: object
+              required:
+                - collateralValue
+                - positions
+                - value
+              properties:
+                leverage:
+                  type: number
+                  description: Sum of positions sizeValue / cross value
+                collateralAssets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PortfolioAsset'
+                collateralValue:
+                  type: number
+                positions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CrossLevPosition'
+                value:
+                  type: number
+            value:
+              type: number
+              description: Total value (total equity)
+            contract:
+              type: string
+            ref:
+              $ref: '#/components/schemas/Ref'
+            sourceRefs:
+              type: array
+              items:
+                $ref: '#/components/schemas/SourceRef'
+            link:
+              type: string
+
+    PortfolioElementBorrowLend:
+      type: object
+      required:
+        - networkId
+        - platformId
+        - value
+        - type
+        - label
+        - data
+      properties:
+        type:
+          type: string
+          const: borrowlend
+        networkId:
+          $ref: '#/components/schemas/NetworkId'
+        platformId:
+          type: string
+        value:
+          type: number
+        label:
+          $ref: '#/components/schemas/PortfolioElementLabel'
+        name:
+          type: string
+        tags:
+          $ref: '#/components/schemas/Tags'
+        netApy:
+          $ref: '#/components/schemas/NetApy'
+        data:
+          type: object
+          required:
+            - value
+            - suppliedAssets
+            - borrowedAssets
+            - rewardAssets
+            - suppliedValue
+            - borrowedValue
+            - rewardValue
+            - suppliedYields
+            - borrowedYields
+            - healthRatio
+          properties:
+            value:
+              type: number
+              description: The value of the portfolio element in USD
+            suppliedAssets:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortfolioAsset'
+            borrowedAssets:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortfolioAsset'
+            rewardAssets:
+              type: array
+              items:
+                $ref: '#/components/schemas/PortfolioAsset'
+            unsettled:
+              type: object
+              required:
+                - assets
+                - value
+              properties:
+                assets:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PortfolioAssetGeneric'
+                value:
+                  type: number
+            suppliedValue:
+              type: number
+            borrowedValue:
+              type: number
+            rewardValue:
+              type: number
+            suppliedYields:
+              type: array
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Yield'
+            borrowedYields:
+              type: array
+              items:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Yield'
+            healthRatio:
+              oneOf:
+                - type: number
+                - type: 'null'
+              description: Health ratio (1 = full health, 0 or below = can be liquidated, null = unknown)
+            expireOn:
+              type: number
+              description: Date (in ms) when the loan will expire
+            contract:
+              type: string
+            ref:
+              $ref: '#/components/schemas/Ref'
+            sourceRefs:
+              type: array
+              items:
+                $ref: '#/components/schemas/SourceRef'
+            link:
+              type: string
+
+    PortfolioLiquidity:
+      type: object
+      required:
+        - assets
+        - assetsValue
+        - rewardAssets
+        - rewardAssetsValue
+        - value
+        - yields
+      properties:
+        assets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PortfolioAsset'
+        assetsValue:
+          type: number
+        rewardAssets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PortfolioAsset'
+        rewardAssetsValue:
+          type: number
+        value:
+          type: number
+        lp:
+          $ref: '#/components/schemas/LiquidityLp'
+        yields:
+          type: array
+          items:
+            $ref: '#/components/schemas/Yield'
+        name:
+          type: string
+        contract:
+          type: string
+        ref:
+          $ref: '#/components/schemas/Ref'
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+        link:
+          type: string
+
+    LiquidityLp:
+      type: object
+      required:
+        - mint
+        - amount
+      properties:
+        mint:
+          type: string
+        amount:
+          type: number
+
+    IsoLevPosition:
+      type: object
+      required:
+        - collateralValue
+        - side
+        - entryPrice
+        - markPrice
+        - size
+        - sizeValue
+        - pnlValue
+        - liquidationPrice
+        - value
+      properties:
+        address:
+          type: string
+          description: Address of the leveraged asset if it exists
+        name:
+          type: string
+        imageUri:
+          type: string
+        collateralValue:
+          type: number
+        side:
+          type: string
+          enum: [long, short]
+        entryPrice:
+          type: number
+        markPrice:
+          type: number
+        size:
+          type: number
+        sizeValue:
+          type: number
+        pnlValue:
+          type: number
+        liquidationPrice:
+          type: number
+        leverage:
+          type: number
+        tp:
+          type: number
+        sl:
+          type: number
+        value:
+          type: number
+        ref:
+          type: string
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+
+    CrossLevPosition:
+      type: object
+      required:
+        - side
+        - entryPrice
+        - markPrice
+        - size
+        - sizeValue
+        - pnlValue
+        - liquidationPrice
+        - value
+      properties:
+        address:
+          type: string
+          description: Address of the leveraged asset if it exists
+        name:
+          type: string
+        imageUri:
+          type: string
+        side:
+          type: string
+          enum: [long, short]
+        entryPrice:
+          type: number
+        markPrice:
+          type: number
+        size:
+          type: number
+        sizeValue:
+          type: number
+        pnlValue:
+          type: number
+        liquidationPrice:
+          type: number
+        leverage:
+          type: number
+        tp:
+          type: number
+        sl:
+          type: number
+        value:
+          type: number
+        ref:
+          type: string
+        sourceRefs:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceRef'
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+paths:
+  '/positions/{address}':
+    get:
+      parameters:
+        - schema:
+            type: string
+          example: 'jupiter-exchange,jupiter-governance'
+          in: query
+          name: platforms
+          required: false
+          description: Comma separated list of platform ids
+        - schema:
+            type: string
+          in: path
+          name: address
+          required: true
+          description: Solana wallet address
+      responses:
+        '200':
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date:
+                    type: number
+                  owner:
+                    type: string
+                  fetcherReports:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FetcherReport'
+                  elements:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PortfolioElement'
+                  duration:
+                    type: number
+                  tokenInfo:
+                    type: object
+                    properties:
+                      solana:
+                        type: object
+                        description: Tokens indexed by token address
+                        additionalProperties:
+                          $ref: '#/components/schemas/TokenInfo'
+              example:
+                date: 1710000000000
+                owner: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                fetcherReports:
+                  - id: "jupiter-exchange"
+                    status: "ok"
+                    duration: 120
+                elements:
+                  - type: "multiple"
+                    label: "Wallet"
+                    platformId: "native-stake"
+                    name: "Native Stake"
+                    data:
+                      assets:
+                        - type: "token"
+                          networkId: "solana"
+                          value: 1713.40
+                          data:
+                            address: "So11111111111111111111111111111111111111112"
+                            amount: 10.0
+                            price: 171.34
+                duration: 450
+
+  /platforms:
+    get:
+      responses:
+        '200':
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    image:
+                      type: string
+                    description:
+                      type: string
+                    defiLlamaId:
+                      type: string
+                    isDeprecated:
+                      type: boolean
+                    tokens:
+                      type: array
+                      items:
+                        type: string
+                    tags:
+                      type: array
+                      items:
+                        type: string
+                    links:
+                      type: object
+                      properties:
+                        website:
+                          type: string
+                        discord:
+                          type: string
+                        telegram:
+                          type: string
+                        twitter:
+                          type: string
+                        github:
+                          type: string
+                        medium:
+                          type: string
+                        documentation:
+                          type: string
+              example:
+                - id: "jupiter-exchange"
+                  name: "Jupiter"
+                  image: "https://sonar.watch/img/platforms/jupiter-exchange.webp"
+                  description: "Jupiter Aggregator"
+                  defiLlamaId: "jupiter"
+                  isDeprecated: false
+  '/staked-jup/{address}':
+    get:
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: address
+          required: true
+      responses:
+        '200':
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stakedAmount:
+                    type: number
+                  unstaking:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        amount:
+                          type: number
+                        until:
+                          type: number
+              example:
+                stakedAmount: 15000.5
+                unstaking:
+                  - amount: 500.0
+                    until: 1711000000000
+

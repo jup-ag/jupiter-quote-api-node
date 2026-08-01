@@ -1,0 +1,572 @@
+openapi: 3.0.3
+info:
+  title: Jupiter Studio API
+  version: 2.0.0
+  description: Jupiter Studio API Schema
+
+servers:
+  - url: https://api.jup.ag/studio/v1
+    description: Jupiter Studio API Endpoint
+
+paths:
+  /dbc-pool/create-tx:
+    post:
+      summary: dbc-pool-create-tx
+      description: |
+        Request for a base64-encoded unsigned transaction to create a Dynamic Bonding Curve pool with token metadata
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDBCTransactionRequestBody'
+            example:
+              buildCurveByMarketCapParam:
+                quoteMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                initialMarketCap: 16000
+                migrationMarketCap: 69000
+                tokenQuoteDecimal: 6
+                lockedVestingParam:
+                  totalLockedVestingAmount: 0
+                  cliffUnlockAmount: 0
+                  numberOfVestingPeriod: 0
+                  totalVestingDuration: 0
+                  cliffDurationFromMigrationTime: 0
+              antiSniping: true
+              fee:
+                feeBps: 100
+              isLpLocked: true
+              tokenName: "My Token"
+              tokenSymbol: "MTK"
+              tokenImageContentType: "image/png"
+              creator: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDBCTransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                mint: "TokenMintAddressExample111111111111111111111"
+                imagePresignedUrl: "https://storage.example.com/upload/image?token=abc123"
+                metadataPresignedUrl: "https://storage.example.com/upload/metadata?token=def456"
+                imageUrl: "https://storage.example.com/tokens/TokenMintAddressExample111111111111111111111/image.png"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  details:
+                    type: string
+
+  /dbc-pool/submit:
+    post:
+      summary: dbc-pool-submit
+      description: |
+        Execute the signed transaction, and optionally upload content and header image
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubmitDBCTransactionRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      mint:
+                        type: string
+                      configKey:
+                        type: string
+              example:
+                success: true
+                data:
+                  mint: "TokenMintAddressExample111111111111111111111"
+                  configKey: "ConfigKeyAddressExample11111111111111111111"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+
+  /dbc-pool/addresses/{mint}:
+    get:
+      summary: dbc-pool-addresses-by-mint
+      description: |
+        Request for pool addresses for a given token mint
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: mint
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      dammv2PoolAddress:
+                        type: string
+                        nullable: true
+                      dbcPoolAddress:
+                        type: string
+                        nullable: true
+                      configKey:
+                        type: string
+                        nullable: true
+              example:
+                success: true
+                data:
+                  dammv2PoolAddress: "PoolAddress11111111111111111111111111111111"
+                  dbcPoolAddress: "DBCPoolAddress111111111111111111111111111111"
+                  configKey: "ConfigKeyAddressExample11111111111111111111"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    description: Validation errors
+        '404':
+          description: Pool addresses not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Pool addresses not found
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /dbc/fee:
+    post:
+      summary: dbc-fee
+      description: |
+        Request for unclaimed creator trading fees of a Dynamic Bonding Curve pool
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - poolAddress
+              properties:
+                poolAddress:
+                  type: string
+                  description: |
+                    - Dynamic Bonding Curve pool address
+            example:
+              poolAddress: "PoolAddress11111111111111111111111111111111"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - unclaimed
+                  - total
+                properties:
+                  unclaimed:
+                    type: string
+                    description: |
+                      - Unclaimed creator quote fee amount
+                  total:
+                    type: string
+                    description: |
+                      - Total trading quote fee amount divided by 2 (creator share)
+              example:
+                unclaimed: "5000000"
+                total: "25000000"
+
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+        '500':
+          description: Internal server error
+
+  /dbc/fee/create-tx:
+    post:
+      summary: dbc-fee-create-tx
+      description: |
+        Request for a base64-encoded unsigned transaction to claim creator trading fees of a Dynamic Bonding Curve pool
+        - Handles both direct creator ownership and proxy-based ownership.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClaimFeeDBCTransactionRequestBody'
+            example:
+              ownerWallet: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              poolAddress: "PoolAddress11111111111111111111111111111111"
+              maxQuoteAmount: 5000000
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - transaction
+                properties:
+                  transaction:
+                    type: string
+                    description: Base64-encoded transaction ready for signing
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: string
+        '403':
+          description: Not authorized to claim fees from this pool
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: You are not the owner of this pool
+        '404':
+          description: Proxy account not found for the creator
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Proxy account not found for the creator
+        '500':
+          description: Internal server error
+
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+  schemas:
+    CreateDBCTransactionRequestBody:
+      type: object
+      required:
+        - buildCurveByMarketCapParam
+        - antiSniping
+        - fee
+        - tokenName
+        - tokenSymbol
+        - tokenImageContentType
+        - creator
+      properties:
+        buildCurveByMarketCapParam:
+          type: object
+          required:
+            - quoteMint
+            - initialMarketCap
+            - migrationMarketCap
+            - tokenQuoteDecimal
+            - lockedVestingParam
+          properties:
+            quoteMint:
+              type: string
+              description: |
+                - Quote mint address
+                - Either USDC, SOL, or JUP
+              example: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+            initialMarketCap:
+              type: number
+              description: |
+                - Initial market cap in quote token units
+                - 16000 passed in = 16000 USDC/SOL/JUP initial market cap
+              example: 16000
+            migrationMarketCap:
+              type: number
+              description: |
+                - Migration market cap in quote token units
+                - 69000 passed in = 69000 USDC/SOL/JUP migration market cap
+              example: 69000
+            tokenQuoteDecimal:
+              type: number
+              enum:
+                - 6
+                - 9
+              description: |
+                - Token quote decimal places
+            lockedVestingParam:
+              type: object
+              required:
+                - totalLockedVestingAmount
+                - cliffUnlockAmount
+                - numberOfVestingPeriod
+                - totalVestingDuration
+                - cliffDurationFromMigrationTime
+              properties:
+                totalLockedVestingAmount:
+                  type: number
+                  description: |
+                    - Total locked vesting amount of tokens (0% to 80% of total supply)
+                cliffUnlockAmount:
+                  type: number
+                  description: |
+                    - Amount of tokens unlocked at cliff
+                numberOfVestingPeriod:
+                  type: number
+                  enum:
+                    - 0
+                    - 6
+                    - 12
+                    - 183
+                    - 365
+                  description: |
+                    - Number of vesting periods in days (183/365) or months (6/12)
+                totalVestingDuration:
+                  type: number
+                  enum:
+                    - 0
+                    - 15552000
+                    - 15811200
+                    - 31536000
+                  description: |
+                    - Total vesting duration in seconds
+                cliffDurationFromMigrationTime:
+                  type: number
+                  enum:
+                    - 0
+                    - 15552000
+                    - 15811200
+                    - 31536000
+                  description: |
+                    - Cliff duration from migration time in seconds
+        antiSniping:
+          type: boolean
+          description: |
+            - Enable anti-sniping protection
+            - Apply an additional swap fee immediately after launch to discourage bots
+            - Starts at 99% and decreases 1% linearly over a randomized period
+        fee:
+          type: object
+          description: |
+            - Fee configuration parameters
+            - If not provided, the default fee will be 100 basis points (1%)
+          properties:
+            totalDuration:
+              type: number
+              enum:
+                - 60
+                - 120
+                - 180
+                - 240
+                - 300
+              description: Total duration for fee schedule
+            baseFeeMode:
+              type: string
+              enum:
+                - linear
+                - exponential
+              description: Base fee mode for fee scheduler
+            feeBps:
+              type: number
+              enum:
+                - 100
+                - 200
+              description: Ending fee in basis points (100 or 200)
+              default: 100
+          required:
+            - feeBps
+        isLpLocked:
+          type: boolean
+          description: |
+            - Whether LP tokens should be locked
+            - If enabled, 50% of graduated LP unlocks after 1 year
+            - Useful for creators to strategize in the long term
+          default: true
+        tokenName:
+          type: string
+          minLength: 1
+        tokenSymbol:
+          type: string
+          minLength: 1
+        tokenImageContentType:
+          type: string
+          description: |
+            - Token image content type
+          enum:
+            - image/jpeg
+            - image/png
+            - image/gif
+            - image/webp
+        creator:
+          type: string
+          description: |
+            - Creator wallet public key
+
+    CreateDBCTransactionResponse:
+      type: object
+      required:
+        - transaction
+        - mint
+        - imagePresignedUrl
+        - metadataPresignedUrl
+        - imageUrl
+      properties:
+        transaction:
+          type: string
+          description: Base64-encoded transaction ready for signing
+        mint:
+          type: string
+          description: Generated token mint address
+        imagePresignedUrl:
+          type: string
+          format: uri
+          description: |
+            - Presigned URL for image upload via `PUT` request
+            - This is for you to make a PUT request to upload your token image to the on-chain uri metadata
+            - [Refer to the Token Metadata section for better understanding](/docs/studio/create-token#token-metadata)
+        metadataPresignedUrl:
+          type: string
+          format: uri
+          description: |
+            - Presigned URL for metadata upload via `PUT` request
+            - This is for you to make a PUT request to upload your token metadata to the on-chain uri metadata
+            - [Refer to the Token Metadata section for better understanding](/docs/studio/create-token#token-metadata)
+        imageUrl:
+          type: string
+          format: uri
+          description: Final image URL
+
+    SubmitDBCTransactionRequestBody:
+      type: object
+      required:
+        - transaction
+        - owner
+      properties:
+        transaction:
+          type: string
+          description: |
+            - Base64-encoded signed transaction
+        owner:
+          type: string
+          description: |
+            - Owner wallet public key
+        content:
+          type: string
+          description: |
+            - Optional content description displayed on Studio dedicated token page
+            - This is stored off-chain for our frontend to display
+            - This is NOT the on-chain token metadata
+            - The on-chain token metadata is done by making a PUT request to the presigned URL
+        headerImage:
+          type: string
+          format: binary
+          description: |
+            - Optional header image file displayed on Studio token page
+            - This is stored off-chain for our frontend to display
+            - This is NOT the on-chain token metadata
+            - The on-chain token metadata is done by making a PUT request to the presigned URL
+
+    CreateClaimFeeDBCTransactionRequestBody:
+      type: object
+      required:
+        - ownerWallet
+        - poolAddress
+        - maxQuoteAmount
+      properties:
+        ownerWallet:
+          type: string
+          description: |
+            - Owner wallet public key
+        poolAddress:
+          type: string
+          description: |
+            - Dynamic Bonding Curve pool address
+        maxQuoteAmount:
+          type: number
+          description: |
+            - Maximum quote amount to claim
+          minimum: 0

@@ -1,0 +1,1370 @@
+openapi: 3.0.0
+info:
+  title: Jupiter Trigger Order API V2
+  version: 2.0.0
+  description: Jupiter Trigger Order API V2 with vault-based deposits, JWT authentication, and advanced order types.
+
+servers:
+  - url: https://api.jup.ag/trigger/v2
+    description: Jupiter Trigger Order API V2 Endpoint
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token from the challenge-response auth flow
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        details:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+        - error
+    OrderResponse:
+      type: object
+      description: Response for a price order create. The deposit lands synchronously during the call, so depositConfirmed is returned. DCA create and confirm-cancel use TxSignatureResponse instead.
+      properties:
+        id:
+          type: string
+          description: Order UUID
+        txSignature:
+          type: string
+          description: On-chain signature of the deposit transaction
+        depositConfirmed:
+          type: boolean
+          description: Whether the deposit has landed and the order is active
+        message:
+          type: string
+          description: Additional context about the deposit state, present on idempotent retries
+      required:
+        - id
+        - txSignature
+        - depositConfirmed
+    TxSignatureResponse:
+      type: object
+      description: Minimal create/cancel response carrying the order ID and an on-chain transaction signature. Returned by DCA create (deposit signature) and by confirm-cancel (withdrawal signature). Unlike price order create, it does not include depositConfirmed.
+      properties:
+        id:
+          type: string
+          description: Order UUID
+        txSignature:
+          type: string
+          description: On-chain transaction signature
+      required:
+        - id
+        - txSignature
+    OrderHistoryItem:
+      type: object
+      properties:
+        id:
+          type: string
+        orderType:
+          type: string
+          enum: [single, oco, otoco]
+        orderState:
+          type: string
+          enum: [pending, open, executing, filled, pending_withdraw, cancelled, expired, failed]
+        rawState:
+          type: string
+        userPubkey:
+          type: string
+        privyWalletPubkey:
+          type: string
+        inputMint:
+          type: string
+        initialInputAmount:
+          type: string
+        remainingInputAmount:
+          type: string
+        outputMint:
+          type: string
+        triggerMint:
+          type: string
+        triggerCondition:
+          type: string
+          enum: [above, below]
+        triggerPriceUsd:
+          type: number
+        slippageBps:
+          type: number
+        expiresAt:
+          type: number
+          nullable: true
+        createdAt:
+          type: number
+        updatedAt:
+          type: number
+        triggeredAt:
+          type: number
+          nullable: true
+        outputAmount:
+          type: string
+          nullable: true
+        inputUsed:
+          type: string
+          nullable: true
+        fillPercent:
+          type: number
+          nullable: true
+        trailingBps:
+          type: number
+          nullable: true
+          description: Trailing stop loss trail distance in basis points. Null for non-trailing orders.
+        highWatermark:
+          type: number
+          nullable: true
+          description: Highest observed trigger-mint price (sell-below trailing).
+        lowWatermark:
+          type: number
+          nullable: true
+          description: Lowest observed trigger-mint price (buy-above trailing).
+        events:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [deposit, fill, withdrawal, cancelled, expired]
+              timestamp:
+                type: number
+              txSignature:
+                type: string
+              state:
+                type: string
+                enum: [success, failed, pending]
+              mint:
+                type: string
+                description: Token mint address (present on deposit/withdrawal events)
+              amount:
+                type: string
+                description: Token amount in smallest unit (present on deposit/withdrawal events)
+              outputMint:
+                type: string
+                description: Output token mint address (present on fill events)
+              outputAmount:
+                type: string
+                description: Output token amount in smallest unit (present on fill events)
+              orderContext:
+                type: string
+                description: Order context identifier (present on fill events)
+      required:
+        - id
+        - orderType
+        - orderState
+        - userPubkey
+        - inputMint
+        - outputMint
+    DcaHistoryItem:
+      type: object
+      properties:
+        id:
+          type: string
+          description: DCA order UUID
+        requestId:
+          type: string
+        userPubkey:
+          type: string
+        vaultPubkey:
+          type: string
+        inputMint:
+          type: string
+        outputMint:
+          type: string
+        inputAmountInitial:
+          type: string
+          description: Total deposit amount in smallest units
+        inputAmountRemaining:
+          type: string
+          description: Amount still held in the vault
+        amountPerRound:
+          type: string
+          description: Amount swapped each round (the last round may include dust)
+        outputAmountTotal:
+          type: string
+          description: Total output received across all successful rounds
+        inputAmountUsed:
+          type: string
+          description: Total input consumed by successful rounds
+        orderType:
+          type: string
+          enum: [time_based, price_conditional]
+        minPriceUsd:
+          type: number
+          nullable: true
+        maxPriceUsd:
+          type: number
+          nullable: true
+        triggerMint:
+          type: string
+          nullable: true
+        retryWindowSeconds:
+          type: number
+          nullable: true
+          description: Retry window per round in seconds, clamp(intervalSeconds/2, 30, 7200)
+        jlEnabled:
+          type: boolean
+          description: Whether Earn While You Wait is on for this order (idle funds earn Jupiter Lend yield between rounds).
+        jlYieldUsd:
+          type: number
+          nullable: true
+          description: Yield earned so far in USD for an Earn While You Wait order, from the ~15 min price cache. null when not JL-enabled or a required price is uncached.
+        numberOfRounds:
+          type: number
+        intervalSeconds:
+          type: number
+        beginFillAt:
+          type: string
+          description: ISO-8601 time the first round is scheduled
+        nextFillAt:
+          type: string
+          description: ISO-8601 time of the next scheduled round
+        lastFillAt:
+          type: string
+          nullable: true
+        roundsFilled:
+          type: number
+        fillPercent:
+          type: number
+          description: Progress from 0 to 1
+        state:
+          type: string
+          enum: [depositing, deposit_failed, active, executing, withdrawing, completed, cancelled]
+        displayState:
+          type: string
+          enum: [pending, active, executing, pending_withdraw, completed, cancelled, failed]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        events:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum: [deposit, fill, withdrawal, cancelled]
+              timestamp:
+                type: string
+              txSignature:
+                type: string
+              roundNumber:
+                type: number
+              inputAmount:
+                type: string
+              outputAmount:
+                type: string
+              state:
+                type: string
+                enum: [success, failed, rescheduled, pending]
+              attemptCount:
+                type: number
+      required:
+        - id
+        - userPubkey
+        - vaultPubkey
+        - inputMint
+        - outputMint
+        - orderType
+        - state
+        - displayState
+
+paths:
+  /auth/challenge:
+    post:
+      summary: Request authentication challenge
+      description: |
+        Request a challenge to sign with your wallet. Use `message` for standard wallets
+        or `transaction` for hardware wallets that only support transaction signing.
+        Challenges expire after 5 minutes.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                walletPubkey:
+                  type: string
+                  description: Your Solana wallet public key
+                type:
+                  type: string
+                  enum: [message, transaction]
+                  description: Challenge type. Use `transaction` for hardware wallets.
+              required:
+                - walletPubkey
+                - type
+            example:
+              walletPubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              type: "message"
+      responses:
+        '200':
+          description: Challenge for wallet signing
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [message]
+                      challenge:
+                        type: string
+                        description: Message to sign
+                    required: [type, challenge]
+                  - type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [transaction]
+                      transaction:
+                        type: string
+                        description: Base64-encoded transaction with memo instruction
+                    required: [type, transaction]
+              example:
+                type: "message"
+                challenge: "Sign this message to authenticate with Jupiter Trigger Order API: abc123..."
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/verify:
+    post:
+      summary: Verify signed challenge and receive JWT
+      description: |
+        Submit the signed challenge to receive a JWT token valid for 24 hours.
+        Include the JWT in all subsequent authenticated requests via the `Authorization: Bearer` header.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - type: object
+                  title: MessageVerification
+                  properties:
+                    type:
+                      type: string
+                      enum: [message]
+                    walletPubkey:
+                      type: string
+                    signature:
+                      type: string
+                      description: Base58-encoded signature
+                  required: [type, walletPubkey, signature]
+                - type: object
+                  title: TransactionVerification
+                  properties:
+                    type:
+                      type: string
+                      enum: [transaction]
+                    walletPubkey:
+                      type: string
+                    signedTransaction:
+                      type: string
+                      description: Base64-encoded signed transaction
+                  required: [type, walletPubkey, signedTransaction]
+            example:
+              type: "message"
+              walletPubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              signature: "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d..."
+      responses:
+        '200':
+          description: JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token (24h TTL)
+                required:
+                  - token
+              example:
+                token: "eyJhbGciOiJIUzI1NiIs..."
+        '400':
+          description: Invalid request body or expired challenge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Invalid signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /vault:
+    get:
+      summary: Get vault info
+      description: Retrieve the vault associated with your authenticated wallet.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      responses:
+        '200':
+          description: Vault details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userPubkey:
+                    type: string
+                  vaultPubkey:
+                    type: string
+                  privyVaultId:
+                    type: string
+                  privyUserId:
+                    type: string
+                    nullable: true
+                required:
+                  - userPubkey
+                  - vaultPubkey
+                  - privyVaultId
+              example:
+                userPubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                vaultPubkey: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+                privyVaultId: "vault-uuid"
+        '404':
+          description: No vault found. Use /vault/register to create one.
+
+  /vault/register:
+    get:
+      summary: Register a new vault
+      description: |
+        Create a new Privy-managed vault wallet for your account.
+        Call this once per wallet. Subsequent calls return the existing vault.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      responses:
+        '201':
+          description: Vault created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userPubkey:
+                    type: string
+                  vaultPubkey:
+                    type: string
+                  privyVaultId:
+                    type: string
+                required:
+                  - userPubkey
+                  - vaultPubkey
+                  - privyVaultId
+        '409':
+          description: Vault already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /deposit/craft:
+    post:
+      summary: Craft deposit transaction
+      description: |
+        Build an unsigned transaction to deposit tokens from your wallet into your vault.
+        The vault address is automatically resolved from your JWT token.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputMint:
+                  type: string
+                  description: Mint address of the token to deposit
+                outputMint:
+                  type: string
+                  description: Mint address of the desired output token
+                userAddress:
+                  type: string
+                  description: Your wallet public key
+                amount:
+                  type: string
+                  description: Amount in smallest unit (e.g. lamports for SOL)
+                orderType:
+                  type: string
+                  enum:
+                    - price
+                    - dca
+                  description: Order type for the deposit. Use price for price trigger orders, or dca for dollar-cost averaging orders.
+                orderSubType:
+                  type: string
+                  enum:
+                    - single
+                    - oco
+                    - otoco
+                  description: Required when orderType is price (single for standalone orders, oco for OCO orders, otoco for OTOCO orders). Must be omitted when orderType is dca.
+                jlMint:
+                  type: string
+                  description: 'For Earn While You Wait DCA orders only. The Jupiter Lend earn token for the input stablecoin (from GET /lend/v1/earn/tokens). Crafts a deposit into Jupiter Lend; the response returns jlTokenAccount instead of inputTokenAccount.'
+              required:
+                - inputMint
+                - outputMint
+                - userAddress
+                - amount
+                - orderType
+            example:
+              inputMint: "So11111111111111111111111111111111111111112"
+              outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+              userAddress: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              amount: "1000000000"
+              orderType: "price"
+              orderSubType: "single"
+      responses:
+        '200':
+          description: Unsigned deposit transaction
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transaction:
+                    type: string
+                    description: Base64-encoded unsigned transaction
+                  requestId:
+                    type: string
+                    description: Deposit request ID (used when creating the order)
+                  receiverAddress:
+                    type: string
+                    description: Vault public key receiving the deposit
+                  mint:
+                    type: string
+                    description: Token mint being deposited
+                  amount:
+                    type: string
+                    description: Deposit amount in smallest unit
+                  tokenDecimals:
+                    type: number
+                    description: Token decimals
+                  inputTokenAccount:
+                    type: string
+                    description: Deterministic per-order input token account. Returned for deposits crafted with an orderSubType.
+                  outputTokenAccount:
+                    type: string
+                    description: Deterministic per-order output token account. Returned only when orderSubType is otoco.
+                  jlTokenAccount:
+                    type: string
+                    description: Jupiter Lend position account. Returned instead of inputTokenAccount when the deposit is crafted with jlMint (Earn While You Wait).
+                required:
+                  - transaction
+                  - requestId
+                  - receiverAddress
+                  - mint
+                  - amount
+                  - tokenDecimals
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                requestId: "01234567-89ab-cdef-0123-456789abcdef"
+                receiverAddress: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+                mint: "So11111111111111111111111111111111111111112"
+                amount: "1000000000"
+                tokenDecimals: 9
+                inputTokenAccount: "InputTokenAccountPubkey..."
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: User address mismatch or no vault registered
+
+  /orders/price:
+    post:
+      summary: Create price order
+      description: |
+        Create a new price order. Supports three order types:
+        - `single`: triggers when price crosses above/below threshold
+        - `oco`: one-cancels-other (take-profit + stop-loss pair)
+        - `otoco`: parent trigger activates a TP/SL pair on fill
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderType:
+                  type: string
+                  enum: [single, oco, otoco]
+                depositRequestId:
+                  type: string
+                  description: From /deposit/craft response
+                depositSignedTx:
+                  type: string
+                  description: Base64-encoded signed deposit transaction
+                userPubkey:
+                  type: string
+                inputMint:
+                  type: string
+                inputAmount:
+                  type: string
+                  description: Amount in smallest unit
+                outputMint:
+                  type: string
+                triggerMint:
+                  type: string
+                  description: Token mint to monitor for price
+                triggerCondition:
+                  type: string
+                  enum: [above, below]
+                  description: Single/OTOCO only
+                triggerPriceUsd:
+                  type: number
+                  description: Single/OTOCO trigger price. For single orders, required unless trailingBps is set.
+                trailingBps:
+                  type: number
+                  minimum: 50
+                  maximum: 9000
+                  description: "Trailing stop loss trail distance in basis points (50-9000). Single orders only; set instead of triggerPriceUsd. Direction from triggerCondition: below = sell-below (triggerMint === inputMint), above = buy-above (triggerMint === outputMint)."
+                slippageBps:
+                  type: number
+                  description: Slippage tolerance (0-10000 bps)
+                tpPriceUsd:
+                  type: number
+                  description: Take-profit price (OCO/OTOCO)
+                slPriceUsd:
+                  type: number
+                  description: Stop-loss price (OCO/OTOCO)
+                tpSlippageBps:
+                  type: number
+                  description: Take-profit slippage (OCO/OTOCO)
+                slSlippageBps:
+                  type: number
+                  description: Stop-loss slippage (OCO/OTOCO)
+                expiresAt:
+                  type: number
+                  description: Expiration timestamp (milliseconds)
+              required:
+                - orderType
+                - depositRequestId
+                - depositSignedTx
+                - userPubkey
+                - inputMint
+                - inputAmount
+                - outputMint
+                - triggerMint
+                - expiresAt
+            example:
+              orderType: "single"
+              depositRequestId: "01234567-89ab-cdef-0123-456789abcdef"
+              depositSignedTx: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+              userPubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              inputMint: "So11111111111111111111111111111111111111112"
+              inputAmount: "1000000000"
+              outputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+              triggerMint: "So11111111111111111111111111111111111111112"
+              triggerCondition: "above"
+              triggerPriceUsd: 200.00
+              slippageBps: 100
+              expiresAt: 1735689600000
+      responses:
+        '200':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+              example:
+                id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                txSignature: "5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d..."
+                depositConfirmed: true
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /orders/price/{orderId}:
+    patch:
+      summary: Update price order
+      description: Update trigger price or slippage of an existing order.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Order UUID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderType:
+                  type: string
+                  enum: [single, oco, otoco]
+                triggerPriceUsd:
+                  type: number
+                  description: New trigger price. Cannot be set on a trailing stop loss order.
+                trailingBps:
+                  type: number
+                  minimum: 50
+                  maximum: 9000
+                  description: New trailing stop loss trail distance in basis points (50-9000), for an order that is already trailing.
+                slippageBps:
+                  type: number
+                tpPriceUsd:
+                  type: number
+                slPriceUsd:
+                  type: number
+                tpSlippageBps:
+                  type: number
+                slSlippageBps:
+                  type: number
+              required:
+                - orderType
+            example:
+              orderType: "single"
+              triggerPriceUsd: 210.00
+              slippageBps: 150
+      responses:
+        '200':
+          description: Order updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                required:
+                  - id
+              example:
+                id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        '400':
+          description: Validation error
+        '401':
+          description: Unauthorized
+        '403':
+          description: Order belongs to a different wallet
+        '404':
+          description: Order not found
+
+  /orders/price/cancel/{orderId}:
+    post:
+      summary: Initiate order cancellation
+      description: |
+        Step 1 of the two-step cancellation flow. Returns a withdrawal transaction
+        that must be signed and submitted via the confirm-cancel endpoint.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Withdrawal transaction for signing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  transaction:
+                    type: string
+                    description: Base64-encoded unsigned withdrawal transaction
+                  requestId:
+                    type: string
+                    description: Cancel request ID (used in confirm step)
+                required:
+                  - id
+                  - transaction
+                  - requestId
+              example:
+                id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                requestId: "cancel-request-uuid"
+        '400':
+          description: Order not in a cancellable state
+        '401':
+          description: Unauthorized
+        '403':
+          description: Order belongs to a different wallet
+        '404':
+          description: Order not found
+
+  /orders/price/confirm-cancel/{orderId}:
+    post:
+      summary: Confirm order cancellation
+      description: |
+        Step 2 of the two-step cancellation flow. Submit the signed withdrawal transaction
+        to complete the cancellation and return funds to your wallet.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signedTransaction:
+                  type: string
+                  description: Base64-encoded signed withdrawal transaction
+                cancelRequestId:
+                  type: string
+                  description: Cancel request ID from the initiate step
+              required:
+                - signedTransaction
+                - cancelRequestId
+            example:
+              signedTransaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+              cancelRequestId: "cancel-request-uuid"
+      responses:
+        '200':
+          description: Cancellation confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TxSignatureResponse'
+              example:
+                id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                txSignature: "3PDo3pMJLqvAfNXwYjY7BSP57ZNQ5DgYDeK6xYszUVMn..."
+        '400':
+          description: Invalid transaction or request ID
+        '401':
+          description: Unauthorized
+        '403':
+          description: Order belongs to a different wallet
+        '404':
+          description: Order not found
+
+  /orders/history:
+    get:
+      summary: Get order history
+      description: |
+        Retrieve paginated order history for the authenticated wallet.
+        Filter by state, mint, and sort order.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [active, past]
+          description: Filter by order state group
+        - name: mint
+          in: query
+          schema:
+            type: string
+          description: Filter by token mint address
+        - name: limit
+          in: query
+          schema:
+            type: number
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Results per page
+        - name: offset
+          in: query
+          schema:
+            type: number
+            default: 0
+          description: Number of results to skip
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [updated_at, created_at, expires_at]
+            default: updated_at
+          description: Sort field
+        - name: dir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+          description: Sort direction
+      responses:
+        '200':
+          description: Paginated order history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderHistoryItem'
+                  pagination:
+                    type: object
+                    properties:
+                      total:
+                        type: number
+                      limit:
+                        type: number
+                      offset:
+                        type: number
+                required:
+                  - orders
+                  - pagination
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+
+  /orders/dca:
+    post:
+      summary: Create DCA order
+      description: |
+        Create a dollar-cost averaging order that splits a single deposit into `orderCount`
+        equal rounds executed every `intervalSeconds`. Submit the signed deposit transaction
+        from `/deposit/craft` (crafted with `orderType: "dca"`).
+
+        Call this path with no trailing slash. `POST /orders/dca/` returns 404.
+
+        Rounds execute as Jupiter swaps with Ultra-managed (RTSE) slippage; there is no
+        slippage parameter. Each round pays the standard Jupiter swap fee (no separate DCA fee),
+        and the output settles directly to the taker's wallet.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                depositRequestId:
+                  type: string
+                  description: requestId from the deposit craft response
+                depositSignedTx:
+                  type: string
+                  description: Base64-encoded signed deposit transaction
+                userPubkey:
+                  type: string
+                  description: Your wallet public key (must match the JWT)
+                inputMint:
+                  type: string
+                  description: Mint of the token to sell
+                outputMint:
+                  type: string
+                  description: Mint of the token to buy
+                inputAmount:
+                  type: string
+                  description: Total amount to DCA in smallest units. Dust from uneven division is added to the last round.
+                orderCount:
+                  type: number
+                  minimum: 2
+                  description: Number of rounds to split the deposit into (minimum 2). No fixed upper limit, but each round must be worth at least 10 USD, so the practical maximum is floor(total deposit USD / 10).
+                intervalSeconds:
+                  type: number
+                  minimum: 60
+                  maximum: 31536000
+                  description: Seconds between rounds (60 to 31,536,000, i.e. 1 minute to 1 year)
+                orderType:
+                  type: string
+                  enum: [time_based, price_conditional]
+                  default: time_based
+                  description: time_based runs every interval; price_conditional only fills while the trigger mint price is within the band.
+                minPriceUsd:
+                  type: number
+                  description: Lower USD price bound. Price-conditional only.
+                maxPriceUsd:
+                  type: number
+                  description: Upper USD price bound. Price-conditional only.
+                triggerMint:
+                  type: string
+                  description: Mint whose USD price is checked against the band. Required for price_conditional. Must be a mint with a supported USD price (in practice the volatile leg / outputMint); a stablecoin such as USDC returns "Trigger mint is not supported". Ignored for time_based.
+                beginFillAt:
+                  type: string
+                  description: ISO-8601 time to start the first round. Defaults to now, max 30 days in the future.
+                jlEnabled:
+                  type: boolean
+                  default: false
+                  description: 'Earn While You Wait. When true, idle funds earn Jupiter Lend yield between rounds. Requires orderType time_based, a supported stablecoin input, and a deposit crafted with jlMint. Default false.'
+                jlMint:
+                  type: string
+                  description: Jupiter Lend earn token for the input stablecoin (from GET /lend/v1/earn/tokens, the address whose assetAddress is the inputMint). Required when jlEnabled is true.
+              required:
+                - depositRequestId
+                - depositSignedTx
+                - userPubkey
+                - inputMint
+                - outputMint
+                - inputAmount
+                - orderCount
+                - intervalSeconds
+            example:
+              depositRequestId: "a8551844-fa46-41c7-af3a-70340c465bde"
+              depositSignedTx: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+              userPubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+              outputMint: "So11111111111111111111111111111111111111112"
+              inputAmount: "20000000"
+              orderCount: 2
+              intervalSeconds: 3600
+              orderType: "time_based"
+      responses:
+        '200':
+          description: DCA order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TxSignatureResponse'
+              example:
+                id: "019f0530-36a7-77da-a38f-ed9414bb996b"
+                txSignature: "PPbp1QbbKDPjpHM3ScKyZBnCtLKKqmWwDeVj7USdBeEoNQsA1hkN35UQfrY2cQpyAB1pfVi9FdfciYdz7qUXBQA"
+        '400':
+          description: 'Validation error, below minimum (10 USD per round), the max of 10 active DCA orders reached ("Maximum of 10 active DCA orders allowed per user"), or invalid deposit'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: userPubkey does not match the authenticated wallet
+
+  /orders/dca/cancel/{id}:
+    post:
+      summary: Initiate DCA cancellation
+      description: |
+        Step 1 of the two-step cancellation. Moves the order to `withdrawing` and returns an
+        unsigned withdrawal transaction for the unfilled remainder. Already-filled rounds are
+        not reversed.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: DCA order UUID
+      responses:
+        '200':
+          description: Withdrawal transaction for signing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  roundsRemaining:
+                    type: number
+                    description: Rounds that will not execute
+                  refundAmount:
+                    type: string
+                    description: Amount to be refunded in smallest units
+                  transaction:
+                    type: string
+                    description: Base64-encoded unsigned withdrawal transaction
+                  requestId:
+                    type: string
+                    description: Pass to confirm-cancel as cancelRequestId
+                required:
+                  - id
+                  - roundsRemaining
+                  - refundAmount
+                  - transaction
+                  - requestId
+              example:
+                id: "019f0530-36a7-77da-a38f-ed9414bb996b"
+                roundsRemaining: 2
+                refundAmount: "20000000"
+                transaction: "AwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMBAgdyOCX48yeQcZusgzCLBJ+otTpXtR9YKzHDx3aLqYwC+0vQ4YrooVs15oSv6alpvSIyPs+Vo55usVe/6EytcDKmDUjHKsrOFPVwGfmQFwHHgWST75hdcLkGE1QZ/OgrO9V7X8BkIOtYGIrydcacmuIKcdfd6e/c7eONpxrCoSbqmM5Q+ul2G2Ootg7YYGSKJ3qW1hW2uKHAvmby4AdEXypFAwZGb+UhFzL/7K26csOb57yM5bvF9xJrLEObOkAAAAAG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqSI5PGNkRpV42tULB0GGLK8o3q7WErcVy5goaCJGrByHBAUABQJQAgAABQAJA5DQAwAAAAAABgQDBAECCQMALTEBAAAAAAYDAwABAQk="
+                requestId: "368645e8-7ac6-4c88-8b10-3a68812bdc1d"
+        '400':
+          description: Order not in active or withdrawing state, or no remaining funds
+        '404':
+          description: Order not found or not owned by the authenticated wallet
+
+  /orders/dca/confirm-cancel/{id}:
+    post:
+      summary: Confirm DCA cancellation
+      description: |
+        Step 2 of the two-step cancellation. Submit the signed withdrawal transaction to return
+        the remaining funds and move the order to `cancelled`.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: DCA order UUID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signedTransaction:
+                  type: string
+                  description: Base64-encoded signed withdrawal transaction
+                cancelRequestId:
+                  type: string
+                  description: requestId from the cancel response
+              required:
+                - signedTransaction
+                - cancelRequestId
+      responses:
+        '200':
+          description: Cancellation confirmed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TxSignatureResponse'
+              example:
+                id: "019f0530-36a7-77da-a38f-ed9414bb996b"
+                txSignature: "53CQkssz7oGmbUxp3W5tsjw8Vhpv8FKVXjfWb3ZyPW71gsAm4qHvK2FjEDKt9RNDVGesoNiMA7moGR1rKbzhEfqb"
+        '400':
+          description: Order not in withdrawing state, transaction mismatch, or invalid signature
+        '401':
+          description: Unauthorized
+        '404':
+          description: Order not found or not owned by the authenticated wallet
+
+  /orders/history/dca:
+    get:
+      summary: List DCA orders
+      description: List the authenticated wallet's DCA orders with full event history.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+            enum: [active, past]
+          description: active = depositing/active/executing/withdrawing; past = completed/cancelled/deposit_failed
+        - name: mint
+          in: query
+          schema:
+            type: string
+          description: Filter by mint (matches inputMint or outputMint)
+        - name: limit
+          in: query
+          schema:
+            type: number
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: number
+            default: 0
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [updated_at, created_at, next_fill_at]
+            default: updated_at
+        - name: dir
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        '200':
+          description: Paginated DCA order history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DcaHistoryItem'
+                  pagination:
+                    type: object
+                    properties:
+                      total:
+                        type: number
+                      limit:
+                        type: number
+                      offset:
+                        type: number
+                required:
+                  - orders
+                  - pagination
+              example:
+                orders:
+                  - id: "019f0530-36a7-77da-a38f-ed9414bb996b"
+                    requestId: "b7d1b2a2-c8b3-4c21-a938-d1499260d218"
+                    userPubkey: "8gs8rXavMQRqoAoMhCfo79r2wndgSn93FLSWErdHp82n"
+                    vaultPubkey: "66xK9AE6oFpGAyn9eCWE3LtYwUZKkeUxbfjFSNmFnkBo"
+                    inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    outputMint: "So11111111111111111111111111111111111111112"
+                    inputAmountInitial: "20000000"
+                    inputAmountRemaining: "20000000"
+                    amountPerRound: "10000000"
+                    outputAmountTotal: "0"
+                    inputAmountUsed: "0"
+                    orderType: "price_conditional"
+                    minPriceUsd: 50
+                    maxPriceUsd: 1000
+                    triggerMint: "So11111111111111111111111111111111111111112"
+                    retryWindowSeconds: 7200
+                    jlEnabled: false
+                    jlYieldUsd: null
+                    numberOfRounds: 2
+                    intervalSeconds: 86400
+                    beginFillAt: "2026-06-26T20:27:46.015Z"
+                    nextFillAt: "2026-06-26T20:27:46.015Z"
+                    lastFillAt: null
+                    roundsFilled: 0
+                    fillPercent: 0
+                    state: "active"
+                    displayState: "active"
+                    createdAt: "2026-06-26T18:27:53.665Z"
+                    updatedAt: "2026-06-26T18:27:54.529Z"
+                    events:
+                      - type: "deposit"
+                        timestamp: "2026-06-26T18:27:54.529Z"
+                        txSignature: "PPbp1QbbKDPjpHM3ScKyZBnCtLKKqmWwDeVj7USdBeEoNQsA1hkN35UQfrY2cQpyAB1pfVi9FdfciYdz7qUXBQA"
+                        inputAmount: "20000000"
+                        state: "success"
+                pagination:
+                  total: 1
+                  limit: 20
+                  offset: 0
+        '401':
+          description: Unauthorized
+
+  /orders/history/dca/{id}:
+    get:
+      summary: Get DCA order
+      description: |
+        Get a single DCA order by ID, including fill history and events. The path requires
+        the `dca` segment.
+      security:
+        - ApiKeyAuth: []
+          BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: DCA order UUID
+      responses:
+        '200':
+          description: DCA order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DcaHistoryItem'
+              example:
+                id: "019f053d-3f0c-70ad-bb5e-76d633291f80"
+                requestId: "1cc1ad82-866e-492d-a092-18859565945d"
+                userPubkey: "8gs8rXavMQRqoAoMhCfo79r2wndgSn93FLSWErdHp82n"
+                vaultPubkey: "66xK9AE6oFpGAyn9eCWE3LtYwUZKkeUxbfjFSNmFnkBo"
+                inputMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                outputMint: "So11111111111111111111111111111111111111112"
+                inputAmountInitial: "20000000"
+                inputAmountRemaining: "10000000"
+                amountPerRound: "10000000"
+                outputAmountTotal: "137589159"
+                inputAmountUsed: "10000000"
+                orderType: "time_based"
+                minPriceUsd: null
+                maxPriceUsd: null
+                triggerMint: null
+                retryWindowSeconds: 1800
+                jlEnabled: false
+                jlYieldUsd: null
+                numberOfRounds: 2
+                intervalSeconds: 3600
+                beginFillAt: "2026-06-26T18:42:07.750Z"
+                nextFillAt: "2026-06-26T19:44:57.469Z"
+                lastFillAt: "2026-06-26T18:42:11.469Z"
+                roundsFilled: 1
+                fillPercent: 0.5
+                state: "active"
+                displayState: "active"
+                createdAt: "2026-06-26T18:42:07.782Z"
+                updatedAt: "2026-06-26T18:42:11.469Z"
+                events:
+                  - type: "fill"
+                    timestamp: "2026-06-26T18:42:11.469Z"
+                    txSignature: "HuNMpjFkTjVrCYMN6gTPWV9ay3GSxTxM7sZj4WNzjvzQoe4J5CR71MnTpuMKH9rtkDoDCTWu6rYRM12oR9cpbb4"
+                    roundNumber: 1
+                    inputAmount: "10000000"
+                    outputAmount: "137589159"
+                    state: "success"
+                  - type: "deposit"
+                    timestamp: "2026-06-26T18:42:08.880Z"
+                    txSignature: "32hAuVdZ57y5TUEx4vdV75zJyTqoCVqAby4eiayrmUW1TCuwoAvPRBcnhPMLN1YpfCp4Rc6HiLXKsi3NF5iWVcrn"
+                    inputAmount: "20000000"
+                    state: "success"
+        '401':
+          description: Unauthorized
+        '404':
+          description: Order not found or not owned by the authenticated wallet

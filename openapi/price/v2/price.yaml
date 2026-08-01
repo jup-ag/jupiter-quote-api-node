@@ -1,0 +1,151 @@
+openapi: 3.0.3
+info:
+  title: Jupiter Price API V2 (Deprecated)
+  version: 2.0.0
+  x-deprecated: true
+  description: Jupiter Price API V2 Schema (Deprecated)
+
+servers:
+  - url: https://api.jup.ag/price/v2
+    description: Jupiter Price API V2 Endpoint
+
+paths:
+  "/":
+    get:
+      summary: price
+      deprecated: true
+      description: |
+        Returns prices of specified tokens. Price V2 API is deprecated, please use Price V3 API instead.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+      - name: ids
+        in: query
+        description: "Comma separate to pass in multiple"
+        required: true
+        schema:
+          type: string
+        example: 'So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+      - name: vsToken
+        in: query
+        description: "By default, prices are denominated by USD. To denominate price in SOL, use `vsToken` with SOL mint address"
+        required: false
+        schema:
+          type: string
+      - name: showExtraInfo
+        in: query
+        description: "To use, pass in `showExtraInfo=true`, cannot use `vsToken` with this parameter"
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceResponse'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+  schemas:
+    PriceResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/TokenPriceInfo'
+        timeTaken:
+          type: number
+          format: float
+
+    TokenPriceInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          example: "derivedPrice"
+        price:
+          type: string
+        extraInfo:
+          $ref: '#/components/schemas/ExtraInfo'
+
+    ExtraInfo:
+      type: object
+      properties:
+        lastSwappedPrice:
+          $ref: '#/components/schemas/LastSwappedPrice'
+        quotedPrice:
+          $ref: '#/components/schemas/QuotedPrice'
+        confidenceLevel:
+          type: string
+          enum: [high, medium, low]
+        depth:
+          $ref: '#/components/schemas/Depth'
+
+    LastSwappedPrice:
+      type: object
+      properties:
+        lastJupiterSellAt:
+          type: integer
+          format: int64
+        lastJupiterSellPrice:
+          type: string
+        lastJupiterBuyAt:
+          type: integer
+          format: int64
+        lastJupiterBuyPrice:
+          type: string
+
+    QuotedPrice:
+      type: object
+      properties:
+        buyPrice:
+          type: string
+        buyAt:
+          type: integer
+          format: int64
+        sellPrice:
+          type: string
+        sellAt:
+          type: integer
+          format: int64
+
+    Depth:
+      type: object
+      properties:
+        buyPriceImpactRatio:
+          $ref: '#/components/schemas/PriceImpactRatio'
+        sellPriceImpactRatio:
+          $ref: '#/components/schemas/PriceImpactRatio'
+
+    PriceImpactRatio:
+      type: object
+      properties:
+        depth:
+          type: object
+          properties:
+            "10":
+              type: number
+              format: float
+            "100":
+              type: number
+              format: float
+            "1000":
+              type: number
+              format: float
+        timestamp:
+          type: integer
+          format: int64

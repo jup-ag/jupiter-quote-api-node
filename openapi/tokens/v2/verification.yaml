@@ -1,0 +1,446 @@
+openapi: 3.0.3
+info:
+  title: Jupiter Token Verification API
+  version: 1.0.0
+  description: API for express token verification and metadata updates via Jupiter VRFD
+
+servers:
+  - url: https://api.jup.ag/tokens/v2/verify
+    description: Jupiter Token Verification API Endpoint
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+  schemas:
+    PaymentCurrency:
+      type: string
+      enum:
+        - JUP
+        - SOL
+        - USDC
+        - JUPUSD
+      description: |
+        Accepted payment currency, given as a token symbol (not a mint address): JUP, SOL, USDC, or JUPUSD.
+        All input currencies are converted to 1000 JUP. JUP transfers directly; SOL, USDC, and JUPUSD are
+        swapped to 1000 JUP via Ultra.
+      example: JUP
+    CheckEligibilityResponse:
+      type: object
+      required:
+        - tokenExists
+        - isVerified
+        - canVerify
+        - canMetadata
+      properties:
+        tokenExists:
+          type: boolean
+          description: Whether the token exists on-chain
+        isVerified:
+          type: boolean
+          description: Whether the token is already verified
+        canVerify:
+          type: boolean
+          description: Whether a verification request can be submitted
+        canMetadata:
+          type: boolean
+          description: Whether a metadata update can be submitted
+        verificationError:
+          type: string
+          description: Reason verification is not allowed (only present when there is a specific error)
+        metadataError:
+          type: string
+          description: Reason metadata update is not allowed (only present when there is a specific error)
+
+    CraftTxnResponse:
+      type: object
+      required:
+        - receiverAddress
+        - mint
+        - amount
+        - tokenDecimals
+        - feeLamports
+        - feeMint
+        - feeTokenDecimals
+        - feeAmount
+        - transaction
+        - requestId
+        - totalTime
+        - code
+        - gasless
+      properties:
+        transaction:
+          type: string
+          description: Base64-encoded unsigned transaction
+        requestId:
+          type: string
+          description: Unique request ID. Pass this to the execute endpoint.
+        receiverAddress:
+          type: string
+          description: Wallet address receiving the JUP payment
+        mint:
+          type: string
+          description: Mint address of the payment token (JUP)
+          example: JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN
+        amount:
+          type: string
+          description: JUP amount collected in smallest unit. JUP path transfers exactly 1000 JUP (1000000000); swap paths yield at least that.
+        tokenDecimals:
+          type: number
+          description: Decimals of the payment token
+        tokenUsdRate:
+          type: number
+          description: USD rate of the payment token at time of crafting
+        feeLamports:
+          type: number
+          description: Transaction fee in lamports
+        feeUsdAmount:
+          type: number
+          description: Transaction fee in USD
+        feeMint:
+          type: string
+          description: Mint address of the fee token
+        feeTokenDecimals:
+          type: number
+          description: Decimals of the fee token
+        feeAmount:
+          type: number
+          description: Fee amount in smallest unit
+        totalTime:
+          type: number
+          description: Time taken to craft the transaction in milliseconds
+        expireAt:
+          type: string
+          description: Expiry timestamp for the crafted transaction
+        error:
+          type: string
+          description: Error message if crafting failed
+        code:
+          type: number
+          description: Status code (0 for success)
+        gasless:
+          type: boolean
+          description: Whether the transaction is gasless
+        inputMint:
+          type: string
+          description: Input token mint address (non-JUP paths)
+        inputDecimals:
+          type: number
+          description: Input token decimals (non-JUP paths)
+        quotedInputAmount:
+          type: string
+          description: Atomic input amount for the swap, sized to yield at least 1000 JUP (non-JUP paths)
+        maxInputAmount:
+          type: string
+          description: Maximum atomic input amount for the swap; equal to quotedInputAmount on the current swap flow (non-JUP paths)
+
+    TokenMetadataInput:
+      type: object
+      required:
+        - tokenId
+      description: Optional token metadata to submit alongside verification
+      properties:
+        tokenId:
+          type: string
+          description: Token mint address
+        icon:
+          type: string
+          nullable: true
+          description: URL to token icon image
+        name:
+          type: string
+          nullable: true
+          description: Token display name
+        symbol:
+          type: string
+          nullable: true
+          description: Token ticker symbol
+        website:
+          type: string
+          nullable: true
+          description: Project website URL
+        telegram:
+          type: string
+          nullable: true
+          description: Telegram group URL
+        twitter:
+          type: string
+          nullable: true
+          description: Twitter/X profile URL
+        twitterCommunity:
+          type: string
+          nullable: true
+          description: Twitter/X community URL
+        discord:
+          type: string
+          nullable: true
+          description: Discord invite URL
+        instagram:
+          type: string
+          nullable: true
+          description: Instagram profile URL
+        tiktok:
+          type: string
+          nullable: true
+          description: TikTok profile URL
+        circulatingSupply:
+          type: string
+          nullable: true
+          description: Circulating supply value
+        useCirculatingSupply:
+          type: boolean
+          nullable: true
+          description: Whether to use the provided circulating supply
+        tokenDescription:
+          type: string
+          nullable: true
+          description: Short description of the token
+        coingeckoCoinId:
+          type: string
+          nullable: true
+          description: CoinGecko coin ID for price data
+        useCoingeckoCoinId:
+          type: boolean
+          nullable: true
+          description: Whether to use the provided CoinGecko ID
+        circulatingSupplyUrl:
+          type: string
+          nullable: true
+          description: URL to a live circulating supply endpoint
+        useCirculatingSupplyUrl:
+          type: boolean
+          nullable: true
+          description: Whether to use the provided circulating supply URL
+        otherUrl:
+          type: string
+          nullable: true
+          description: Any other relevant URL
+
+    ExpressExecuteBody:
+      type: object
+      required:
+        - transaction
+        - requestId
+        - senderAddress
+        - tokenId
+        - twitterHandle
+        - description
+      properties:
+        transaction:
+          type: string
+          description: Base64-encoded signed transaction from the craft-txn step
+        requestId:
+          type: string
+          description: requestId returned by craft-txn
+        senderAddress:
+          type: string
+          description: Solana wallet address of the sender
+        tokenId:
+          type: string
+          description: Token mint address to verify
+        twitterHandle:
+          type: string
+          description: Twitter/X handle of the token project
+        senderTwitterHandle:
+          type: string
+          description: Twitter/X handle of the submitter (optional)
+        description:
+          type: string
+          description: Reason for verification request
+        tokenMetadata:
+          $ref: "#/components/schemas/TokenMetadataInput"
+        paymentCurrency:
+          allOf:
+            - $ref: "#/components/schemas/PaymentCurrency"
+            - description: Payment currency. Defaults to JUP (direct transfer). SOL/USDC/JUPUSD execute the Ultra swap crafted in the previous step.
+        paymentAmount:
+          type: string
+          description: Atomic input amount paid. Required when paymentCurrency is not JUP.
+        jupOutputAmount:
+          type: string
+          description: Atomic JUP output from the craft quote (CraftTxnResponse.amount), echoed back so revenue tracks the actual JUP collected on swap paths.
+
+    ExpressExecuteResponse:
+      type: object
+      required:
+        - status
+        - totalTime
+        - verificationCreated
+        - metadataCreated
+      properties:
+        status:
+          type: string
+          enum:
+            - Success
+            - Failed
+          description: Whether the transaction was executed successfully
+        signature:
+          type: string
+          description: Transaction signature on-chain (present on success)
+        error:
+          type: string
+          description: Error message (present on failure)
+        code:
+          type: number
+          description: Error code (present on failure)
+        totalTime:
+          type: number
+          description: Time taken to execute in milliseconds
+        verificationCreated:
+          type: boolean
+          description: Whether a verification request was created
+        metadataCreated:
+          type: boolean
+          description: Whether a metadata update request was created
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: number
+        message:
+          type: string
+        error:
+          type: string
+
+paths:
+  /express/check-eligibility:
+    get:
+      summary: Check express verification eligibility
+      description: |
+        Checks whether a token is eligible for express verification and metadata updates.
+        If both `canVerify` and `canMetadata` are `false`, any submission will be rejected
+        before payment is charged.
+      tags:
+        - Express Verification
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: query
+          name: tokenId
+          schema:
+            type: string
+          required: true
+          description: Token mint address to check eligibility for
+          example: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+      responses:
+        "200":
+          description: Eligibility check result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckEligibilityResponse"
+              example:
+                tokenExists: true
+                isVerified: false
+                canVerify: true
+                canMetadata: false
+                metadataError: "A premium metadata update request for this token already exists"
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /express/craft-txn:
+    get:
+      summary: Craft express verification payment transaction
+      description: |
+        Returns an unsigned Solana transaction worth 1000 JUP as payment for express
+        verification. JUP transfers directly; SOL, USDC, and JUPUSD craft an Ultra swap to
+        1000 JUP. The `requestId` in the response is required for the execute step.
+      tags:
+        - Express Verification
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - in: query
+          name: senderAddress
+          schema:
+            type: string
+          required: true
+          description: Solana wallet address that will sign and pay for the transaction
+        - in: query
+          name: paymentCurrency
+          schema:
+            $ref: "#/components/schemas/PaymentCurrency"
+          required: false
+          description: Payment currency. Defaults to JUP (direct transfer). SOL/USDC/JUPUSD route through an Ultra swap to JUP.
+      responses:
+        "200":
+          description: Unsigned payment transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CraftTxnResponse"
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Failed to craft transaction
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /express/execute:
+    post:
+      summary: Execute express verification
+      description: |
+        Submits the signed payment transaction, records the payment, creates a verification
+        request, and optionally submits token metadata updates. Verification and metadata
+        updates are reviewed independently.
+      tags:
+        - Express Verification
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExpressExecuteBody"
+      responses:
+        "200":
+          description: Submission result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExpressExecuteResponse"
+              example:
+                status: "Success"
+                signature: "5UfDuX..."
+                totalTime: 1234
+                verificationCreated: true
+                metadataCreated: true
+        "400":
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Token not eligible for verification or metadata update
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Transaction execution or server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"

@@ -1,0 +1,383 @@
+openapi: 3.0.3
+info:
+  title: Jupiter Send API
+  version: 1.0.0
+  description: Jupiter Send API Schema
+
+servers:
+  - url: https://api.jup.ag/send/v1
+    description: Jupiter Send API Endpoint
+
+paths:
+  /craft-send:
+    post:
+      summary: craft-send
+      description: |
+        Request for a base64-encoded unsigned Send transaction
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - inviteSigner
+                - sender
+                - amount
+              properties:
+                inviteSigner:
+                  type: string
+                  description: |
+                    - Public key address generated from the hash of the invite code
+                    - Do note that, the invite code requires to be generated client side, [refer to docs](/docs/send)
+                    - Please handle invite code and secret key with highest security as user funds are involved
+                sender:
+                  type: string
+                  description: |
+                    - Public key address of the sender
+                    - This address will be funding the amount to be sent and the token accounts involved
+                amount:
+                  type: string
+                  description: |
+                    - Amount in atomic value (before decimals)
+                    - E.g. to send 1 USDC is equivalent of `amount='1000000'`
+                    - Do note that there will be additional SOL amount being used in the transaction for transaction fees and token accounts
+                mint:
+                  type: string
+                  description: |
+                    - Defaults to WSOL mint
+                    - Only pass in this parameter with other mint when required
+            example:
+              inviteSigner: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+              sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+              amount: "1000000"
+              mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - tx
+                  - expiry
+                  - totalFeeLamports
+                properties:
+                  tx:
+                    type: string
+                    description: |
+                      - Base64-encoded unsigned Send transaction
+                  expiry:
+                    type: string
+                    description: |
+                      - Unix timestamp of when the invite will expire
+                      - Expired invites will automatically clawback to sender
+                  totalFeeLamports:
+                    type: string
+                    description: |
+                      - Amount of fees required for network's transaction fee and token accounts
+              example:
+                tx: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+                expiry: "2025-03-22T10:30:00.000Z"
+                totalFeeLamports: "5000"
+        '400':
+          description: Bad request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+
+  /craft-clawback:
+    post:
+      summary: craft-clawback
+      description: |
+        Request for a base64-encoded unsigned Send transaction
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - invitePDA
+                - sender
+              properties:
+                invitePDA:
+                  type: string
+                  description: |
+                    - Program Derived Address derived by `"invite"` and the public key of the invite
+                    - Do note that, the invitePDA requires to be generated client side, [refer to docs](/docs/send)
+                    - Please handle invite code and secret key with highest security as user funds are involved
+                sender:
+                  type: string
+                  description: |
+                    - Public key address of the sender
+                    - Since this address funded the invite, it will be the receiving address of the full amount
+            example:
+              invitePDA: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+              sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - tx
+                properties:
+                  tx:
+                    type: string
+                    description: |
+                      - Base64-encoded unsigned Send transaction
+              example:
+                tx: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+        '400':
+          description: Bad request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+
+  /pending-invites:
+    get:
+      summary: pending-invites
+      description: |
+        Request for the pending invites of an address
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: address
+          in: query
+          description: |
+            - Pubkey of Sender
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: |
+            - Pagination of response
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteDataResponse'
+              example:
+                invites:
+                  - invite_signer: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+                    invite_pda: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                    sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    expiry: "2025-03-22T10:30:00.000Z"
+                    amount: "1000000"
+                    creation_tx: "4xKpN2..."
+                    deletion_tx: null
+                    receiver: null
+                    action: "created"
+                    creation_time: "2025-03-15T10:30:00.000Z"
+                    deletion_time: null
+                    mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    confirmed: true
+                hasMoreData: false
+        '400':
+          description: Bad request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+
+  /invite-history:
+    get:
+      summary: invite-history
+      description: |
+        Request for the invite history of an address
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: address
+          in: query
+          description: |
+            - Pubkey can be sender or recipient
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: |
+            - Pagination of response
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteDataResponse'
+              example:
+                invites:
+                  - invite_signer: "7nE9GJoYHNmtaQvTQpota3KV2oz4pQ2dA6nvYK8EUJHV"
+                    invite_pda: "8mF4HKoPQNmtbRvTRqotb4LW3pz5rR3eB7owZL9FVKIW"
+                    sender: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    expiry: "2025-03-22T10:30:00.000Z"
+                    amount: "1000000"
+                    creation_tx: "4xKpN2..."
+                    deletion_tx: "5yLqO3..."
+                    receiver: "9pG5ILqRSOnucCwUSRspuc5MV4pR4sD8fC8qxNL0GWJX"
+                    action: "claimed"
+                    creation_time: "2025-03-15T10:30:00.000Z"
+                    deletion_time: "2025-03-16T08:15:00.000Z"
+                    mint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+                    confirmed: true
+                hasMoreData: false
+        '400':
+          description: Bad request body
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                  - error
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+  schemas:
+    InviteDataResponse:
+      type: object
+      required:
+        - invites
+        - hasMoreData
+      properties:
+        invites:
+          type: array
+          items:
+            type: object
+            required:
+              - invite_signer
+              - invite_pda
+              - sender
+              - expiry
+              - amount
+              - creation_tx
+              - deletion_tx
+              - receiver
+              - action
+              - creation_time
+              - deletion_time
+              - mint
+              - confirmed
+            properties:
+              invite_signer:
+                type: string
+              invite_pda:
+                type: string
+              sender:
+                type: string
+              expiry:
+                type: string
+              amount:
+                type: string
+              creation_tx:
+                type: string
+              deletion_tx:
+                type: string
+                nullable: true
+              receiver:
+                type: string
+                nullable: true
+              action:
+                type: string
+                nullable: true
+              creation_time:
+                type: string
+              deletion_time:
+                type: string
+                nullable: true
+              mint:
+                type: string
+                nullable: true
+              confirmed:
+                type: integer
+                nullable: true
+        hasMoreData:
+          type: boolean

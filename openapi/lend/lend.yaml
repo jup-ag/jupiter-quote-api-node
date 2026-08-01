@@ -1,0 +1,631 @@
+openapi: 3.0.3
+info:
+  title: Jupiter Lend API
+  version: 1.0.0
+  description: Jupiter Lend API Schema
+
+servers:
+  - url: https://api.jup.ag/lend/v1
+    description: Jupiter Lend API endpoint
+
+paths:
+  /earn/deposit:
+    post:
+      summary: deposit
+      description: |
+        Request for a base64-encoded unsigned earn deposit transaction to deposit assets
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnAmountRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+
+  /earn/deposit-instructions:
+    post:
+      summary: deposit-instructions
+      description: |
+        Request for the instruction of an earn deposit transaction to deposit assets
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnAmountRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstructionResponse'
+              example:
+                programId: "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
+                accounts:
+                  - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    isSigner: true
+                    isWritable: true
+                  - pubkey: "So11111111111111111111111111111111111111112"
+                    isSigner: false
+                    isWritable: false
+                data: "3Dc2AAAAAAA..."
+
+  /earn/withdraw:
+    post:
+      summary: withdraw
+      description: |
+        Request for a base64-encoded unsigned earn withdraw transaction to withdraw assets
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnAmountRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+
+  /earn/withdraw-instructions:
+    post:
+      summary: withdraw-instructions
+      description: |
+        Request for the instruction of an earn withdraw transaction to withdraw assets
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnAmountRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstructionResponse'
+              example:
+                programId: "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
+                accounts:
+                  - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    isSigner: true
+                    isWritable: true
+                data: "4Ec3AAAAAAA..."
+
+  /earn/mint:
+    post:
+      summary: mint
+      description: |
+        Request for a base64-encoded unsigned earn mint transaction to mint shares
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnSharesRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+
+  /earn/mint-instructions:
+    post:
+      summary: mint-instructions
+      description: |
+        Request for the instruction of an earn mint transaction to mint shares
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnSharesRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstructionResponse'
+              example:
+                programId: "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
+                accounts:
+                  - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    isSigner: true
+                    isWritable: true
+                data: "5Fd4AAAAAAA..."
+
+  /earn/redeem:
+    post:
+      summary: redeem
+      description: |
+        Request for a base64-encoded unsigned earn redeem transaction to redeem shares
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnSharesRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+              example:
+                transaction: "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAEN..."
+
+  /earn/redeem-instructions:
+    post:
+      summary: redeem-instructions
+      description: |
+        Request for the instruction of an earn redeem transaction to redeem shares
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EarnSharesRequestBody'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstructionResponse'
+              example:
+                programId: "jup3YeL8QhtSx1e253b2FDvsMNC87fDrgQZivbrndc9"
+                accounts:
+                  - pubkey: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                    isSigner: true
+                    isWritable: true
+                data: "6Ge5AAAAAAA..."
+
+  /earn/tokens:
+    get:
+      summary: tokens
+      description: |
+        Request for the tokens available to be deposited and their information
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokensResponse'
+              example:
+                - id: "So11111111111111111111111111111111111111112"
+                  address: "So11111111111111111111111111111111111111112"
+                  name: "Wrapped SOL"
+                  symbol: "SOL"
+                  decimals: 9
+                  assetAddress: "So11111111111111111111111111111111111111112"
+                  asset:
+                    address: "So11111111111111111111111111111111111111112"
+                    chain_id: 0
+                    name: "Wrapped SOL"
+                    symbol: "SOL"
+                    decimals: 9
+                    logo_url: "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png"
+                    price: 171.34
+                    coingecko_id: "solana"
+                  totalAssets: "1500000000000"
+                  totalSupply: "1450000000000"
+                  convertToShares: "0.966667"
+                  convertToAssets: "1.034483"
+                  rewardsRate: "0.035"
+                  supplyRate: "0.025"
+                  totalRate: "0.06"
+
+  /earn/positions:
+    get:
+      summary: positions
+      description: |
+        Request for the position data of one or multiple users
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: users
+          in: query
+          description: |
+            User wallet addresses (comma separated)
+          required: true
+          schema:
+            type: string
+          example: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf,jdocuPgEAjMfihABsPgKEvYtsmMzjUHeq9LX4Hvs7f3"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPositionsResponse'
+              example:
+                - token:
+                    id: "So11111111111111111111111111111111111111112"
+                    address: "So11111111111111111111111111111111111111112"
+                    name: "Wrapped SOL"
+                    symbol: "SOL"
+                    decimals: 9
+                  ownerAddress: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                  shares: "100000000"
+                  underlyingAssets: "103448300"
+                  underlyingBalance: "17.72"
+                  allowance: "1000000000"
+
+  /earn/earnings:
+    get:
+      summary: earnings
+      description: |
+        Request for the earnings of one or multiple positions of a user
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: user
+          in: query
+          description: |
+            User wallet address
+          required: true
+          schema:
+            type: string
+          example: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"
+        - name: positions
+          in: query
+          description: |
+            User token positions (comma-separated)
+          required: true
+          schema:
+            type: string
+          example: "9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D,2uQsyo1fXXQkDtcpXnLofWy88PxcvnfH2L8FPSE62FVU"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserEarningsResponse'
+              example:
+                - address: "So11111111111111111111111111111111111111112"
+                  ownerAddress: "BQ72nSv9f3PRyRKCBnHLVrerrv37CYTHm5h3s9VSGQDV"
+                  earnings: 34483000
+                  slot: 345678901
+
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+  schemas:
+    EarnAmountRequestBody:
+      type: object
+      required:
+        - asset
+        - signer
+        - amount
+      properties:
+        asset:
+          type: string
+          default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        signer:
+          type: string
+          default: "vBXNsd5SRtTPpW7GWv3wREA6Ztm2jCWp5eqqTsVhyG5"
+        amount:
+          type: string
+          default: "5"
+      example:
+        asset: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        signer: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"
+        amount: "1000000"
+
+    EarnSharesRequestBody:
+      type: object
+      required:
+        - asset
+        - signer
+        - shares
+      properties:
+        asset:
+          type: string
+          default: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        signer:
+          type: string
+          default: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"
+        shares:
+          type: string
+          default: "1000000"
+      example:
+        asset: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+        signer: "HYbxGkNvEwvZ14RzJHPB9h3dWfXjxwAEhkyzJRHx1hBf"
+        shares: "1000000"
+
+    TransactionResponse:
+      type: object
+      required:
+        - transaction
+      properties:
+        transaction:
+          type: string
+
+    InstructionResponse:
+      type: object
+      required:
+        - programId
+        - accounts
+        - data
+      properties:
+        programId:
+          type: string
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountMeta'
+        data:
+          type: string
+
+    AccountMeta:
+      type: object
+      required:
+        - pubkey
+        - isSigner
+        - isWritable
+      properties:
+        pubkey:
+          type: string
+        isSigner:
+          type: boolean
+        isWritable:
+          type: boolean
+
+    TokensResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/TokenInfo'
+
+    UserPositionsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserPosition'
+
+    UserEarningsResponse:
+      type: object
+      required:
+        - address
+        - ownerAddress
+        - earnings
+        - slot
+      properties:
+        address:
+          type: string
+        ownerAddress:
+          type: string
+        earnings:
+          type: number
+        slot:
+          type: number
+
+    UserPosition:
+      type: object
+      required:
+        - token
+        - ownerAddress
+        - shares
+        - underlyingAssets
+        - underlyingBalance
+        - allowance
+      properties:
+        token:
+          $ref: '#/components/schemas/TokenInfo'
+        ownerAddress:
+          type: string
+          description: |
+            - Address of user's wallet
+        shares:
+          type: string
+          description: |
+            - Balance of user's jlTokens
+        underlyingAssets:
+          type: string
+          description: |
+            - Balance of user's USDC in protocol (including intereste accured)
+        underlyingBalance:
+          type: string
+          description: |
+            - Balance of user's USDC in wallet
+        allowance:
+          type: string
+
+    TokenInfo:
+      type: object
+      required:
+        - id
+        - address
+        - name
+        - symbol
+        - decimals
+        - assetAddress
+        - asset
+        - totalAssets
+        - totalSupply
+        - convertToShares
+        - convertToAssets
+        - rewardsRate
+        - supplyRate
+        - totalRate
+        - rebalanceDifference
+        - liquiditySupplyData
+      properties:
+        id:
+          type: integer
+          description: |
+            - Lending ID, starts from `1`
+        address:
+          type: string
+          description: |
+            - Lending token address like `9BEcn9aPEmhSPbPQeFGjidRiEKki46fVQDyPpSQXPA2D`
+        name:
+          type: string
+          description: |
+            - Lending token name like Jupiter Lend USDC
+        symbol:
+          type: string
+          description: |
+            - Lending token symbol like jlUSDC
+        decimals:
+          type: integer
+        assetAddress:
+          type: string
+          description: |
+            - Lending token underlying asset address like `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
+        asset:
+          $ref: '#/components/schemas/AssetInfo'
+        totalAssets:
+          type: string
+          description: |
+            - Total available underlying mint from jlTokens (with accured interest)
+        totalSupply:
+          type: string
+          description: |
+            - Total supply of jlTokens for this mint
+        convertToShares:
+          type: string
+          description: |
+            - Value of one 1 underlying token to jlToken, like 1 USDC = X jlUSDC
+            - Used for conversion
+        convertToAssets:
+          type: string
+          description: |
+            - Value of one 1 jlToken token to underlying mint, like 1 jlUSDC = X USDC
+            - Used for conversion
+        rewardsRate:
+          type: string
+          description: |
+            - Rewards rate , in 1e4 decimals
+        supplyRate:
+          type: string
+          description: |
+            - Supply rate, in 1e4 decimals
+        totalRate:
+          type: string
+          description: |
+            - Total sum of rewards + supply rate
+        rebalanceDifference:
+          type: string
+        liquiditySupplyData:
+          $ref: '#/components/schemas/LiquiditySupplyData'
+
+    AssetInfo:
+      type: object
+      required:
+        - address
+        - chain_id
+        - name
+        - symbol
+        - decimals
+        - logo_url
+        - price
+        - coingecko_id
+      properties:
+        address:
+          type: string
+          description: |
+            - Lending token underlying asset address like `EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
+        chain_id:
+          type: string
+          description: |
+            - Lending token underlying asset chain id like `solana`
+        name:
+          type: string
+        symbol:
+          type: string
+        decimals:
+          type: integer
+        logo_url:
+          type: string
+          format: uri
+        price:
+          type: string
+        coingecko_id:
+          type: string
+
+    LiquiditySupplyData:
+      type: object
+      required:
+        - modeWithInterest
+        - supply
+        - withdrawalLimit
+        - lastUpdateTimestamp
+        - expandPercent
+        - expandDuration
+        - baseWithdrawalLimit
+        - withdrawableUntilLimit
+        - withdrawable
+      properties:
+        modeWithInterest:
+          type: boolean
+          description: |
+            - The underlying asset is earning interest at liquidity layer
+        supply:
+          type: string
+          description: |
+            - Total supply of underlying asset on liquidity layer
+            - In decimals, like 3168044480191 / 1e6 for USDC
+        withdrawalLimit:
+          type: string
+          description: |
+            - Available withdrawal limit for this asset
+        lastUpdateTimestamp:
+          type: string
+          description: |
+            - When was the reserve last updated
+        expandPercent:
+          type: string
+        expandDuration:
+          type: string
+        baseWithdrawalLimit:
+          type: string
+        withdrawableUntilLimit:
+          type: string
+        withdrawable:
+          type: string
+          description: |
+            - Total amount withdrawable at this current point, it expands every second.

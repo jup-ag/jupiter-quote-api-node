@@ -1,0 +1,92 @@
+openapi: 3.0.3
+info:
+  title: Jupiter Price API V3
+  version: 3.0.0
+  description: Jupiter Price API V3 Schema
+
+servers:
+  - url: https://api.jup.ag
+    description: Jupiter Price API V3 Endpoint
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Get API key via https://developers.jup.ag/portal
+
+paths:
+  "/price/v3":
+    get:
+      summary: price
+      description: |
+        Get USD prices for up to 50 tokens per request. Tokens without a reliable price are omitted from the response.
+      security:
+        - ApiKeyAuth: []
+      parameters:
+      - name: ids
+        in: query
+        description: "Comma separate to pass in multiple"
+        required: true
+        schema:
+          type: string
+        example: 'So11111111111111111111111111111111111111112,EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  description: Token addresses as keys
+                  type: object
+                  properties:
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: When the token was minted or created (fixed date for legacy tokens like SOL/USDC that predate the API)
+                    liquidity:
+                      type: number
+                      description: Total liquidity in USD across all pools
+                    usdPrice:
+                      type: number
+                      description: Current USD price
+                    blockId:
+                      type: integer
+                      nullable: true
+                      description: Solana block ID when price was computed
+                    decimals:
+                      type: integer
+                      description: Token decimal places
+                    priceChange24h:
+                      type: number
+                      nullable: true
+                      description: 24-hour price change as a percentage
+                  required:
+                    - createdAt
+                    - liquidity
+                    - usdPrice
+                    - blockId
+                    - decimals
+                    - priceChange24h
+              example:
+                So11111111111111111111111111111111111111112:
+                  createdAt: "2024-06-05T08:55:25.527Z"
+                  liquidity: 621679197.67
+                  usdPrice: 147.48
+                  blockId: 348004023
+                  decimals: 9
+                  priceChange24h: 1.29
+                EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:
+                  createdAt: "2024-06-05T08:55:25.527Z"
+                  liquidity: 522175174.66
+                  usdPrice: 0.9999
+                  blockId: 348004025
+                  decimals: 6
+                  priceChange24h: -0.003
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error

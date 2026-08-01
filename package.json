@@ -18,12 +18,14 @@
   "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "bun run openapi-gen && tsdown",
+    "build": "bun run generate && tsdown",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "lint": "oxlint --fix",
     "lint:check": "oxlint",
-    "openapi-gen": "openapi-generator-cli generate -i swagger.yaml -o generated -g typescript-fetch --skip-validate-spec --additional-properties=supportsES6=true,typescriptThreePlus=true",
+    "prepare-openapi": "bun run scripts/prepare-openapi.ts",
+    "openapi-gen": "openapi-generator-cli generate -i openapi/jupiter.yaml -o generated -g typescript-fetch --skip-validate-spec",
+    "generate": "rm -rf generated && bun run prepare-openapi && bun run openapi-gen",
     "prepare": "husky"
   },
   "devDependencies": {
