@@ -24,6 +24,7 @@
   },
   "scripts": {
     "build": "bun run generate && tsdown",
+    "changeset": "changeset",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check .",
     "lint": "oxlint --fix",
@@ -31,9 +32,12 @@
     "prepare-openapi": "bun run scripts/prepare-openapi.ts",
     "openapi-gen": "openapi-generator-cli generate -i openapi/jupiter.yaml -o generated -g typescript-fetch --skip-validate-spec",
     "generate": "rm -rf generated && bun run prepare-openapi && bun run openapi-gen",
-    "prepare": "husky"
+    "prepare": "husky",
+    "release": "bun run build && changeset publish",
+    "version": "changeset version"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.1",
     "@openapitools/openapi-generator-cli": "^2.40.1",
     "@types/bun": "^1.3.14",
     "husky": "^9.1.7",
